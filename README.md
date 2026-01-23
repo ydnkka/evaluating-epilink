@@ -9,7 +9,7 @@ This repository contains the code and analysis workflows used in the paper:
 
 The paper introduces a probabilistic framework for inferring recent transmission and identifying superspreading molecular transmission clusters (SMTCs) from pathogen genomic data and sampling dates, without relying on fixed genetic or temporal thresholds.
 
-The methodological framework itself is implemented in the companion tool **epilink**. This repository is dedicated to the reproducibility of the results presented in the paper and includes scripts for data generation, analysis, benchmarking, and figure reproduction.
+The methodological framework itself is implemented in the companion tool **[epilink](https://github.com/ydnkka/epilink)**. This repository is dedicated to the reproducibility of the results presented in the paper and includes scripts for data generation, analysis, benchmarking, and figure reproduction.
 
 The repository supports:
 
@@ -23,5 +23,21 @@ The repository supports:
 
 This repository is intended for transparency and reproducibility and is not a standalone implementation of the framework.
 
-The full implementation of the framework is available in the **epilink** repository.
+The full implementation of the framework is available in the **[epilink](https://github.com/ydnkka/epilink)** repository.
+
+## Repository structure
+
+- simulations/        Synthetic data generation
+- inference/          Pairwise transmission probability estimation
+- clustering/         Network construction and community detection
+- evaluation/         Cluster evaluation and superspreading analysis
+- sensitivity/        Sensitivity analyses
+- benchmarks/         Logistic regression baseline
+- figures/            Figure generation scripts
+
+## Reproducing the paper
+
+1. Install dependencies
+2. Install [epilink](https://github.com/ydnkka/epilink)
+3. Run scripts/run_all.sh
 
