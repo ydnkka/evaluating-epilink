@@ -6,7 +6,7 @@ SCRIPTS=(
   "02.1_generate_tree.py"
   "02.2_simulate_datasets.py"
   "03_evaluate_edges.py"
-#  "04.1_sparsify_effects.py"
+  "04.1_sparsify_effects.py"
   "04.2_run_clustering.py"
   "05_evaluate_clustering.py"
 )

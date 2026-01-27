@@ -11,5 +11,5 @@ community_detection:
 network:
   sparsify: {enabled: true, min_edge_weight: 0.01}
   min_edge_weights: [0.0, 0.001, 0.005, 0.01, 0.02, 0.05,  0.1]
-  topks: [5, 10 ,20]
+  topks: [5, 10, 20, 30]
 save_formats: ["png", "pdf"]
