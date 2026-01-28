@@ -9,7 +9,6 @@ community_detection:
     - LogitProbLinearDist_1.0
     - LogitProbPoissonDist_1.0
 network:
-  sparsify: {enabled: true, min_edge_weight: 0.01}
-  min_edge_weights: [0.0, 0.001, 0.005, 0.01, 0.02, 0.05,  0.1]
-  topks: [5, 10, 20, 30]
+  sparsify: {enabled: true, min_edge_weight: 0.0001}
+  min_edge_weights: [0.0, 0.0001, 0.0005, 0.001, 0.005, 0.01,  0.05, 0.1]
 save_formats: ["png", "pdf"]

@@ -22,7 +22,7 @@ config/clustering.yaml:
     random_seed: 42
     n_restarts: 10
   network:
-    sparsify: {enabled: true, min_edge_weight: 0.01}
+    sparsify: {enabled: true, min_edge_weight: 0.0001}
 """
 from __future__ import annotations
 

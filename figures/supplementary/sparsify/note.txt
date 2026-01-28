@@ -1,0 +1,21 @@
+Supplementary material
+
+Network sparsification diagnostics and threshold selection
+
+To reduce computational burden while preserving the probabilistic structure of the mechanistic transmission network, we applied edge-weight–based sparsification prior to community detection. Specifically, edges with transmission probability below a minimum threshold were removed, and the effect of varying this threshold was systematically evaluated using a suite of edge-, node-, and graph-level diagnostics.
+
+We considered a range of minimum edge-weight thresholds (w_{\min} \in \{0, 10^{-4}, 5\times10^{-4}, 10^{-3}, 5\times10^{-3}, 10^{-2}, 5\times10^{-2}, 10^{-1}\}) and quantified their impact on: (i) edge and total weight retention, (ii) graph connectivity and fragmentation, and (iii) node-level strength distortion relative to an unsparsified reference network.
+
+Across all thresholds considered, the network remained fully connected, with a single connected component and a giant component fraction of 1.0 (Supplementary Fig. X). This indicates substantial structural redundancy in the mechanistic transmission graph and demonstrates that sparsification does not induce topological fragmentation within the examined range.
+
+In contrast, edge count was highly sensitive to sparsification. Increasing the minimum edge weight resulted in the rapid removal of low-probability edges, with fewer than 10% of edges retained at w_{\min} \geq 10^{-3} (Supplementary Fig. Y). However, this pronounced reduction in edge count was not accompanied by a comparable loss in total transmission probability mass. At w_{\min} = 10^{-4}, over 95% of total edge weight was retained, and even at w_{\min} = 10^{-2}, more than 80% of the total weight remained (Supplementary Fig. Z). This disparity indicates that the majority of removed edges contribute negligibly to the overall probabilistic structure of the network.
+
+To assess the local impact of sparsification, we examined node strength distortion, defined as the absolute log-ratio of each node’s weighted degree under sparsification relative to the reference network. Node strength distortion remained negligible at low thresholds, with median values close to zero and minimal dispersion for w_{\min} \leq 10^{-4} (Supplementary Fig. W). At higher thresholds, distortion increased both in magnitude and heterogeneity, indicating that sparsification increasingly altered the relative transmission potential of individual nodes despite preserved global connectivity.
+
+Based on these diagnostics, we selected a minimum edge weight of w_{\min} = 10^{-4} for all main analyses. This threshold substantially reduces the number of edges while preserving nearly all transmission probability mass and maintaining minimal distortion of node-level strength, thereby balancing computational efficiency with faithful representation of the underlying mechanistic transmission structure.
+
+⸻
+
+Single sentence for the main Results section
+
+To reduce computational complexity while preserving the probabilistic structure of the transmission network, we sparsified the mechanistic graph using a minimum edge weight of 10^{-4}, a threshold shown to retain over 95% of total transmission probability mass with negligible node-level distortion (Supplementary Fig. X).
