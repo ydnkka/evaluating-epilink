@@ -1,23 +1,26 @@
 # mechanistic-transmission-inference
-Reproducibility code and analyses for *A Mechanistic, Threshold-Free Framework for Inferring Superspreading Molecular Transmission Clusters*.
+Reproducibility code and analyses for *A Mechanistic, Threshold-Free Method for Inferring Superspreading Molecular Transmission Clusters*.
 
 ---
 
 This repository contains the code and analysis workflows used in the paper:
 
-***A Mechanistic, Threshold-Free Framework for Inferring Superspreading Molecular Transmission Clusters***
+***A Mechanistic, Threshold-Free Method for Inferring Superspreading Molecular Transmission Clusters***
 
-The paper introduces a probabilistic framework for inferring recent transmission and identifying superspreading molecular transmission clusters (SMTCs) from pathogen genomic data and sampling dates, without relying on fixed genetic or temporal thresholds.
+The paper introduces a probabilistic method for inferring recent transmission and identifying superspreading molecular 
+transmission clusters (SMTCs) from pathogen genomic data and sampling dates, without relying on fixed genetic or temporal thresholds.
 
-The methodological framework itself is implemented in the companion tool **[epilink](https://github.com/ydnkka/epilink)**. This repository is dedicated to the reproducibility of the results presented in the paper and includes scripts for data generation, analysis, benchmarking, and figure reproduction.
+The methodological framework itself is implemented in the companion tool **[epilink](https://github.com/ydnkka/epilink)**. This repository is dedicated 
+to the reproducibility of the results presented in the paper and includes scripts for data generation, analysis,
+benchmarking, and figure reproduction.
 
 The repository supports:
 
 * Simulation of epidemiological and genomic data along known transmission trees
 * Application of the mechanistic, threshold-free inference framework via *epilink*
 * Network construction and community detection analyses
-* Evaluation of inferred clusters using BCubed metrics
-* Sensitivity analyses for incubation period assumptions and molecular clock rates
+* Evaluation of inferred clusters using [BCubed](https://github.com/hhromic/python-bcubed) metrics
+* Scenario-based sensitivity analyses
 * Benchmarking against logistic regression baselines
 * Reproduction of all figures and tables in the main text and supplementary material
 
@@ -26,16 +29,6 @@ This repository is intended for transparency and reproducibility and is not a st
 All analyses are fully configuration-driven. No parameters affecting results are hard-coded.
 
 The full implementation of the framework is available in the **[epilink](https://github.com/ydnkka/epilink)** repository.
-
-## Repository structure
-
-- simulations/        Synthetic data generation
-- inference/          Pairwise transmission probability estimation
-- clustering/         Network construction and community detection
-- evaluation/         Cluster evaluation and superspreading analysis
-- sensitivity/        Sensitivity analyses
-- benchmarks/         Logistic regression baseline
-- figures/            Figure generation scripts
 
 ## Reproducing the paper
 
