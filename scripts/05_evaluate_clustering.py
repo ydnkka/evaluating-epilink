@@ -153,6 +153,5 @@ def main() -> None:
     print(f"Saved clustering metrics to: {tabs_dir / 'clustering_metrics.csv'}")
     print(f"Saved clustering stability to: {tabs_dir / 'clustering_stability.csv'}")
 
-
 if __name__ == "__main__":
     main()
