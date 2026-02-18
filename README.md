@@ -1,11 +1,11 @@
 # mechanistic-transmission-inference
-Reproducibility code and analyses for *A Mechanistic, Threshold-Free Method for Inferring Superspreading Molecular Transmission Clusters*.
+Reproducibility code and analyses for *Threshold-Free Probabilistic Inference of Superspreading Molecular Transmission Clusters*.
 
 ---
 
 This repository contains the code and analysis workflows used in the paper:
 
-***A Mechanistic, Threshold-Free Method for Inferring Superspreading Molecular Transmission Clusters***
+***Threshold-Free Probabilistic Inference of Superspreading Molecular Transmission Clusters***
 
 The paper introduces a probabilistic method for inferring recent transmission and identifying superspreading molecular 
 transmission clusters (SMTCs) from pathogen genomic data and sampling dates, without relying on fixed genetic or temporal thresholds.
