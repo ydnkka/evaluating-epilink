@@ -1,0 +1,773 @@
+strain	date	region	country	division	location	host	age	sex	clade	clade	pango
+MA_MGH_00003	2020-03-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00004	2020-03-11	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00005	2020-03-11	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00006	2020-03-11	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00013	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00014	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00016	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00017	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00018	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00021	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00023	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00024	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00028	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00031	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00032	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00036	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00037	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00039	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00042	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00044	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00048	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00049	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00050	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00051	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B
+MA_MGH_00052	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00054	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00055	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00056	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00059	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00062	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00063	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00064	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00065	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00067	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00069	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00071	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00075	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00076	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00080	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00081	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00083	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00084	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00085	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00086	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00089	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00090	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00091	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00093	2020-03-29	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00094	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00096	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00097	2020-03-24	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00100	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00109	2020-03-31	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00111	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00115	2020-03-29	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00116	2020-03-31	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00117	2020-03-31	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00120	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00124	2020-03-31	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00126	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B
+MA_MGH_00127	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00132	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00134	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00136	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00140	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00143	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00145	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00148	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00149	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00150	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00151	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00152	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00153	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00155	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00156	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00157	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00159	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00160	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00161	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00162	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00164	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00165	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00166	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00168	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00170	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00174	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00177	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00178	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00179	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00181	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00182	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00183	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00184	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00185	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00187	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00188	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00189	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00190	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00192	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00194	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00195	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00199	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00200	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00202	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00203	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00205	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00206	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00208	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00209	2020-03-26	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B.39
+MA_MGH_00210	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00211	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00214	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00225	2020-03-25	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00227	2020-04-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00229	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00230	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00231	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00232	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00233	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00234	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00238	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00239	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00242	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00243	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00244	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00245	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00247	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00248	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00250	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00251	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00252	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00254	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00255	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00256	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00257	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00258	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00261	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00262	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00263	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00264	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00265	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00266	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00267	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00269	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00270	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00271	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00272	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00273	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00274	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00276	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00277	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00278	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00280	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00281	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00282	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00283	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00285	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00287	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00288	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00289	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00290	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00291	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00294	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00295	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00296	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00297	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00298	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00299	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00302	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00303	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00304	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00305	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00307	2020-04-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00316	2020-04-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00318	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00415	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00416	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00417	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00418	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00419	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00420	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00421	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00422	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00424	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00425	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00426	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00427	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00428	2020-03-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00430	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00431	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00432	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00433	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00434	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00435	2020-03-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00437	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00438	2020-03-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00439	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00440	2020-03-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00441	2020-03-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00442	2020-03-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00443	2020-03-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00444	2020-03-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00445	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00446	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00447	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00453	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00454	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00456	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00458	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00459	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00460	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00461	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00463	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00464	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00465	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00466	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00467	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00468	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00469	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00471	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00472	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00473	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00474	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00475	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00476	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00477	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00479	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00480	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00481	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00484	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00485	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00486	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00488	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00489	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00492	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00495	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00497	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00499	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00501	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00502	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00505	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00506	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00510	2020-03-11	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00516	2020-03-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00517	2020-03-14	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00521	2020-03-16	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00523	2020-03-18	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00525	2020-03-18	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00528	2020-03-18	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B.39
+MA_MGH_00530	2020-03-18	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00532	2020-03-18	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00533	2020-03-18	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00537	2020-03-19	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00538	2020-03-19	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00539	2020-03-19	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00541	2020-03-19	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00542	2020-03-19	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00551	2020-03-20	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00552	2020-03-20	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00554	2020-03-20	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B
+MA_MGH_00555	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00557	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00558	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00562	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00563	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00564	2020-03-21	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00565	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00566	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00567	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00568	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00569	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B.40
+MA_MGH_00570	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00571	2020-03-23	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00576	2020-03-20	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00579	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00580	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00581	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00582	2020-03-27	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00583	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00585	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00588	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00592	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00595	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00597	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00598	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00600	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00602	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00603	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00604	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00611	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00612	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00613	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00614	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00615	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00622	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00627	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00628	2020-03-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00633	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00635	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00637	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00639	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00642	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00644	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00645	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00646	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00648	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00649	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00650	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00651	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1.356
+MA_MGH_00653	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00654	2020-04-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00656	2020-04-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00657	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00658	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00659	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00660	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00661	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00663	2020-04-03	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1.356
+MA_MGH_00664	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00665	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00666	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00669	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00670	2020-04-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00673	2020-04-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00674	2020-04-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00675	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00676	2020-03-21	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.1
+MA_MGH_00678	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00679	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00680	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00681	2020-03-22	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00683	2020-03-21	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00684	2020-03-20	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00687	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00688	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00689	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00690	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00691	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00693	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00694	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00695	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00696	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.2
+MA_MGH_00698	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00699	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00701	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00703	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00704	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00705	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00706	2020-04-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00707	2020-04-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00708	2020-04-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00711	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00715	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00716	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00717	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00718	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1.22
+MA_MGH_00721	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00727	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00728	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00730	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00732	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00734	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00735	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1.356
+MA_MGH_00736	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00738	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00740	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00741	2020-04-09	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00742	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00743	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00745	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00746	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00747	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00749	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00751	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00753	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00757	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.2
+MA_MGH_00758	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00759	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00760	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00761	2020-04-11	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00762	2020-04-11	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00764	2020-04-11	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00766	2020-04-11	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00767	2020-04-11	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00770	2020-04-12	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00773	2020-04-12	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00774	2020-04-12	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00775	2020-04-12	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00779	2020-04-12	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00789	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00791	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00795	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00796	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00798	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00799	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00801	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00809	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00811	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00812	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00814	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00816	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00817	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00822	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00823	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00824	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00826	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1.356
+MA_MGH_00827	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00828	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00829	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00830	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00831	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00832	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00834	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00836	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00840	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00841	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00845	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00848	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00853	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00855	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00858	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00862	2020-04-13	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00866	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00868	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00869	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00871	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00876	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00878	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00883	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00886	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00887	2020-04-14	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_00893	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00896	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00900	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00902	2020-04-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00903	2020-04-08	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00906	2020-04-17	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00908	2020-04-10	North America	USA	Massachusetts	Massachusetts	Human			19B	19B	A.3
+MA_MGH_00916	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00922	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00923	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00926	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00931	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00935	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00937	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00939	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00945	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00946	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00947	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1.319
+MA_MGH_00954	2020-05-02	North America	USA	New Hampshre	New Hampshre	Human			20C	20C	B.1
+MA_MGH_00957	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00958	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00959	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00976	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_00977	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00978	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_00992	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_00996	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01001	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01011	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01017	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01018	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01021	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01022	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01027	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01031	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01032	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01033	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01045	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01048	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01049	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01057	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01060	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01061	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01063	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01065	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01068	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01071	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01073	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01076	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01080	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_01081	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01084	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01086	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01089	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01092	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01096	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01103	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01107	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01108	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01109	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01110	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01111	2020-05-01	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01119	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01120	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01121	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01126	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_01127	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01132	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01137	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01140	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01149	2020-05-02	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01151	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1
+MA_MGH_01152	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01153	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01157	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01161	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01166	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			19A	19A	B
+MA_MGH_01169	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01182	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01183	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01194	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01195	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01196	2020-05-03	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01201	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01206	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01207	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01227	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_01232	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01235	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01248	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01256	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01257	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01260	2020-05-04	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01271	2020-04-29	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01297	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01304	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01319	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01322	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01325	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01328	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01331	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01333	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01338	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01343	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01344	2020-05-05	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01358	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01365	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01367	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01368	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01372	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01379	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01380	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01381	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01382	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01397	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01405	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01407	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01409	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01415	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01442	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01443	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01448	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01452	2020-04-30	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01460	2020-04-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01467	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01469	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01471	2020-05-06	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01491	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20B	20B	B.1.1.33
+MA_MGH_01494	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01495	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01501	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01502	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01504	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01522	2020-05-07	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01543	2020-04-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01544	2020-04-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01552	2020-04-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01580	2020-05-08	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01586	2020-05-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01592	2020-05-09	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01593	2020-05-09	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01606	2020-05-08	North America	USA	Massachusetts	Massachusetts	Human			20C	20C	B.1
+MA_MGH_01623	2020-05-09	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_MGH_01632	2020-04-28	North America	USA	Massachusetts	Massachusetts	Human			20A	20A	B.1
+MA_DPH_00002	2020-03-03	North America	USA	Massachusetts	Massachusetts				19A	19A	B
+MA_DPH_00003	2020-03-05	North America	USA	Massachusetts	Massachusetts				19A	19A	B
+MA_DPH_00011	2020-03-10	North America	USA	Massachusetts	Massachusetts				19B	19B	A.1
+MA_DPH_00013	2020-03-28	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00014	2020-03-30	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00015	2020-03-30	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00016	2020-04-01	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00017	2020-04-01	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00018	2020-04-01	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00019	2020-04-01	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00020	2020-04-01	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00021	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00023	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00024	2020-04-02	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00025	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00027	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00028	2020-04-02	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00029	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00030	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00031	2020-04-02	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00032	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00034	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00035	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00036	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00038	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00039	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00040	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00042	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00043	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00046	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00047	2020-04-02	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00048	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00050	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00051	2020-04-02	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00052	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00053	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00054	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00057	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00058	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00060	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00062	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00063	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00065	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00068	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00074	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00075	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00076	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00080	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00081	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00083	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00084	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00086	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00087	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00089	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00090	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00091	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00092	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00094	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00095	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00098	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00100	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00102	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00104	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00105	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00106	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00107	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00108	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00109	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00110	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00113	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00114	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00115	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00116	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00117	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00118	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00121	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00122	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00123	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00124	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00126	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00127	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00129	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00130	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00134	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00135	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00137	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00138	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00139	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00140	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00142	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00143	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00144	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00145	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00147	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00148	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00149	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00150	2020-04-03	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00151	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00156	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00157	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00158	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00159	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00163	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00164	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00165	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00166	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00167	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00168	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00169	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00170	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00171	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00176	2020-04-03	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00177	2020-04-05	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00178	2020-04-05	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00180	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00181	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00182	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00183	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00185	2020-04-06	North America	USA	Massachusetts	Massachusetts				19A	19A	B
+MA_DPH_00186	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00187	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00188	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00189	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00192	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00194	2020-04-06	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00195	2020-04-07	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00197	2020-04-07	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00198	2020-04-07	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00199	2020-04-07	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00200	2020-04-07	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00202	2020-04-08	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00203	2020-04-09	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00204	2020-04-09	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00206	2020-04-09	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00208	2020-04-10	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00209	2020-04-10	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00212	2020-04-12	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00213	2020-04-12	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00216	2020-04-13	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00217	2020-04-13	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00218	2020-04-13	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00219	2020-04-13	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00221	2020-04-14	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00222	2020-04-14	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00225	2020-04-15	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00227	2020-04-15	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00228	2020-04-15	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00229	2020-04-15	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00230	2020-04-15	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00231	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00232	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00234	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00235	2020-04-16	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00236	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00237	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00238	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00239	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00240	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00241	2020-04-16	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00243	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00244	2020-04-16	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00246	2020-04-16	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00248	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00250	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00252	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00255	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00256	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00257	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00261	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00263	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00264	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00265	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00266	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00268	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00270	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00271	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00277	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00283	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00287	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00292	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00294	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00295	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00299	2020-04-17	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00301	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00303	2020-04-17	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00304	2020-04-18	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00305	2020-04-18	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00306	2020-04-18	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00308	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00310	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00311	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00315	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00317	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00318	2020-04-18	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
+MA_DPH_00321	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_DPH_00322	2020-04-18	North America	USA	Massachusetts	Massachusetts				20C	20C	B.1
+MA_MGH_01290	2020-05-05	North America	USA	Massachusetts	Massachusetts				20A	20A	B.1
