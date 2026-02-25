@@ -1,0 +1,33 @@
+inputs:
+  metadata: boston_metadata.parquet
+  pairwise_distances: boston_pairwise_distances.parquet
+  id_col_1: SeqID1
+  id_col_2: SeqID2
+  date_col: Date
+  exposure_col: Exposure
+  temporal_col: Temporal_Distance
+
+inference:
+  rng_seed: 42
+  subs_rate: 1e-3
+  relax_rate: false
+  subs_rate_sigma: 0.0
+  mutation_model: deterministic
+
+analysis:
+  resolution: 0.3
+  probability_threshold: 0.0001
+  min_cluster_size: 2
+  focus_exposures:
+    - Conference
+    - SNF
+  exposure_order:
+    - BHCHP
+    - Other
+    - City
+    - Conference
+    - SNF
+
+outputs:
+  figures_subdir: boston
+  figure_name: figure2

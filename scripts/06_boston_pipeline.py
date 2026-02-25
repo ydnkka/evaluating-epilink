@@ -1,185 +1,361 @@
 #!/usr/bin/env python3
 """
-scripts/06_boston_application.py
+scripts/06_boston_pipeline.py
 
-Backbone for the Boston empirical application:
-  - load precomputed pairwise distances (TN93 -> SNPs or substitutions)
-  - compute mechanistic pairwise probabilities (epilink)
-  - build weighted network, run Leiden across gamma grid
-  - save cluster summaries and persistence across resolution
+Boston empirical analysis pipeline:
+  - load metadata + precomputed pairwise distances
+  - compute mechanistic linkage probabilities (epilink)
+  - run Leiden community detection at a fixed resolution
+  - summarize cluster composition and export a manuscript figure/table
 
-This script intentionally does NOT attempt to recreate full paper figures—
-those should live in a separate plotting script once the pipeline is stable.
-
-Config (suggested)
-------------------
+Config
+------
 config/paths.yaml
-config/clustering.yaml
-config/inference.yaml
-config/boston.yaml:
-  input:
-    pairwise_distances: "data/raw/empirical/boston/pairwise_distances.parquet"
-  output:
-    out_dir: "data/processed/boston"
-  distances:
-    genetic_col: "SNPs"          # or "tn93_subs"
-    temporal_col: "DeltaDays"    # sampling-date difference
-  inference:
-    mutation_model: "deterministic"
-    subs_rate: 1e-3
-    relax_rate: false
-    subs_rate_sigma: 0.0
+config/boston.yaml
 """
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, List
-
-import numpy as np
-import pandas as pd
-
-try:
-    import yaml
-except ImportError as e:
-    raise ImportError("Please install PyYAML: `pip install pyyaml`.") from e
+from typing import Any, Dict, Iterable, List, Optional
 
 import igraph as ig
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from scipy.stats import chisquare
 
 from epilink import TOIT, InfectiousnessParams, estimate_linkage_probabilities
 
+from utils import deep_get, ensure_dirs, load_yaml, save_figure, set_seaborn_paper_context
 
-def load_yaml(path: Path) -> Dict[str, Any]:
-    with path.open("r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-def deep_get(d: Dict[str, Any], keys: List[str], default: Any = None) -> Any:
-    cur: Any = d
-    for k in keys:
-        if not isinstance(cur, dict) or k not in cur:
-            return default
-        cur = cur[k]
-    return cur
-
-def ensure_dirs(*dirs: Path) -> None:
-    for d in dirs:
-        d.mkdir(parents=True, exist_ok=True)
 
 def hart_default_params() -> InfectiousnessParams:
-    return InfectiousnessParams(k_inc=5.807, scale_inc=0.948, k_E=3.38, mu=0.37, k_I=1, alpha=2.29)
+    return InfectiousnessParams(
+        k_inc=5.807,
+        scale_inc=0.948,
+        k_E=3.38,
+        mu=0.37,
+        k_I=1,
+        alpha=2.29,
+    )
 
-def build_igraph(df: pd.DataFrame, min_w: float, wcol: str) -> ig.Graph:
-    if min_w > 0:
-        df = df[df[wcol] >= min_w].copy()
-    nodes = pd.Index(pd.unique(df[["case_i", "case_j"]].values.ravel()))
-    idx = {str(n): i for i, n in enumerate(nodes.astype(str).tolist())}
-    edges = [(idx[str(a)], idx[str(b)]) for a, b in df[["case_i", "case_j"]].values]
-    g = ig.Graph(n=len(nodes), edges=edges, directed=False)
-    g.es["weight"] = df[wcol].astype(float).values.tolist()
-    g.vs["case_id"] = nodes.astype(str).tolist()
+
+def add_temporal_distance(
+    pairwise_df: pd.DataFrame,
+    metadata_df: pd.DataFrame,
+    id_col_1: str,
+    id_col_2: str,
+    date_col: str,
+    out_col: str,
+) -> pd.DataFrame:
+    date_map = metadata_df.set_index("SeqID")[date_col]
+    d1 = pd.to_datetime(pairwise_df[id_col_1].map(date_map))
+    d2 = pd.to_datetime(pairwise_df[id_col_2].map(date_map))
+    pairwise_df[out_col] = (d1 - d2).abs().dt.days.astype(int)
+    return pairwise_df
+
+
+def build_graph(
+    pairwise_df: pd.DataFrame,
+    metadata_df: pd.DataFrame,
+    id_col_1: str,
+    id_col_2: str,
+    exposure_col: str,
+    minimum_weight: float = 0.0001,
+    probability_col: str = "Probability",
+) -> ig.Graph:
+    all_ids = pd.unique(pairwise_df[[id_col_1, id_col_2]].values.ravel())
+    id_to_index = {seq_id: i for i, seq_id in enumerate(all_ids)}
+    metadata_dict = metadata_df.set_index("SeqID").to_dict(orient="index")
+
+    g = ig.Graph(n=len(all_ids))
+    g.vs["SeqID"] = all_ids.tolist()
+    g.vs["Date"] = [metadata_dict.get(sid, {}).get("Date") for sid in all_ids]
+    g.vs["Clade"] = [metadata_dict.get(sid, {}).get("Clade") for sid in all_ids]
+    g.vs[exposure_col] = [metadata_dict.get(sid, {}).get(exposure_col) for sid in all_ids]
+
+    filtered = pairwise_df[pairwise_df[probability_col] >= minimum_weight]
+    edges = list(zip(filtered[id_col_1].map(id_to_index), filtered[id_col_2].map(id_to_index)))
+    g.add_edges(edges)
+
+    for col in ["TN93_Distance", "SNP_Distance", "Temporal_Distance", probability_col]:
+        if col in filtered.columns:
+            g.es[col] = filtered[col].tolist()
+
     return g
+
+
+def analyse_partition(
+    part: ig.VertexClustering,
+    node_attribute: str,
+    edge_attributes: Optional[Iterable[str]] = None,
+    min_size: int = 1,
+) -> pd.DataFrame:
+    if edge_attributes is None:
+        edge_attributes = []
+
+    g = part.graph
+    results = []
+
+    clusters = [
+        (cid, members)
+        for cid, members in enumerate(part)
+        if len(members) >= min_size
+    ]
+
+    all_node_attrs = list(g.vs[node_attribute])
+    overall_attr_counts = Counter(all_node_attrs)
+    total_nodes = len(all_node_attrs)
+    unique_global_attrs = list(overall_attr_counts.keys())
+
+    all_composition_vals = Counter()
+    for _, members in clusters:
+        vals = g.vs[members][node_attribute]
+        all_composition_vals.update(vals)
+    all_composition_attrs = [attr for attr, _ in all_composition_vals.most_common()]
+
+    for cid, members in clusters:
+        comm_size = len(members)
+        subgraph = g.subgraph(members)
+
+        comm_attrs = list(subgraph.vs[node_attribute])
+        comm_attr_counts = Counter(comm_attrs)
+
+        observed = np.array([comm_attr_counts.get(attr, 0) for attr in unique_global_attrs], dtype=float)
+        p_value = None
+        if observed.sum() > 0 and total_nodes > 0:
+            expected_props = np.array(
+                [overall_attr_counts.get(attr, 0) / total_nodes for attr in unique_global_attrs],
+                dtype=float,
+            )
+            expected = expected_props * observed.sum()
+            keep = expected > 0
+            if keep.sum() >= 1:
+                _, p_value = chisquare(f_obs=observed[keep], f_exp=expected[keep])
+
+        intra_es = g.es.select(_within=members)
+        others = list(set(range(g.vcount())) - set(members))
+        inter_es = g.es.select(_between=(members, others))
+
+        edge_stats: Dict[str, Any] = {}
+        for attr in edge_attributes:
+            intra_vals = intra_es[attr]
+            inter_vals = inter_es[attr]
+
+            has_intra = len(intra_vals) > 0
+            has_inter = len(inter_vals) > 0
+
+            intra_max = np.max(intra_vals) if has_intra else 0
+
+            edge_stats[f"intra_mean_{attr}"] = np.mean(intra_vals) if has_intra else None
+            edge_stats[f"intra_max_{attr}"] = intra_max if has_intra else None
+            edge_stats[f"intra_min_{attr}"] = np.min(intra_vals) if has_intra else None
+
+            edge_stats[f"inter_min_{attr}"] = np.min(inter_vals) if has_inter else None
+            edge_stats[f"inter_mean_{attr}"] = np.mean(inter_vals) if has_inter else None
+
+            dunn_index = (np.mean(inter_vals) / intra_max) if has_inter and has_intra and intra_max > 0 else None
+            edge_stats[f"dunn_index_{attr}"] = dunn_index
+
+        row = {
+            "cluster_id": cid,
+            "size": comm_size,
+            f"{node_attribute}_dist": dict(comm_attr_counts),
+            "chi2_p_value": p_value,
+            **edge_stats,
+        }
+
+        total_in_cluster = max(1, sum(comm_attr_counts.values()))
+        for attr in all_composition_attrs:
+            count = comm_attr_counts.get(attr, 0)
+            row[f"count::{attr}"] = count
+            row[f"prop::{attr}"] = count / total_in_cluster
+
+        results.append(row)
+
+    df = pd.DataFrame(results)
+    if not df.empty:
+        df = df.sort_values("size", ascending=False).reset_index(drop=True)
+    return df
+
+
+def save_exposure_barplot(
+    prob_focus: pd.DataFrame,
+    exposure_order: List[str],
+    out_base: Path,
+) -> None:
+    exposure_cols = [f"count::{label}" for label in exposure_order]
+    missing = [c for c in exposure_cols if c not in prob_focus.columns]
+    if missing:
+        raise ValueError(f"Missing exposure columns in cluster summary: {missing}")
+
+    exposure_counts = prob_focus[exposure_cols].copy()
+    exposure_counts.columns = exposure_order
+    exposure_counts.index = prob_focus["cluster_id"]
+
+    ax = exposure_counts.plot(kind="bar", stacked=True, figsize=(5, 4))
+    ax.set_xlabel("Cluster ID")
+    ax.set_ylabel("Number of sequences")
+    ax.legend(title="Exposure", fontsize="small", frameon=False)
+
+    fig = ax.figure
+    fig.tight_layout()
+    save_figure(fig, out_base, ["pdf", "png"])
+    plt.close(fig)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="config/paths.yaml")
-    parser.add_argument("--clustering", default="config/clustering.yaml")
-    parser.add_argument("--inference", default="config/inference.yaml")
     parser.add_argument("--boston", default="config/boston.yaml")
     parser.add_argument("--out-root", default="")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))
-    clus_cfg = load_yaml(Path(args.clustering))
-    inf_cfg = load_yaml(Path(args.inference))
     bos_cfg = load_yaml(Path(args.boston))
 
     out_root = Path(args.out_root) if args.out_root else None
 
-    out_dir = Path(deep_get(bos_cfg, ["output", "out_dir"], "data/processed/boston"))
+    data_boston = Path(deep_get(paths_cfg, ["data", "processed", "boston"], "../data/processed/boston"))
+    if out_root and not data_boston.is_absolute():
+        data_boston = out_root / data_boston
+
+    tables_main = Path(deep_get(paths_cfg, ["outputs", "tables", "main"], "../tables/main"))
+    figs_main = Path(deep_get(paths_cfg, ["outputs", "figures", "main"], "../figures/main"))
+    figs_sup = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary"))
     if out_root:
-        out_dir = out_root / out_dir
-    ensure_dirs(out_dir)
+        if not tables_main.is_absolute():
+            tables_main = out_root / tables_main
+        if not figs_main.is_absolute():
+            figs_main = out_root / figs_main
+        if not figs_sup.is_absolute():
+            figs_sup = out_root / figs_sup
 
-    pw_path = Path(deep_get(bos_cfg, ["input", "pairwise_distances"], "data/raw/empirical/boston/pairwise_distances.parquet"))
-    if out_root and not pw_path.is_absolute():
-        # keep input relative to repo root unless user wants to mirror under out_root
-        pass
-    if not pw_path.exists():
-        raise FileNotFoundError(f"Boston pairwise file not found: {pw_path}")
+    figs_sup = figs_sup / str(deep_get(bos_cfg, ["outputs", "figures_subdir"], "boston"))
+    ensure_dirs(data_boston, tables_main, figs_main, figs_sup)
 
-    df = pd.read_parquet(pw_path)
+    metadata_path = data_boston / str(deep_get(bos_cfg, ["inputs", "metadata"], "boston_metadata.parquet"))
+    pairwise_path = data_boston / str(deep_get(bos_cfg, ["inputs", "pairwise_distances"], "boston_pairwise_distances.parquet"))
 
-    gcol = str(deep_get(bos_cfg, ["distances", "genetic_col"], "SNPs"))
-    tcol = str(deep_get(bos_cfg, ["distances", "temporal_col"], "DeltaDays"))
+    if not metadata_path.exists():
+        raise FileNotFoundError(f"Boston metadata file not found: {metadata_path}")
+    if not pairwise_path.exists():
+        raise FileNotFoundError(f"Boston pairwise file not found: {pairwise_path}")
 
-    # Expect case identifiers in columns case_i / case_j
-    # (Adjust this to your file schema once finalised.)
-    required = {"case_i", "case_j", gcol, tcol}
-    missing = required - set(df.columns)
+    metadata = pd.read_parquet(metadata_path)
+    pair_data = pd.read_parquet(pairwise_path)
+
+    id_col_1 = str(deep_get(bos_cfg, ["inputs", "id_col_1"], "SeqID1"))
+    id_col_2 = str(deep_get(bos_cfg, ["inputs", "id_col_2"], "SeqID2"))
+    date_col = str(deep_get(bos_cfg, ["inputs", "date_col"], "Date"))
+    exposure_col = str(deep_get(bos_cfg, ["inputs", "exposure_col"], "Exposure"))
+    temporal_col = str(deep_get(bos_cfg, ["inputs", "temporal_col"], "Temporal_Distance"))
+
+    required = {id_col_1, id_col_2, "SNP_Distance"}
+    missing = required - set(pair_data.columns)
     if missing:
         raise ValueError(f"Missing required columns in Boston pairwise file: {missing}")
 
-    # Mechanistic inference settings
+    pair_data = add_temporal_distance(
+        pairwise_df=pair_data,
+        metadata_df=metadata,
+        id_col_1=id_col_1,
+        id_col_2=id_col_2,
+        date_col=date_col,
+        out_col=temporal_col,
+    )
+
+    params = hart_default_params()
+    rng_seed = int(deep_get(bos_cfg, ["inference", "rng_seed"], 42))
     subs_rate = float(deep_get(bos_cfg, ["inference", "subs_rate"], 1e-3))
     relax_rate = bool(deep_get(bos_cfg, ["inference", "relax_rate"], False))
     sigma = float(deep_get(bos_cfg, ["inference", "subs_rate_sigma"], 0.0))
     mutation_model = str(deep_get(bos_cfg, ["inference", "mutation_model"], "deterministic"))
-    rng_seed = int(deep_get(bos_cfg, ["inference", "rng_seed"], 42))
 
-    params = hart_default_params()
     toit = TOIT(params=params, rng_seed=rng_seed, subs_rate=subs_rate, relax_rate=relax_rate, subs_rate_sigma=sigma)
-
-    # Compute probabilities
-    df["P_mech"] = estimate_linkage_probabilities(
+    pair_data["Probability"] = estimate_linkage_probabilities(
         toit=toit,
-        genetic_distance=df[gcol].astype(float).values,
-        temporal_distance=df[tcol].astype(float).values,
+        genetic_distance=pair_data["SNP_Distance"].values,
+        temporal_distance=pair_data[temporal_col].values,
         mutation_model=mutation_model,
     )
-    df.to_parquet(out_dir / "boston_pairwise_with_probs.parquet", index=False)
+    pair_data.to_parquet(data_boston / "boston_pairwise_with_probs.parquet", index=False)
 
-    # Leiden across gamma grid
-    gmin = float(deep_get(clus_cfg, ["community_detection", "resolution", "min"], 0.1))
-    gmax = float(deep_get(clus_cfg, ["community_detection", "resolution", "max"], 1.0))
-    gstep = float(deep_get(clus_cfg, ["community_detection", "resolution", "step"], 0.05))
-    gammas = np.round(np.arange(gmin, gmax + 1e-9, gstep), 10)
+    resolution = float(deep_get(bos_cfg, ["analysis", "resolution"], 0.3))
+    probability_threshold = float(deep_get(bos_cfg, ["analysis", "probability_threshold"], 0.0001))
+    min_cluster_size = int(deep_get(bos_cfg, ["analysis", "min_cluster_size"], 2))
+    focus_exposures = list(deep_get(bos_cfg, ["analysis", "focus_exposures"], ["Conference", "SNF"]))
+    exposure_order = list(deep_get(
+        bos_cfg,
+        ["analysis", "exposure_order"],
+        ["BHCHP", "Other", "City", "Conference", "SNF"],
+    ))
 
-    min_w = float(deep_get(clus_cfg, ["network", "sparsify", "min_edge_weight"], 0.01))
-    sparsify = bool(deep_get(clus_cfg, ["network", "sparsify", "enabled"], True))
-    if not sparsify:
-        min_w = 0.0
+    g = build_graph(
+        pairwise_df=pair_data,
+        metadata_df=metadata,
+        id_col_1=id_col_1,
+        id_col_2=id_col_2,
+        exposure_col=exposure_col,
+        minimum_weight=probability_threshold,
+        probability_col="Probability",
+    )
 
-    seed = int(deep_get(clus_cfg, ["community_detection", "random_seed"], 42))
-    n_restarts = int(deep_get(clus_cfg, ["community_detection", "n_restarts"], 10))
+    part = g.community_leiden(
+        weights="Probability",
+        resolution=resolution,
+        n_iterations=-1,
+    )
 
-    g = build_igraph(df[["case_i", "case_j", "P_mech"]].dropna(), min_w=min_w, wcol="P_mech")
+    prob_results = analyse_partition(
+        part,
+        node_attribute=exposure_col,
+        edge_attributes=["SNP_Distance", temporal_col],
+        min_size=min_cluster_size,
+    )
 
-    rows = []
-    for gamma in gammas:
-        best = None
-        best_q = -np.inf
-        for r in range(n_restarts):
-            part = g.community_leiden(weights="weight", resolution_parameter=float(gamma), n_iterations=-1, seed=seed + r)
-            q = g.modularity(part, weights="weight")
-            if q > best_q:
-                best_q, best = q, part
-        rows.append(pd.DataFrame({
-            "case_id": g.vs["case_id"],
-            "gamma": float(gamma),
-            "cluster_id": np.array(best.membership, dtype=int),
-        }))
+    if focus_exposures:
+        focus_cols = [f"count::{label}" for label in focus_exposures if f"count::{label}" in prob_results.columns]
+        if not focus_cols:
+            raise ValueError(f"Focus exposures not found in cluster summary: {focus_exposures}")
+        prob_focus = prob_results[prob_results[focus_cols].sum(axis=1) > 0]
+    else:
+        prob_focus = prob_results
 
-    parts = pd.concat(rows, ignore_index=True)
-    parts.to_parquet(out_dir / "boston_leiden_partitions.parquet", index=False)
+    set_seaborn_paper_context()
+    figure_name = str(deep_get(bos_cfg, ["outputs", "figure_name"], "figure2"))
+    save_exposure_barplot(prob_focus, exposure_order, figs_main / figure_name)
 
-    # Basic cluster summary (counts per gamma)
-    summ = (parts.groupby(["gamma", "cluster_id"])
-                 .size()
-                 .reset_index(name="cluster_size"))
-    summ.to_csv(out_dir / "boston_cluster_sizes.csv", index=False)
+    prob_summary = prob_focus[[
+        "cluster_id",
+        "size",
+        "intra_mean_SNP_Distance",
+        "intra_max_SNP_Distance",
+        f"intra_mean_{temporal_col}",
+        f"intra_max_{temporal_col}",
+        "inter_mean_SNP_Distance",
+        "dunn_index_SNP_Distance",
+    ]].copy()
 
-    print(f"Saved Boston outputs to: {out_dir}")
+    prob_summary.rename(
+        columns={
+            "cluster_id": "Cluster ID",
+            "size": "Size",
+            "intra_mean_SNP_Distance": "Intra-SNP (Mean)",
+            "intra_max_SNP_Distance": "Intra-SNP(Max)",
+            f"intra_mean_{temporal_col}": "Intra-Time (Mean)",
+            f"intra_max_{temporal_col}": "Intra-Time (Max)",
+            "inter_mean_SNP_Distance": "Inter-SNP (Mean)",
+            "dunn_index_SNP_Distance": "Dunn Index (Genetic)",
+        },
+        inplace=True,
+    )
+
+    prob_summary.T.to_csv(tables_main / "boston_cluster_summary.csv")
+
+    print(f"Saved Boston outputs to: {tables_main} and {figs_main}")
 
 
 if __name__ == "__main__":
