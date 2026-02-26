@@ -2,13 +2,13 @@
 set -euo pipefail
 
 SCRIPTS=(
-  "01_characterise_mechanism.py"
-  "02.1_generate_tree.py"
-  "02.2_simulate_datasets.py"
-  "03_evaluate_edges.py"
-  "04.1_sparsify_effects.py"
-  "04.2_run_clustering.py"
-  "05_evaluate_clustering.py"
+  "characterise_epilink.py"
+  "generate_tree.py"
+  "generate_datasets.py"
+  "pairwise_discrimination.py"
+  "sparsify_effects.py"
+  "run_clustering.py"
+  "evaluate_clustering.py"
 )
 
 echo "Starting pipeline..."

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/04.2_run_clustering.py
+scripts/run_clustering.py
 
 Build weighted networks from saved synthetic pairwise datasets and run Leiden
 community detection across a grid of resolution parameters.
@@ -51,7 +51,7 @@ def build_igraph_from_pairwise(df: pd.DataFrame, weight_col: str, min_w: float) 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/simulate_datasets.yaml")
+    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
     parser.add_argument("--clustering", default="../config/clustering.yaml")
     args = parser.parse_args()
 

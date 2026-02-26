@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/06_boston_pipeline.py
+scripts/boston_pipeline.py
 
 Boston empirical analysis pipeline:
   - load metadata + precomputed pairwise distances

@@ -1,0 +1,33 @@
+sampling:
+  step_days: 7
+  train_max_time_index: 2
+
+leiden:
+  n_restarts: 10
+  min_prob_weight: 0.0001
+  gammas:
+    min: 0.0
+    max: 1.0
+    step: 0.05
+
+scores:
+  snp_thresholds: [0, 1, 2, 3, 4, 5]
+
+logistic_regression:
+  max_iter: 200
+
+methods:
+  enabled:
+    - mech_linear
+    - mech_poisson
+    - logit_linear
+    - logit_poisson
+  titles:
+    mech_linear: "(a) Mechanistic (Deterministic)"
+    mech_poisson: "(b) Mechanistic (Stochastic)"
+    logit_linear: "(c) Logistic (Deterministic)"
+    logit_poisson: "(d) Logistic (Stochastic)"
+
+plots:
+  save_formats: ["png", "pdf"]
+  stability_subdir: "stability"

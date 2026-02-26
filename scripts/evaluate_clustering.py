@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/05_evaluate_clustering.py
+scripts/evaluate_clustering.py
 
 Evaluate clustering partitions against simulation ground truth using BCubed
 and quantify resolution stability (ARI between consecutive gammas).
@@ -17,7 +17,7 @@ tables/supplementary/
 Config
 ------
 config/paths.yaml
-config/simulate_datasets.yaml
+config/generate_datasets.yaml
 """
 from __future__ import annotations
 
@@ -83,7 +83,7 @@ def bcubed_scores(pred, truth):
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/simulate_datasets.yaml")
+    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))

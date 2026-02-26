@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-scripts/02.2_simulate_datasets.py
+scripts/generate_datasets.py
 
 Generate synthetic datasets across scenarios defined by varying epidemiological parameters and sampling schemes.:
 
 This script should run ONCE to produce datasets reused by:
-  - scripts/03_evaluate_edges.py
-  - scripts/04.2_run_clustering.py
+  - scripts/pairwise_discrimination.py
+  - scripts/run_clustering.py
 
 Config
 ------
 config/paths.yaml
-config/simulate_datasets.yaml
+config/generate_datasets.yaml
 """
 from __future__ import annotations
 
@@ -67,7 +67,7 @@ def summarise_data(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/simulate_datasets.yaml")
+    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))
@@ -87,7 +87,7 @@ def main() -> None:
 
     scenarios = deep_get(scenarios_cfg, ["scenarios"], None)
     if not isinstance(scenarios, dict) or len(scenarios) == 0:
-        raise ValueError("simulate_datasets.yaml must define a `scenarios:` mapping.")
+        raise ValueError("generate_datasets.yaml must define a `scenarios:` mapping.")
 
     # Defaults (same philosophy as earlier)
     baseline = scenarios["baseline"]

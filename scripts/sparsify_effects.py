@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/04.1_sparsify_effects.py
+scripts/sparsify_effects.py
 
 Edge-, neighbourhood-, and computational-scaling diagnostics for graph sparsification.
 

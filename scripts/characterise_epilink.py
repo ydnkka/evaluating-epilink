@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/01_characterise_mechanism.py
+scripts/characterise_epilink.py
 
 Characterise the mechanistic, threshold-free linkage model.
 

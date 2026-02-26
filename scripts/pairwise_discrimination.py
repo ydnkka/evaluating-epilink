@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/03_evaluate_edges.py
+scripts/pairwise_discrimination.py
 
 Consume saved synthetic datasets (pairwise.parquet per scenario) and evaluate
 edge “meaningfulness” via binary classification metrics.
@@ -12,7 +12,7 @@ This is deliberately separate from dataset generation so that:
 Config
 ------
 config/paths.yaml
-config/simulate_datasets.yaml
+config/generate_datasets.yaml
 config/default_parameters.yaml
 """
 
@@ -119,7 +119,7 @@ def plot_weight_distributions(df: pd.DataFrame, out_path: Path, scenario: str) -
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/simulate_datasets.yaml")
+    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
     parser.add_argument("--defaults", default="../config/default_parameters.yaml")
     args = parser.parse_args()
 
