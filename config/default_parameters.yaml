@@ -31,7 +31,3 @@ characterisation:
   temporal_distance_grid:
     max_days: 21
     step: 1
-
-  save_formats:
-    - "png"
-    - "pdf"

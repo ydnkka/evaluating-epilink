@@ -3,7 +3,3 @@ transmission_tree:
   infection_history_file: "InfectedIndividuals.1.csv"
   transmission_events_file: "TransmissionEvents.1.csv"
   target_component_size: 5000
-
-save_formats:
-  - "png"
-  - "pdf"

@@ -22,20 +22,9 @@ A *pairwise* DataFrame stored as parquet:
 Outputs
 -------
 tables/supplementary/
-  - sparsify_edge_retention.csv
+  - sparsify_edge_retention.parquet
   - sparsify_node_strength_distortion.parquet
-  - sparsify_components_summary.csv
-
-figures/supplementary/sparsify/
-  - weight_retention_curve.(png|pdf)
-  - edge_retention_curve.(png|pdf)
-  - node_strength_distortion_boxplot.(png|pdf)
-  - components_vs_minw.(png|pdf)
-  - runtime_vs_edges.(png|pdf)
-  - build_time_vs_edges.(png|pdf)
-  - leiden_time_vs_edges.(png|pdf)
-  - clusters_vs_minw.(png|pdf)
-  - peak_mem_vs_edges.(png|pdf)
+  - sparsify_components_summary.parquet
 
 Notes
 -----
@@ -63,9 +52,6 @@ import networkx as nx
 import igraph as ig
 
 from utils import *
-
-
-set_seaborn_paper_context()
 
 # -----------------------------
 # Timing helpers
@@ -243,38 +229,6 @@ def timed_igraph_and_leiden(
 
 
 # -----------------------------
-# Plotting
-# -----------------------------
-
-def plot_curve(
-        df: pd.DataFrame, x: str, y: str, title: str,
-        xlabel: str, ylabel: str) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.plot(df[x].values, df[y].values, marker="o")
-    ax.set_title(title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    return fig
-
-
-def boxplot_by_threshold(
-        df: pd.DataFrame, x: str, y: str,
-        title: str, xlabel: str, ylabel: str) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(6, 4))
-    cats = df[x].astype(str)
-    order = sorted(cats.unique(), key=lambda z: float(z))
-    ax.boxplot(
-        [df.loc[cats == c, y].values for c in order],
-        tick_labels=order,
-        showfliers=False,
-    )
-    ax.set_title(title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    return fig
-
-
-# -----------------------------
 # Main
 # -----------------------------
 
@@ -295,14 +249,10 @@ def main() -> None:
 
     processed_dir = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
     tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
-    figs_dir = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary"))
-    figs_dir = figs_dir / "sparsify"
-    ensure_dirs(tabs_dir, processed_dir, figs_dir)
+    ensure_dirs(tabs_dir, processed_dir)
 
     min_ws = list(deep_get(clus_cfg, ["network", "min_edge_weights"], [0.0, 0.0001, 0.001, 0.01, 0.1]))
     weight_columns = list(deep_get(clus_cfg, ["community_detection", "weight_columns"], ["MechProbLinearDist"]))
-    formats = list(deep_get(clus_cfg, ["save_formats"], ["png", "pdf"]))
-
     sc_dir = processed_dir / f"scenario={args.scenario}"
     df = pd.read_parquet(sc_dir / "pairwise_eval.parquet")
 
@@ -403,92 +353,11 @@ def main() -> None:
     components_df = pd.DataFrame(components_rows).sort_values("min_edge_weight").reset_index(drop=True)
 
     # ---- Save tables ----
-    retention_df.to_csv(tabs_dir / "sparsify_edge_retention.csv", index=False)
+    retention_df.to_parquet(tabs_dir / "sparsify_edge_retention.parquet", index=False)
     strength_df.to_parquet(tabs_dir / "sparsify_node_strength_distortion.parquet", index=False)
-    components_df.to_csv(tabs_dir / "sparsify_components_summary.csv", index=False)
-
-    # ---- Plots ----
-
-    # Runtime vs edges (NX diagnostics total time)
-    fig = plot_curve(
-        retention_df, x="n_edges", y="t_total_nx_s",
-        title="", # Total runtime vs retained edges (NX diagnostics)
-        xlabel="Number of retained edges", ylabel="Total time (s)",
-    )
-    save_figure(fig, figs_dir / "sm5_runtime_vs_edges", formats)
-    plt.close(fig)
-
-    # NX build time vs edges
-    fig = plot_curve(
-        retention_df, x="n_edges", y="t_build_nx_s",
-        title="",
-        xlabel="Number of retained edges", ylabel="Build time (s)",
-    )
-    save_figure(fig, figs_dir / "sm5_build_time_vs_edges", formats)
-    plt.close(fig)
-
-    fig = plot_curve(
-        retention_df, x="n_edges", y="t_igraph_build_s",
-        title="",
-        xlabel="Number of retained edges", ylabel="igraph build time (s)",
-    )
-    save_figure(fig, figs_dir / "sm5_igraph_build_time_vs_edges", formats)
-    plt.close(fig)
-
-    fig = plot_curve(
-        retention_df, x="n_edges", y="t_leiden_s",
-        title=f"",  # Leiden runtime vs retained edges (γ={args.gamma})
-        xlabel="Number of retained edges", ylabel="Leiden time (s)",
-    )
-    save_figure(fig, figs_dir / "sm5_leiden_time_vs_edges", formats)
-    plt.close(fig)
-
-    fig = plot_curve(
-        retention_df, x="min_edge_weight", y="n_clusters",
-        title="", # Number of Leiden clusters (n>1) vs sparsification threshold
-        xlabel="min_edge_weight", ylabel="Number of clusters (n>1)",
-    )
-    save_figure(fig, figs_dir / "sm5_clusters_vs_minw", formats)
-    plt.close(fig)
-
-    # Peak memory vs edges (Python allocations)
-    fig = plot_curve(
-        retention_df, x="n_edges", y="peak_tracemalloc_mb",
-        title="",  # Peak Python-allocated memory vs retained edges
-        xlabel="Number of retained edges", ylabel="Peak tracemalloc (MB)",
-    )
-    save_figure(fig, figs_dir / "sm5_peak_mem_vs_edges", formats)
-    plt.close(fig)
-
-    # Weight retention vs threshold
-    fig = plot_curve(
-        retention_df, x="min_edge_weight", y="weight_retention_frac",
-        title="", # Total edge-weight retained under sparsification
-        xlabel="min_edge_weight", ylabel="Weight retention fraction",
-    )
-    save_figure(fig, figs_dir / "sm5_weight_retention_curve", formats)
-    plt.close(fig)
-
-    # Edge retention vs threshold
-    fig = plot_curve(
-        retention_df, x="min_edge_weight", y="edge_retention_frac",
-        title="", # Edge count retained under sparsification
-        xlabel="min_edge_weight", ylabel="Edge retention fraction",
-    )
-    save_figure(fig, figs_dir / "sm5_edge_retention_curve", formats)
-    plt.close(fig)
-
-    # Strength distortion: |log ratio| boxplot
-    fig = boxplot_by_threshold(
-        strength_df, x="min_edge_weight", y="abs_log_ratio",
-        title="",  # Node strength distortion under sparsification (|log ratio|)
-        xlabel="min_edge_weight", ylabel="|log(strength / strength_ref)|",
-    )
-    save_figure(fig, figs_dir / "sm5_node_strength_distortion_boxplot", formats)
-    plt.close(fig)
+    components_df.to_parquet(tabs_dir / "sparsify_components_summary.parquet", index=False)
 
     print(f"Saved tables to: {tabs_dir}")
-    print(f"Saved figures to: {figs_dir}")
     print("Done.")
 
 

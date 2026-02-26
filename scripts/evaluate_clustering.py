@@ -11,8 +11,8 @@ BCubed implementation (especially for overlapping truth).
 Outputs
 -------
 tables/supplementary/
-  - clustering_metrics.csv
-  - clustering_stability.csv
+  - clustering_metrics.parquet
+  - clustering_stability.parquet
 
 Config
 ------
@@ -147,11 +147,11 @@ def main() -> None:
                     "BCubed_F1_Score": f1,
                 })
 
-    pd.DataFrame(metrics_rows).to_csv(tabs_dir / "clustering_metrics.csv", index=False)
-    pd.DataFrame(stability_rows).to_csv(tabs_dir / "clustering_stability.csv", index=False)
+    pd.DataFrame(metrics_rows).to_parquet(tabs_dir / "clustering_metrics.parquet", index=False)
+    pd.DataFrame(stability_rows).to_parquet(tabs_dir / "clustering_stability.parquet", index=False)
 
-    print(f"Saved clustering metrics to: {tabs_dir / 'clustering_metrics.csv'}")
-    print(f"Saved clustering stability to: {tabs_dir / 'clustering_stability.csv'}")
+    print(f"Saved clustering metrics to: {tabs_dir / 'clustering_metrics.parquet'}")
+    print(f"Saved clustering stability to: {tabs_dir / 'clustering_stability.parquet'}")
 
 if __name__ == "__main__":
     main()

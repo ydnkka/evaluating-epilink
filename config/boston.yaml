@@ -21,13 +21,3 @@ analysis:
   focus_exposures:
     - Conference
     - SNF
-  exposure_order:
-    - BHCHP
-    - Other
-    - City
-    - Conference
-    - SNF
-
-outputs:
-  figures_subdir: boston
-  figure_name: figure2

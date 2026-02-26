@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 import yaml
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 
 
 def load_yaml(path: Path) -> Dict[str, Any]:
@@ -27,12 +28,14 @@ def ensure_dirs(*dirs: Path) -> None:
         d.mkdir(parents=True, exist_ok=True)
 
 
-def save_figure(fig: plt.Figure, out_base: Path, formats: List[str]) -> None:
+def save_figure(fig: "Figure", out_base: Path, formats: List[str]) -> None:
     for ext in formats:
         fig.savefig(out_base.with_suffix(f".{ext}"), bbox_inches="tight", dpi=300)
 
 
 def set_seaborn_paper_context(font_scale=1.5) -> None:
+    import seaborn as sns
+
     sns.set_theme(
         context="paper",       # scales fonts/lines appropriately
         style="whitegrid",     # subtle horizontal grid

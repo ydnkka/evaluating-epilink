@@ -14,6 +14,11 @@ Config
 config/paths.yaml
 config/generate_datasets.yaml
 config/default_parameters.yaml
+
+Outputs
+-------
+tables/supplementary/
+  - edge_eval_metrics.parquet
 """
 
 from __future__ import annotations
@@ -35,8 +40,6 @@ from epilink import (
 )
 
 from utils import *
-
-set_seaborn_paper_context(font_scale=1.2)
 
 MODELS = {
     "LinearDistScore": "Lin–Score",
@@ -79,43 +82,6 @@ def evaluate(y: np.ndarray, score: np.ndarray, is_prob: bool) -> Dict[str, float
     return out
 
 
-def plot_weight_distributions(df: pd.DataFrame, out_path: Path, scenario: str) -> None:
-    # Quick diagnostic plot: related vs unrelated score distributions
-
-    # Pair models two-by-two from the flat list
-    model_pairs = [
-        ("LinearDistScore", "PoissonDistScore"),
-        ("MechProbLinearDist", "MechProbPoissonDist"),
-        ("LogitProbLinearDist_0.1", "LogitProbPoissonDist_0.1"),
-        ("LogitProbLinearDist_1.0", "LogitProbPoissonDist_1.0"),
-    ]
-
-    fig, axes = plt.subplots(2, 2, figsize=(8, 8))
-    axes = axes.flatten()
-
-    for idx, (m1, m2) in enumerate(model_pairs):
-        ax = axes[idx]
-        data = []
-        labels = []
-
-        for label, related_val in [("Unrelated", 0), ("Related", 1)]:
-            for m in [m1, m2]:
-                values = df.loc[df["Related"] == related_val, m].dropna().values
-                data.append(values)
-                labels.append(f"{MODELS[m]}\n{label}")
-
-        ax.boxplot(data, patch_artist=True)
-        ax.set_xticklabels(labels, rotation=90)
-        ax.set_ylabel("Edge weight")
-        ax.grid(True, alpha=0.3)
-
-    fig.suptitle(f"{SCENARIOS[scenario]}: effect of deterministic (Lin) vs stochastic (Pois)\ngenetic distances "
-                 "on edge weight distributions")
-
-    fig.tight_layout()
-    save_figure(fig, out_path, ["png"])
-    plt.close(fig)
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
@@ -128,10 +94,8 @@ def main() -> None:
     defaults_cfg = load_yaml(Path(args.defaults))
 
     processed_dir = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
-    figs_dir = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary"))
     tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
-    figs_dir = figs_dir / "edge_eval"
-    ensure_dirs(processed_dir, figs_dir, tabs_dir)
+    ensure_dirs(processed_dir, tabs_dir)
 
     rng_seed = int(deep_get(defaults_cfg, ["toit", "rng_seed"], 12345))
     params_cfg = deep_get(defaults_cfg, ["toit", "infectiousness_params"], {})
@@ -227,11 +191,9 @@ def main() -> None:
             }
             rows.append(row)
 
-        plot_weight_distributions(df, figs_dir / f"sm6_{scen}_boxplots", scenario=scen)
-
     out = pd.DataFrame(rows)
-    out.to_csv(tabs_dir / "edge_eval_metrics.csv", index=False)
-    print(f"Saved edge evaluation metrics to: {tabs_dir / 'edge_eval_metrics.csv'}")
+    out.to_parquet(tabs_dir / "edge_eval_metrics.parquet", index=False)
+    print(f"Saved edge evaluation metrics to: {tabs_dir / 'edge_eval_metrics.parquet'}")
 
 if __name__ == "__main__":
     main()

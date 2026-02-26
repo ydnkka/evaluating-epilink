@@ -12,6 +12,13 @@ Config
 ------
 config/paths.yaml
 config/generate_datasets.yaml
+
+Outputs
+-------
+data/processed/synthetic/scenario=<name>/
+  - pairwise.parquet
+tables/supplementary/
+  - scenario_summary.parquet
 """
 from __future__ import annotations
 
@@ -172,10 +179,10 @@ def main() -> None:
         summary_rows.append(dist_summary)
 
     summary_df = pd.concat(summary_rows, ignore_index=True)
-    summary_df.to_csv(tabs_dir / "scenario_summary.csv", index=False)
+    summary_df.to_parquet(tabs_dir / "scenario_summary.parquet", index=False)
 
     print(f"\nSaved datasets to: {processed_dir}")
-    print(f"Saved scenario summary to: {tabs_dir / 'scenario_summary.csv'}")
+    print(f"Saved scenario summary to: {tabs_dir / 'scenario_summary.parquet'}")
 
 
 if __name__ == "__main__":

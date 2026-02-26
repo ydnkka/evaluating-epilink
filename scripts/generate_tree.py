@@ -26,7 +26,7 @@ What this script does
 6) Save outputs:
    - Tree as GML (and optional edge list CSV)
    - Summary statistics (CSV)
-   - Figures (component sizes, degree distributions, etc.)
+   - Diagnostics tables (component sizes, degree distributions, edge timesteps)
 
 Notes
 -----
@@ -59,14 +59,12 @@ class TreeConfig:
     infection_history_file: str
     transmission_events_file: str
     target_component_size: int
-    save_formats: list[str]
 
 
 @dataclass
 class PathsConfig:
     scovmod_output_dir: Path
     processed_dir: Path
-    figures_out_dir: Path
     tables_out_dir: Path
 
 
@@ -80,13 +78,11 @@ def parse_configs(
     # Paths
     scovmod_output = Path(deep_get(paths_cfg, ["data", "raw", "scovmod_output"], "../data/raw/scovmod_output"))
     processed = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
-    figures_supp = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary"))
     tables_supp = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
 
     paths = PathsConfig(
         scovmod_output_dir=scovmod_output,
         processed_dir=processed,
-        figures_out_dir=figures_supp / "scovmod",
         tables_out_dir=tables_supp,
     )
 
@@ -97,8 +93,7 @@ def parse_configs(
                                             "InfectedIndividuals.1.csv")),
         transmission_events_file=str(deep_get(scovmod_cfg, ["transmission_tree", "transmission_events_file"],
                                               "TransmissionEvents.1.csv")),
-        target_component_size=int(deep_get(scovmod_cfg, ["transmission_tree", "target_component_size"], 5000)),
-        save_formats=list(deep_get(scovmod_cfg, ["save_formats"], ["png", "pdf"]))
+        target_component_size=int(deep_get(scovmod_cfg, ["transmission_tree", "target_component_size"], 5000))
     )
 
     return paths, tree_cfg
@@ -251,61 +246,14 @@ def build_msa_tree(graph: nx.DiGraph) -> nx.DiGraph:
     return nx.DiGraph(msa)
 
 
-# -----------------------------
-# Figures and summaries
-# -----------------------------
-
-
-def plot_component_size_distribution(graph: nx.DiGraph) -> plt.Figure:
-    comps = list(nx.weakly_connected_components(graph))
-    sizes = np.array([len(c) for c in comps], dtype=int)
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    # Log-spaced bins help with heavy-tailed component distributions
-    bin_edges = np.unique(np.logspace(0, np.log10(sizes.max()), num=min(100, sizes.max()), dtype=int))
-    ax.hist(sizes, bins=bin_edges, density=True)
-    ax.set_xscale("log")
-    ax.set_xlabel("Component size (log10 scale)")
-    ax.set_ylabel("Density")
-    ax.set_title("Distribution of connected component sizes")
-    ax.grid(True, alpha=0.3)
-    return fig
-
-
-def plot_degree_distributions(graph: nx.DiGraph, title: str) -> plt.Figure:
+def _degree_rows(graph: nx.DiGraph, label: str) -> list[dict[str, object]]:
     in_deg = np.array([d for _, d in graph.in_degree(graph.nodes)], dtype=int)
     out_deg = np.array([d for _, d in graph.out_degree(graph.nodes)], dtype=int)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-    axes[0].hist(in_deg, bins=np.arange(in_deg.max() + 2) - 0.5, density=True)
-    axes[0].set_xlabel("In-degree")
-    axes[0].set_ylabel("Density")
-    axes[0].set_title("In-degree distribution")
-    axes[0].grid(True, alpha=0.3)
-
-    axes[1].hist(out_deg, bins=np.arange(out_deg.max() + 2) - 0.5, density=True)
-    axes[1].set_xlabel("Out-degree")
-    axes[1].set_ylabel("Density")
-    axes[1].set_title("Out-degree distribution")
-    axes[1].grid(True, alpha=0.3)
-
-    fig.suptitle(title)
-    fig.tight_layout()
-    return fig
-
-
-def plot_edge_timestep_distribution(graph: nx.DiGraph, title: str) -> plt.Figure:
-    ts = [d.get("timeStep", np.nan) for _, _, d in graph.edges(data=True)]
-    ts = np.array([t for t in ts if not pd.isna(t)], dtype=float)
-
-    fig, ax = plt.subplots(figsize=(8, 4))
-    if ts.size > 0:
-        ax.hist(ts, bins=50, density=True)
-    ax.set_xlabel("Edge timeStep")
-    ax.set_ylabel("Density")
-    ax.set_title(title)
-    ax.grid(True, alpha=0.3)
-    return fig
+    rows: list[dict[str, object]] = []
+    rows.extend({"graph": label, "degree_type": "in", "value": int(v)} for v in in_deg)
+    rows.extend({"graph": label, "degree_type": "out", "value": int(v)} for v in out_deg)
+    return rows
 
 
 def summarise_graph(graph: nx.DiGraph, label: str) -> Dict[str, Any]:
@@ -347,7 +295,7 @@ def main() -> None:
         scovmod_yaml=Path(args.simulation),
     )
 
-    ensure_dirs(paths.processed_dir, paths.figures_out_dir, paths.tables_out_dir)
+    ensure_dirs(paths.processed_dir, paths.tables_out_dir)
 
     # Inputs (SCoVMod output dir + file names from config)
     infection_path = paths.scovmod_output_dir / tree_cfg.infection_history_file
@@ -368,18 +316,22 @@ def main() -> None:
     raw_G = build_transmission_network(trans_df, infect_df, rng_seed=tree_cfg.rng_seed)
     print(f"Raw network: {raw_G.number_of_nodes():,} nodes, {raw_G.number_of_edges():,} edges.")
 
-    # Figures on raw network
-    fig = plot_component_size_distribution(raw_G)
-    save_figure(fig, paths.figures_out_dir / "scovmod_tree_raw_component_sizes", tree_cfg.save_formats)
-    plt.close(fig)
+    # Raw network diagnostics
+    raw_components = [len(c) for c in nx.weakly_connected_components(raw_G)]
+    raw_component_df = pd.DataFrame({
+        "graph": "raw",
+        "component_size": np.array(raw_components, dtype=int),
+    })
 
-    fig = plot_degree_distributions(raw_G, title="Raw network degree distributions")
-    save_figure(fig, paths.figures_out_dir / "scovmod_tree_raw_degrees", tree_cfg.save_formats)
-    plt.close(fig)
-
-    fig = plot_edge_timestep_distribution(raw_G, title="Raw network edge timeStep distribution")
-    save_figure(fig, paths.figures_out_dir / "scovmod_tree_raw_edge_timesteps", tree_cfg.save_formats)
-    plt.close(fig)
+    raw_edge_timesteps = [
+        d.get("timeStep")
+        for _, _, d in raw_G.edges(data=True)
+        if d.get("timeStep") is not None
+    ]
+    raw_edge_ts_df = pd.DataFrame({
+        "graph": "raw",
+        "timeStep": np.array(raw_edge_timesteps, dtype=int),
+    })
 
     # Clean multiple parents
     clean_G = remove_reinfections(raw_G)
@@ -388,10 +340,6 @@ def main() -> None:
         f"({raw_G.number_of_edges() - clean_G.number_of_edges():,} edges removed)."
     )
 
-    fig = plot_degree_distributions(clean_G, title="Cleaned network degree distributions")
-    save_figure(fig, paths.figures_out_dir / "scovmod_tree_clean_degrees", tree_cfg.save_formats)
-    plt.close(fig)
-
     # Select target component
     comp_G = select_target_component(
         clean_G,
@@ -399,9 +347,11 @@ def main() -> None:
     )
     print(f"Selected component: {comp_G.number_of_nodes():,} nodes, {comp_G.number_of_edges():,} edges.")
 
-    fig = plot_degree_distributions(comp_G, title="Selected component degree distributions")
-    save_figure(fig, paths.figures_out_dir / "scovmod_tree_component_degrees", tree_cfg.save_formats)
-    plt.close(fig)
+    degree_rows: list[dict[str, object]] = []
+    degree_rows.extend(_degree_rows(raw_G, "raw"))
+    degree_rows.extend(_degree_rows(clean_G, "cleaned"))
+    degree_rows.extend(_degree_rows(comp_G, "selected_component"))
+    degree_df = pd.DataFrame(degree_rows)
 
     # Build tree (MSA)
     tree_G = build_msa_tree(comp_G)
@@ -434,9 +384,13 @@ def main() -> None:
     ]
 
     summary_df = pd.DataFrame(summaries)
-    summary_csv = paths.tables_out_dir / f"scovmod_tree_summary.csv"
-    summary_df.to_csv(summary_csv, index=False)
-    print(f"Saved summary to: {summary_csv}")
+    summary_parquet = paths.tables_out_dir / "scovmod_tree_summary.parquet"
+    summary_df.to_parquet(summary_parquet, index=False)
+    print(f"Saved summary to: {summary_parquet}")
+
+    raw_component_df.to_parquet(paths.tables_out_dir / "scovmod_tree_component_sizes.parquet", index=False)
+    raw_edge_ts_df.to_parquet(paths.tables_out_dir / "scovmod_tree_edge_timesteps.parquet", index=False)
+    degree_df.to_parquet(paths.tables_out_dir / "scovmod_tree_degree_distributions.parquet", index=False)
 
     print("Done.")
 

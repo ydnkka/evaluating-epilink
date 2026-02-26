@@ -9,13 +9,11 @@ Outputs
 -------
 data/processed/synthetic/scenario=<name>/
   - leiden_partitions.parquet  (rows: case_id, gamma, cluster_id)
-tables/supplementary/
-  - leiden_summary.csv (optional quick summary)
 
 Config
 ------
 config/paths.yaml
-config/clustering.yaml:
+config/clustering.yaml
 """
 from __future__ import annotations
 

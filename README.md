@@ -22,7 +22,7 @@ The repository supports:
 * Evaluation of inferred clusters using [BCubed](https://github.com/hhromic/python-bcubed) metrics
 * Scenario-based sensitivity analyses
 * Benchmarking against logistic regression baselines
-* Reproduction of all figures and tables in the main text and supplementary material
+* Reproduction of all figures and tables in the main text and supplementary material via data-first outputs
 
 This repository is intended for transparency and reproducibility and is not a standalone implementation of the framework.
 
@@ -35,8 +35,8 @@ The full implementation of the framework is available in the **[epilink](https:/
 ```
 config/     configuration files for simulation and analyses
 data/       raw and processed inputs (see data/README.md)
-figures/    manuscript figures
-tables/     manuscript tables
+figures/    manuscript figures (rendered from notebooks)
+tables/     parquet outputs used to build manuscript tables/figures
 notebooks/  exploratory notebooks
 scripts/    reproducible pipelines used for the manuscript
 ```
@@ -45,10 +45,11 @@ scripts/    reproducible pipelines used for the manuscript
 
 1. Install dependencies (see `environment.yml`)
 2. Install [epilink](https://github.com/ydnkka/epilink)
-3. Run `scripts/run_all.sh`
+3. Run `scripts/run_all.sh` to generate parquet outputs in `tables/` and processed data
+4. Use `notebooks/` to render the main and supplementary figures from the parquet outputs
 
 ### Boston empirical analysis
 
-The Boston pipeline is implemented in `scripts/06_boston_pipeline.py` and configured via
+The Boston pipeline is implemented in `scripts/boston_clustering.py` and configured via
 `config/boston.yaml`. Inputs are expected in `data/processed/boston/`, and outputs are
-written to `figures/` and `tables/`.
+written to `tables/main/` in parquet format (figures are rendered in notebooks).

@@ -2,9 +2,6 @@ backbone:
   tree_gml: "../data/processed/synthetic/scovmod_tree.gml"
   rng_seed: 12345
   gen_length: 29903
-  save_formats:
-    - "png"
-    - "pdf"
 
 # All simulation scenarios are defined as perturbations of a common baseline parameterisation corresponding to the
 # estimates of Hart et al. Parameters not explicitly listed for a given scenario take their baseline values.

@@ -6,12 +6,10 @@ Evaluate cluster stability over time for different edge-weight models.
 
 Outputs
 -------
-figures/main/
-  - cluster_stability.(png|pdf)
-figures/supplementary/stability/
-  - case_counts_over_time.(png|pdf)
 tables/main/
-  - stability_summary_<method>.csv
+  - stability_summary_<method>.parquet
+tables/supplementary/
+  - case_counts_over_time.parquet
 
 Config
 ------
@@ -44,9 +42,6 @@ from epilink import (
 )
 
 from utils import *
-
-
-set_seaborn_paper_context()
 
 
 def _gamma_grid(cfg: dict) -> tuple[float, ...]:
@@ -303,21 +298,6 @@ def cumulative_stability(
     return pd.concat(transitions, ignore_index=True) if transitions else pd.DataFrame()
 
 
-def plot_stability_over_time(summary: pd.DataFrame, title: str, ax) -> None:
-    cols = ["forward", "backward", "jaccard"]
-    missing = [c for c in cols if c not in summary.columns]
-    if missing:
-        raise ValueError(f"summary is missing columns: {missing}")
-
-    for c, style in zip(cols, ["--", "-.", "-"]):
-        ax.plot(summary.index, summary[c], linestyle=style, linewidth=2, label=c.capitalize())
-
-    ax.set_xlabel("Week")
-    ax.set_ylabel("Mean stability")
-    ax.set_ylim(0, 1)
-    ax.set_title(title, loc="left", pad=20)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
@@ -331,13 +311,10 @@ def main() -> None:
     datasets_cfg = load_yaml(Path(args.datasets))
     stability_cfg = load_yaml(Path(args.stability))
 
-    figs_dir = Path(deep_get(paths_cfg, ["outputs", "figures", "main"], "../figures/main"))
-    sup_figs_dir = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary"))
     tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "main"], "../tables/main"))
+    sup_tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
 
-    stability_subdir = deep_get(stability_cfg, ["plots", "stability_subdir"], "stability")
-    sup_figs_dir = sup_figs_dir / stability_subdir
-    ensure_dirs(figs_dir, sup_figs_dir, tabs_dir)
+    ensure_dirs(tabs_dir, sup_tabs_dir)
 
     step_days = int(deep_get(stability_cfg, ["sampling", "step_days"], 7))
     train_max_time_index = int(deep_get(stability_cfg, ["sampling", "train_max_time_index"], 2))
@@ -348,8 +325,6 @@ def main() -> None:
 
     snp_thresholds = tuple(deep_get(stability_cfg, ["scores", "snp_thresholds"], [0, 1, 2, 3, 4, 5]))
     logit_max_iter = int(deep_get(stability_cfg, ["logistic_regression", "max_iter"], 200))
-    save_formats = list(deep_get(stability_cfg, ["plots", "save_formats"], ["png", "pdf"]))
-
     tree_path = Path(deep_get(datasets_cfg, ["backbone", "tree_gml"],
                               "../data/processed/synthetic/scovmod_tree.gml"))
 
@@ -366,12 +341,12 @@ def main() -> None:
 
     sample_dates = sampling_times(populated_tree, step=step_days)
 
-    fig = plt.figure(figsize=(10, 5))
-    sns.countplot(data=sample_dates, x="available_time")
-    plt.xlabel("Week")
-    plt.ylabel("Number of cases")
-    save_figure(fig, sup_figs_dir / "case_counts_over_time", save_formats)
-    plt.close(fig)
+    case_counts = (
+        sample_dates.groupby("available_time", as_index=False)
+        .size()
+        .rename(columns={"size": "n_cases"})
+    )
+    case_counts.to_parquet(sup_tabs_dir / "case_counts_over_time.parquet", index=False)
 
     inter_gens = tuple(deep_get(inference_cfg, ["inter_generations"], [0, 1]))
     no_intermediates = int(deep_get(inference_cfg, ["num_intermediates"], 10))
@@ -533,19 +508,6 @@ def main() -> None:
     best_f1 = eval_metrics.loc[idx, ["Weight", "BCubed_F1_Score", "snp"]]
     model_snp = best_f1.set_index("Weight")["snp"].to_dict()
 
-    method_titles = {
-        "mech_linear": "(a) Mechanistic (Deterministic)",
-        "mech_poisson": "(b) Mechanistic (Stochastic)",
-        "logit_linear": "(c) Logistic (Deterministic)",
-        "logit_poisson": "(d) Logistic (Stochastic)",
-        "snp_linear": "(e) SNP (Deterministic)",
-        "snp_poisson": "(f) SNP (Stochastic)",
-    }
-
-    custom_titles = deep_get(stability_cfg, ["methods", "titles"], {})
-    if isinstance(custom_titles, dict):
-        method_titles.update(custom_titles)
-
     methods = {
         "mech_linear": {
             "weight_col": "MechProbLinearDist",
@@ -596,13 +558,7 @@ def main() -> None:
 
     n_methods = len(enabled_methods)
     if n_methods == 0:
-        raise ValueError("No valid methods enabled for stability plotting.")
-
-    ncols = 2 if n_methods > 1 else 1
-    nrows = int(np.ceil(n_methods / ncols))
-
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(10, 7), sharex=True, sharey=True)
-    axes = np.atleast_1d(axes).flatten()
+        raise ValueError("No valid methods enabled for stability outputs.")
 
     for i, name in enumerate(enabled_methods):
         cfg = methods[name]
@@ -614,14 +570,7 @@ def main() -> None:
             **cfg,
         )
         summary = stability_df.groupby("t1")[["forward", "backward", "jaccard"]].mean()
-        summary.to_csv(tabs_dir / f"stability_summary_{name}.csv", index=False)
-        plot_stability_over_time(summary, title=method_titles.get(name, name), ax=axes[i])
-
-    handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, frameon=False, loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.07))
-    fig.tight_layout()
-    save_figure(fig, figs_dir / "cluster_stability", save_formats)
-    plt.close(fig)
+        summary.to_parquet(tabs_dir / f"stability_summary_{name}.parquet", index=False)
 
 
 if __name__ == "__main__":

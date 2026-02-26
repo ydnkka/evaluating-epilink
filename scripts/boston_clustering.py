@@ -6,29 +6,34 @@ Boston empirical analysis pipeline:
   - load metadata + precomputed pairwise distances
   - compute mechanistic linkage probabilities (epilink)
   - run Leiden community detection at a fixed resolution
-  - summarize cluster composition and export a manuscript figure/table
+  - summarize cluster composition and export manuscript tables
 
 Config
 ------
 config/paths.yaml
 config/boston.yaml
+
+Outputs
+-------
+tables/main/
+  - boston_cluster_summary.parquet
+  - boston_cluster_composition.parquet
 """
 from __future__ import annotations
 
 import argparse
 from collections import Counter
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, Optional
 
 import igraph as ig
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.stats import chisquare
 
 from epilink import TOIT, InfectiousnessParams, estimate_linkage_probabilities
 
-from utils import deep_get, ensure_dirs, load_yaml, save_figure, set_seaborn_paper_context
+from utils import deep_get, ensure_dirs, load_yaml
 
 
 def hart_default_params() -> InfectiousnessParams:
@@ -181,35 +186,10 @@ def analyse_partition(
     return df
 
 
-def save_exposure_barplot(
-    prob_focus: pd.DataFrame,
-    exposure_order: List[str],
-    out_base: Path,
-) -> None:
-    exposure_cols = [f"count::{label}" for label in exposure_order]
-    missing = [c for c in exposure_cols if c not in prob_focus.columns]
-    if missing:
-        raise ValueError(f"Missing exposure columns in cluster summary: {missing}")
-
-    exposure_counts = prob_focus[exposure_cols].copy()
-    exposure_counts.columns = exposure_order
-    exposure_counts.index = prob_focus["cluster_id"]
-
-    ax = exposure_counts.plot(kind="bar", stacked=True, figsize=(5, 4))
-    ax.set_xlabel("Cluster ID")
-    ax.set_ylabel("Number of sequences")
-    ax.legend(title="Exposure", fontsize="small", frameon=False)
-
-    fig = ax.figure
-    fig.tight_layout()
-    save_figure(fig, out_base, ["pdf", "png"])
-    plt.close(fig)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--paths", default="config/paths.yaml")
-    parser.add_argument("--boston", default="config/boston.yaml")
+    parser.add_argument("--paths", default="../config/paths.yaml")
+    parser.add_argument("--boston", default="../config/boston.yaml")
     parser.add_argument("--out-root", default="")
     args = parser.parse_args()
 
@@ -223,18 +203,11 @@ def main() -> None:
         data_boston = out_root / data_boston
 
     tables_main = Path(deep_get(paths_cfg, ["outputs", "tables", "main"], "../tables/main"))
-    figs_main = Path(deep_get(paths_cfg, ["outputs", "figures", "main"], "../figures/main"))
-    figs_sup = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary"))
     if out_root:
         if not tables_main.is_absolute():
             tables_main = out_root / tables_main
-        if not figs_main.is_absolute():
-            figs_main = out_root / figs_main
-        if not figs_sup.is_absolute():
-            figs_sup = out_root / figs_sup
 
-    figs_sup = figs_sup / str(deep_get(bos_cfg, ["outputs", "figures_subdir"], "boston"))
-    ensure_dirs(data_boston, tables_main, figs_main, figs_sup)
+    ensure_dirs(data_boston, tables_main)
 
     metadata_path = data_boston / str(deep_get(bos_cfg, ["inputs", "metadata"], "boston_metadata.parquet"))
     pairwise_path = data_boston / str(deep_get(bos_cfg, ["inputs", "pairwise_distances"], "boston_pairwise_distances.parquet"))
@@ -287,11 +260,6 @@ def main() -> None:
     probability_threshold = float(deep_get(bos_cfg, ["analysis", "probability_threshold"], 0.0001))
     min_cluster_size = int(deep_get(bos_cfg, ["analysis", "min_cluster_size"], 2))
     focus_exposures = list(deep_get(bos_cfg, ["analysis", "focus_exposures"], ["Conference", "SNF"]))
-    exposure_order = list(deep_get(
-        bos_cfg,
-        ["analysis", "exposure_order"],
-        ["BHCHP", "Other", "City", "Conference", "SNF"],
-    ))
 
     g = build_graph(
         pairwise_df=pair_data,
@@ -324,10 +292,6 @@ def main() -> None:
     else:
         prob_focus = prob_results
 
-    set_seaborn_paper_context()
-    figure_name = str(deep_get(bos_cfg, ["outputs", "figure_name"], "figure2"))
-    save_exposure_barplot(prob_focus, exposure_order, figs_main / figure_name)
-
     prob_summary = prob_focus[[
         "cluster_id",
         "size",
@@ -353,9 +317,10 @@ def main() -> None:
         inplace=True,
     )
 
-    prob_summary.T.to_csv(tables_main / "boston_cluster_summary.csv")
+    prob_summary.to_parquet(tables_main / "boston_cluster_summary.parquet", index=False)
+    prob_focus.to_parquet(tables_main / "boston_cluster_composition.parquet", index=False)
 
-    print(f"Saved Boston outputs to: {tables_main} and {figs_main}")
+    print(f"Saved Boston outputs to: {tables_main}")
 
 
 if __name__ == "__main__":

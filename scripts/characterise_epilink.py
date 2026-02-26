@@ -6,14 +6,12 @@ Characterise the mechanistic, threshold-free linkage model.
 
 Outputs
 ---------------------
-figures/supplementary/mechanism/
-  - toit_density.(png|pdf)
-  - generation_time_density.(png|pdf)
-  - prob_vs_snp.(png|pdf)
-  - prob_vs_days.(png|pdf)
-  - joint_probability_heatmap.(png|pdf)
 tables/supplementary/
-  - mechanism_sanity_table.csv
+  - mechanism_samples.parquet
+  - mechanism_probability_surface.parquet
+  - mechanism_prob_vs_snp.parquet
+  - mechanism_prob_vs_days.parquet
+  - mechanism_sanity_table.parquet
 """
 from __future__ import annotations
 
@@ -31,9 +29,6 @@ from epilink import (
 )
 
 from utils import *
-
-
-set_seaborn_paper_context()
 
 @dataclass
 class CharCfg:
@@ -58,34 +53,6 @@ class CharCfg:
 
 
 # -----------------------------
-# Plots
-# -----------------------------
-
-def plot_density(samples: np.ndarray, xlabel: str, title: str) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.hist(samples, bins=100, density=True)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel("Density")
-    ax.set_title(title)
-    return fig
-
-
-def heatmap(z: np.ndarray, x: np.ndarray, y: np.ndarray, xlabel: str, ylabel: str, title: str) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(6, 4))
-    im = ax.imshow(
-        z,
-        origin="lower",
-        aspect="auto",
-        extent=(x.min(), x.max(), y.min(), y.max()),
-    )
-    fig.colorbar(im, ax=ax, label="Probability")
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_title(title)
-    return fig
-
-
-# -----------------------------
 # Main
 # -----------------------------
 
@@ -98,13 +65,9 @@ def main() -> None:
     paths_cfg = load_yaml(Path(args.paths))
     param_cfg = load_yaml(Path(args.defaults))
 
-    figs_dir = Path(deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "figures/supplementary"))
     tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "tables/supplementary"))
 
-    figs_dir = figs_dir / "mechanism"
-    ensure_dirs(figs_dir, tabs_dir)
-
-    formats = list(deep_get(param_cfg, ["save_formats"], ["png", "pdf"]))
+    ensure_dirs(tabs_dir)
     cc = CharCfg(
         rng_seed=int(deep_get(param_cfg, ["toit", "rng_seed"], 42)),
         k_inc=float(deep_get(param_cfg, ["toit", "infectiousness_params", "k_inc"], 5.807)),
@@ -151,9 +114,11 @@ def main() -> None:
     toit_samples = toit.rvs(cc.n_sim)
     gen_time_samples = toit.generation_time(cc.n_sim)
 
-    fig = plot_density(toit_samples, xlabel="Days", title="")
-    save_figure(fig, figs_dir / "sm1_toit_density", formats)
-    plt.close(fig)
+    samples_df = pd.DataFrame({
+        "sample_type": (["toit"] * len(toit_samples)) + (["generation_time"] * len(gen_time_samples)),
+        "value": np.concatenate([toit_samples, gen_time_samples]).astype(float),
+    })
+    samples_df.to_parquet(tabs_dir / "mechanism_samples.parquet", index=False)
 
     # --- B) Plausibility surfaces: genetic-only, temporal-only, joint
     snps = np.arange(0, cc.max_snp + 1, cc.snp_step)
@@ -191,28 +156,24 @@ def main() -> None:
         num_simulations=cc.n_sim,
     )
 
-    # Heatmaps
-    fig = heatmap(P_joint, x=snps, y=days, xlabel="Genetic distance (SNPs)", ylabel="Temporal distance (days)",
-                  title="")
-    save_figure(fig, figs_dir / "sm1_joint_probability_heatmap", formats)
-    plt.close(fig)
+    surface_df = pd.DataFrame({
+        "snp": Dg.ravel().astype(int),
+        "days": Dt.ravel().astype(int),
+        "probability": P_joint.ravel().astype(float),
+    })
+    surface_df.to_parquet(tabs_dir / "mechanism_probability_surface.parquet", index=False)
 
-    # Line plots for sanity
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.plot(snps, P_genetic)
-    ax.set_xlabel("Genetic distance (SNPs)")
-    ax.set_ylabel("Probability")
-    ax.grid(True, alpha=0.3)
-    save_figure(fig, figs_dir / "sm1_prob_vs_snp", formats)
-    plt.close(fig)
+    prob_vs_snp_df = pd.DataFrame({
+        "snp": snps.astype(int),
+        "probability": P_genetic.astype(float),
+    })
+    prob_vs_snp_df.to_parquet(tabs_dir / "mechanism_prob_vs_snp.parquet", index=False)
 
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.plot(days, P_temporal)
-    ax.set_xlabel("Temporal distance (days)")
-    ax.set_ylabel("Probability")
-    ax.grid(True, alpha=0.3)
-    save_figure(fig, figs_dir / "sm1_prob_vs_days", formats)
-    plt.close(fig)
+    prob_vs_days_df = pd.DataFrame({
+        "days": days.astype(int),
+        "probability": P_temporal.astype(float),
+    })
+    prob_vs_days_df.to_parquet(tabs_dir / "mechanism_prob_vs_days.parquet", index=False)
 
     # --- C) Sanity table (handy for Methods / Supplement)
     sanity_rows = []
@@ -227,12 +188,10 @@ def main() -> None:
                 num_simulations=cc.n_sim,
             )[0])
             sanity_rows.append({"SNPs": s, "DeltaDays": t, "P_mech": p})
-    pd.DataFrame(sanity_rows).to_csv(tabs_dir / "mechanism_sanity_table.csv", index=False)
+    pd.DataFrame(sanity_rows).to_parquet(tabs_dir / "mechanism_sanity_table.parquet", index=False)
 
-    print(f"Saved characterisation figures to: {figs_dir}")
-    print(f"Saved sanity table to: {tabs_dir / 'mechanism_sanity_table.csv'}")
+    print(f"Saved mechanism tables to: {tabs_dir}")
 
 
 if __name__ == "__main__":
     main()
-
