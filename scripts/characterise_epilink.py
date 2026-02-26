@@ -2,7 +2,7 @@
 """
 scripts/characterise_epilink.py
 
-Characterise the mechanistic, threshold-free linkage model.
+Characterise epilink 
 
 Outputs
 ---------------------
@@ -21,7 +21,6 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-# epilink provides the mechanistic timing model + probability estimator
 from epilink import (
     TOIT,
     InfectiousnessParams,
@@ -31,7 +30,7 @@ from epilink import (
 from utils import *
 
 @dataclass
-class CharCfg:
+class Cfg:
     rng_seed: int
     k_inc: float
     scale_inc: float
@@ -65,10 +64,10 @@ def main() -> None:
     paths_cfg = load_yaml(Path(args.paths))
     param_cfg = load_yaml(Path(args.defaults))
 
-    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "tables/supplementary"))
+    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
 
     ensure_dirs(tabs_dir)
-    cc = CharCfg(
+    cfg = Cfg(
         rng_seed=int(deep_get(param_cfg, ["toit", "rng_seed"], 42)),
         k_inc=float(deep_get(param_cfg, ["toit", "infectiousness_params", "k_inc"], 5.807)),
         scale_inc=float(deep_get(param_cfg, ["toit", "infectiousness_params", "scale_inc"], 0.948)),
@@ -93,26 +92,26 @@ def main() -> None:
     )
 
     params = InfectiousnessParams(
-        k_inc=cc.k_inc,
-        scale_inc=cc.scale_inc,
-        k_E=cc.k_E,
-        mu=cc.mu,
-        k_I=cc.k_I,
-        alpha=cc.alpha,
+        k_inc=cfg.k_inc,
+        scale_inc=cfg.scale_inc,
+        k_E=cfg.k_E,
+        mu=cfg.mu,
+        k_I=cfg.k_I,
+        alpha=cfg.alpha,
     )
 
     toit = TOIT(
         params=params,
-        rng_seed=cc.rng_seed,
-        subs_rate=cc.subs_rate,
-        relax_rate=cc.relax_rate,
-        subs_rate_sigma=cc.subs_rate_sigma,
-        gen_len=cc.gen_length,
+        rng_seed=cfg.rng_seed,
+        subs_rate=cfg.subs_rate,
+        relax_rate=cfg.relax_rate,
+        subs_rate_sigma=cfg.subs_rate_sigma,
+        gen_len=cfg.gen_length,
     )
 
     # --- A) Timing priors: TOIT and generation time
-    toit_samples = toit.rvs(cc.n_sim)
-    gen_time_samples = toit.generation_time(cc.n_sim)
+    toit_samples = toit.rvs(cfg.n_sim)
+    gen_time_samples = toit.generation_time(cfg.n_sim)
 
     samples_df = pd.DataFrame({
         "sample_type": (["toit"] * len(toit_samples)) + (["generation_time"] * len(gen_time_samples)),
@@ -121,8 +120,8 @@ def main() -> None:
     samples_df.to_parquet(tabs_dir / "mechanism_samples.parquet", index=False)
 
     # --- B) Plausibility surfaces: genetic-only, temporal-only, joint
-    snps = np.arange(0, cc.max_snp + 1, cc.snp_step)
-    days = np.arange(0, cc.max_days + 1, cc.day_step)
+    snps = np.arange(0, cfg.max_snp + 1, cfg.snp_step)
+    days = np.arange(0, cfg.max_days + 1, cfg.day_step)
     Dg, Dt = np.meshgrid(snps.astype(float), days.astype(float))
 
     # Genetic plausibility at Dt=0: treat temporal_distance as fixed
@@ -132,9 +131,9 @@ def main() -> None:
         toit=toit,
         genetic_distance=Dg.ravel(),
         temporal_distance=Dt.ravel(),
-        intermediate_generations=cc.inter_gen,
-        no_intermediates=cc.n_inter,
-        num_simulations=cc.n_sim,
+        intermediate_generations=cfg.inter_gen,
+        no_intermediates=cfg.n_inter,
+        num_simulations=cfg.n_sim,
 
     ).reshape(Dg.shape)
 
@@ -143,17 +142,17 @@ def main() -> None:
         toit=toit,
         genetic_distance=snps.astype(float),
         temporal_distance=np.zeros_like(snps, dtype=float),
-        intermediate_generations=cc.inter_gen,
-        no_intermediates=cc.n_inter,
-        num_simulations=cc.n_sim,
+        intermediate_generations=cfg.inter_gen,
+        no_intermediates=cfg.n_inter,
+        num_simulations=cfg.n_sim,
     )
     P_temporal = estimate_linkage_probabilities(
         toit=toit,
         genetic_distance=np.zeros_like(days, dtype=float),
         temporal_distance=days.astype(float),
-        intermediate_generations=cc.inter_gen,
-        no_intermediates=cc.n_inter,
-        num_simulations=cc.n_sim,
+        intermediate_generations=cfg.inter_gen,
+        no_intermediates=cfg.n_inter,
+        num_simulations=cfg.n_sim,
     )
 
     surface_df = pd.DataFrame({
@@ -183,9 +182,9 @@ def main() -> None:
                 toit=toit,
                 genetic_distance=np.array([float(s)]),
                 temporal_distance=np.array([float(t)]),
-                intermediate_generations=cc.inter_gen,
-                no_intermediates=cc.n_inter,
-                num_simulations=cc.n_sim,
+                intermediate_generations=cfg.inter_gen,
+                no_intermediates=cfg.n_inter,
+                num_simulations=cfg.n_sim,
             )[0])
             sanity_rows.append({"SNPs": s, "DeltaDays": t, "P_mech": p})
     pd.DataFrame(sanity_rows).to_parquet(tabs_dir / "mechanism_sanity_table.parquet", index=False)
