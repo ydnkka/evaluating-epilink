@@ -9,6 +9,8 @@ SCRIPTS=(
   "sparsify_effects.py"
   "run_clustering.py"
   "evaluate_clustering.py"
+  "cluster_stability.py"
+  "boston_clustering.py"
 )
 
 echo "Starting pipeline..."
