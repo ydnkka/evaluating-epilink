@@ -48,6 +48,8 @@ def main() -> None:
     tabs_dir = Path(
         deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
     )
+    tabs_dir = tabs_dir / "characterise_epilink"
+
     figs_dir = Path(
         deep_get(paths_cfg, ["outputs", "figures", "supplementary"], "../figures/supplementary")
     )

@@ -60,7 +60,7 @@ class Cfg:
     subs_rate_sigma: float
     gen_length: int
     num_simulations: int
-    intermediate_generations: tuple[int, int]
+    intermediate_generations: tuple[int, ...]
     intermediate_hosts: int
     max_snp: int
     snp_step: int
@@ -112,6 +112,8 @@ def main() -> None:
 
     tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
 
+    tabs_dir = tabs_dir / "characterise_epilink"
+
     ensure_dirs(tabs_dir)
     cfg = Cfg(
         rng_seed=int(deep_get(param_cfg, ["rng_seed"], 42)),
@@ -131,7 +133,7 @@ def main() -> None:
 
         num_simulations=int(deep_get(param_cfg, ["inference", "num_simulations"], 10_000)),
         intermediate_generations=tuple(
-            deep_get(param_cfg, ["inference", "intermediate_generations"], (0, 1))
+            int(x) for x in deep_get(param_cfg, ["inference", "intermediate_generations"], (0, 1))
         ),
         intermediate_hosts=int(deep_get(param_cfg, ["inference", "intermediate_hosts"], 10)),
 
@@ -291,6 +293,7 @@ def main() -> None:
     stage_samples_df.to_parquet(tabs_dir / "characteristic_stage_samples.parquet", index=False)
 
     tost_samples = tost.rvs(cfg.num_simulations)
+    presymp_fraction_value = float(presymptomatic_fraction(params))
     sample_summary = [
         summarize_samples(toit_samples, "toit"),
         summarize_samples(gen_time_samples, "generation_time"),
@@ -299,12 +302,13 @@ def main() -> None:
         summarize_samples(presymptomatic_samples, "presymptomatic"),
         summarize_samples(symptomatic_samples, "symptomatic"),
         summarize_samples(incubation_samples, "incubation"),
+        summarize_samples(np.array([presymp_fraction_value]), "presymptomatic_fraction"),
     ]
     sample_summary_df = pd.DataFrame(sample_summary)
     sample_summary_df.to_parquet(tabs_dir / "characteristic_sample_summary.parquet", index=False)
 
     presymp_fraction_df = pd.DataFrame({
-        "fraction": [float(presymptomatic_fraction(params))],
+        "fraction": [presymp_fraction_value],
     })
     presymp_fraction_df.to_parquet(
         tabs_dir / "characteristic_presymptomatic_fraction.parquet", index=False
