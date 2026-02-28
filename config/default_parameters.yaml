@@ -22,3 +22,7 @@ characterisation:
   temporal_distance_grid:
     max_days: 21
     step: 1
+  expected_mutations_grid:
+    max_days: 60
+    step: 1
+    sample_size: 300

@@ -126,24 +126,8 @@ def main() -> None:
     axes[0].set_xlabel("Substitution rate (per site per year)")
     axes[0].set_ylabel("Density")
     axes[0].set_title("Clock rate distribution")
-    days = expected_df["days"].to_numpy(dtype=float)
-    rates = clock_rates_df["rate_per_day"].to_numpy(dtype=float)
-    rng = np.random.default_rng(123)
-    n_per_day = min(300, rates.size)
-    scatter_rows = []
-    for day in days:
-        sampled_rates = rng.choice(rates, size=n_per_day, replace=True)
-        scatter_rows.append(
-            pd.DataFrame(
-                {
-                    "days": np.full(n_per_day, day, dtype=float),
-                    "expected_mutations": sampled_rates * day,
-                }
-            )
-        )
-    scatter_df = pd.concat(scatter_rows, ignore_index=True)
     sns.regplot(
-        data=scatter_df,
+        data=expected_df,
         x="days",
         y="expected_mutations",
         scatter_kws={"alpha": 0.2, "s": 12, "color": "#9467bd"},

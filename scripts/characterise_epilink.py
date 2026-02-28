@@ -73,6 +73,7 @@ class Cfg:
     tost_day_step: float
     expected_mutation_max_days: int
     expected_mutation_day_step: int
+    expected_mutation_sample_size: int
 
 
 def summarize_samples(values: np.ndarray, label: str) -> dict[str, float | str | int]:
@@ -161,6 +162,9 @@ def main() -> None:
         ),
         expected_mutation_day_step=int(
             deep_get(param_cfg, ["characterisation", "expected_mutations_grid", "step"], 1)
+        ),
+        expected_mutation_sample_size=int(
+            deep_get(param_cfg, ["characterisation", "expected_mutations_grid", "sample_size"], 300)
         ),
     )
 
@@ -356,11 +360,21 @@ def main() -> None:
         cfg.expected_mutation_day_step,
         dtype=float,
     )
-    expected_mutations = clock.expected_mutations(expected_days)
-    expected_mutations_df = pd.DataFrame({
-        "days": expected_days.astype(int),
-        "expected_mutations": expected_mutations.astype(float),
-    })
+    expected_mutations = clock.expected_mutations(
+        expected_days, size=cfg.expected_mutation_sample_size
+    )
+    if expected_mutations.ndim == 1:
+        expected_mutations_df = pd.DataFrame({
+            "days": expected_days.astype(int),
+            "expected_mutations": expected_mutations.astype(float),
+        })
+    else:
+        sample_ids = np.arange(expected_mutations.shape[0], dtype=int)
+        expected_mutations_df = pd.DataFrame({
+            "sample_id": np.repeat(sample_ids, expected_days.size),
+            "days": np.tile(expected_days, expected_mutations.shape[0]).astype(int),
+            "expected_mutations": expected_mutations.reshape(-1).astype(float),
+        })
     expected_mutations_df.to_parquet(
         tabs_dir / "characteristic_expected_mutations.parquet", index=False
     )
