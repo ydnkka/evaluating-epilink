@@ -1,31 +1,31 @@
 #!/usr/bin/env python3
 """
-scripts/plot_characterise_epilink.py
+scripts/characterise_epilink_plot.py
 
 Generate supplementary figures from characteristic tables.
 
 Outputs
 ---------------------
 figures/supplementary/
-  - supplementary_characteristic_toit.(png|pdf)
-  - supplementary_characteristic_tost.(png|pdf)
-  - supplementary_characteristic_stages.(png|pdf)
-  - supplementary_characteristic_clock.(png|pdf)
-  - supplementary_characteristic_linkage_components.(png|pdf)
-  - supplementary_characteristic_linkage_surface.(png|pdf)
-  - supplementary_characteristic_scenario_weights.(png|pdf)
+  - OUT_PREFIX_toit.(png|pdf)
+  - OUT_PREFIX_tost.(png|pdf)
+  - OUT_PREFIX_stages.(png|pdf)
+  - OUT_PREFIX_clock.(png|pdf)
+  - OUT_PREFIX_linkage_components.(png|pdf)
+  - OUT_PREFIX_linkage_surface.(png|pdf)
+  - OUT_PREFIX_scenario_weights.(png|pdf)
+
+Use ``--out-prefix`` to match the table prefix (default: ``characteristic``).
 """
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from utils import deep_get, ensure_dirs, load_yaml, save_figure, set_seaborn_paper_context
+from utils import *
 
 
 def read_table(path: Path) -> pd.DataFrame:
@@ -42,6 +42,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
     parser.add_argument("--formats", default="png,pdf")
+    parser.add_argument("--out-prefix", default="characteristic")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))
@@ -56,11 +57,19 @@ def main() -> None:
     figs_dir = figs_dir / "characterise_epilink"
     ensure_dirs(figs_dir)
 
+    out_prefix = args.out_prefix
+
+    def table_path(stem: str) -> Path:
+        return tabs_dir / f"{out_prefix}_{stem}.parquet"
+
+    def figure_base(stem: str) -> Path:
+        return figs_dir / f"{out_prefix}_{stem}"
+
     formats = parse_formats(args.formats)
-    set_seaborn_paper_context(font_scale=1.4)
+    set_seaborn_paper_context()
 
     # TOIT PDF/CDF
-    toit_df = read_table(tabs_dir / "characteristic_toit_grid.parquet")
+    toit_df = read_table(table_path("toit_grid"))
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     axes[0].plot(toit_df["days"], toit_df["pdf"], color="#1f77b4", lw=2)
     axes[0].set_xlabel("Days")
@@ -74,11 +83,11 @@ def main() -> None:
     axes[1].set_title("TOIT CDF")
     axes[1].set_xlim(0, 20)
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_toit", formats)
+    save_figure(fig, figure_base("toit"), formats)
     plt.close(fig)
 
     # TOST PDF/CDF
-    tost_df = read_table(tabs_dir / "characteristic_tost_grid.parquet")
+    tost_df = read_table(table_path("tost_grid"))
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
     axes[0].plot(tost_df["days"], tost_df["pdf"], color="#ff7f0e", lw=2)
     axes[0].axvline(0, color="black", lw=1, ls="--", alpha=0.6)
@@ -94,11 +103,11 @@ def main() -> None:
     axes[1].set_title("TOST CDF")
     axes[1].set_xlim(-10, 10)
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_tost", formats)
+    save_figure(fig, figure_base("tost"), formats)
     plt.close(fig)
 
     # Stage duration distributions
-    stage_df = read_table(tabs_dir / "characteristic_stage_samples.parquet")
+    stage_df = read_table(table_path("stage_samples"))
     stages = ["latent", "presymptomatic", "symptomatic", "incubation"]
     fig, axes = plt.subplots(2, 2, figsize=(10, 7), sharex=False)
     for ax, stage in zip(axes.ravel(), stages):
@@ -109,12 +118,12 @@ def main() -> None:
         ax.set_ylabel("Density")
         ax.set_xlim(left=0)
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_stages", formats)
+    save_figure(fig, figure_base("stages"), formats)
     plt.close(fig)
 
     # Molecular clock diagnostics
-    clock_rates_df = read_table(tabs_dir / "characteristic_clock_rate_samples.parquet")
-    expected_df = read_table(tabs_dir / "characteristic_expected_mutations.parquet")
+    clock_rates_df = read_table(table_path("clock_rate_samples"))
+    expected_df = read_table(table_path("expected_mutations"))
     fig, axes = plt.subplots(1, 2, figsize=(11, 4))
     sns.histplot(
         clock_rates_df["rate_per_site_year"],
@@ -138,13 +147,13 @@ def main() -> None:
     axes[1].set_ylabel("Expected mutations")
     axes[1].set_title("Expected mutations over time")
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_clock", formats)
+    save_figure(fig, figure_base("clock"), formats)
     plt.close(fig)
 
     # Temporal-only and genetic-only components
-    temporal_df = read_table(tabs_dir / "characteristic_temporal_linkage.parquet")
+    temporal_df = read_table(table_path("temporal_linkage"))
     temporal_df = temporal_df.loc[temporal_df["days"] >= 0]
-    genetic_df = read_table(tabs_dir / "characteristic_genetic_linkage.parquet")
+    genetic_df = read_table(table_path("genetic_linkage"))
     fig, axes = plt.subplots(1, 2, figsize=(11, 4))
     axes[0].plot(
         temporal_df["days"],
@@ -176,11 +185,11 @@ def main() -> None:
     axes[1].set_title("Genetic evidence")
     axes[1].legend(frameon=False)
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_linkage_components", formats)
+    save_figure(fig, figure_base("linkage_components"), formats)
     plt.close(fig)
 
     # Joint linkage surface
-    surface_df = read_table(tabs_dir / "characteristic_probability_surface.parquet")
+    surface_df = read_table(table_path("probability_surface"))
     surface_pivot = surface_df.pivot(index="days", columns="snp", values="probability")
     fig, ax = plt.subplots(figsize=(7, 5))
     sns.heatmap(
@@ -193,11 +202,11 @@ def main() -> None:
     ax.set_ylabel("Temporal distance (days)")
     ax.set_title("Joint linkage probability")
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_linkage_surface", formats)
+    save_figure(fig, figure_base("linkage_surface"), formats)
     plt.close(fig)
 
     # Scenario weights by intermediate hosts
-    scenarios_df = read_table(tabs_dir / "characteristic_genetic_scenarios.parquet")
+    scenarios_df = read_table(table_path("genetic_scenarios"))
     scenario_pivot = scenarios_df.pivot(index="m", columns="snp", values="normalized")
     fig, ax = plt.subplots(figsize=(7, 5))
     sns.heatmap(
@@ -210,7 +219,7 @@ def main() -> None:
     ax.set_ylabel("Intermediate hosts (m)")
     ax.set_title("Genetic scenario weights")
     fig.tight_layout()
-    save_figure(fig, figs_dir / "supplementary_characteristic_scenario_weights", formats)
+    save_figure(fig, figure_base("scenario_weights"), formats)
     plt.close(fig)
 
     print(f"Saved supplementary figures to: {figs_dir}")

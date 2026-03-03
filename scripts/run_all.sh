@@ -6,6 +6,7 @@ cd "$SCRIPT_DIR"
 
 SCRIPTS=(
   "characterise_epilink.py"
+  "characterise_epilink_plot.py"
   "generate_tree.py"
   "generate_datasets.py"
   "pairwise_discrimination.py"

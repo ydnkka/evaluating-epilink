@@ -82,11 +82,12 @@ def main() -> None:
 
     processed_dir = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
     tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
+    tabs_dir = tabs_dir / "scovmod"
 
     ensure_dirs(processed_dir, tabs_dir)
 
     tree_path = Path(deep_get(scenarios_cfg, ["backbone", "tree_gml"],
-                              "../data/processed/synthetic/scovmod_tree.gml"))
+                              ".../data/processed/synthetic/scovmod/scovmod_tree.gml"))
     rng_seed = int(deep_get(scenarios_cfg, ["backbone", "rng_seed"], 12345))
     gen_length = int(deep_get(scenarios_cfg, ["backbone", "gen_length"], 29903))
 
@@ -96,7 +97,7 @@ def main() -> None:
     if not isinstance(scenarios, dict) or len(scenarios) == 0:
         raise ValueError("generate_datasets.yaml must define a `scenarios:` mapping.")
 
-    # Defaults (same philosophy as earlier)
+    # Defaults are applied by copying the baseline scenario and updating with any scenario-specific patches.
     baseline = scenarios["baseline"]
 
     summary_rows = []

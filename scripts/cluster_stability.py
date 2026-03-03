@@ -38,7 +38,7 @@ from epilink import (
     populate_epidemic_data,
     simulate_genomic_data,
     generate_pairwise_data,
-    estimate_linkage_probabilities,
+    linkage_probability,
 )
 
 from utils import *

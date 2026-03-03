@@ -1,11 +1,11 @@
 {
-  "dispersion_k": 0.23295007758779804,
-  "mean_Rt": 0.9994133666199423,
-  "Rt_CI95": [
+  "disp_k": 0.23295007758779804,
+  "meanRt": 0.9994133666199423,
+  "RtCI95": [
     0.9922797959978048,
     1.0055915297206908
   ],
-  "k_CI95": [
+  "kCI95": [
     0.23169662743533537,
     0.23466684634112334
   ],
@@ -17,9 +17,10 @@
     "n": 536866,
     "total_transmissions": 536541,
     "bootstrap_kept": 200,
+    "bootstrap_kept_R": 200,
+    "bootstrap_kept_k": 200,
     "fit_method": "mle",
     "fit_notes": "",
-    "superspreading_reference": "poisson",
     "quantile": 0.99
   }
 }

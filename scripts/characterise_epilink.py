@@ -7,22 +7,24 @@ Characterise epilink
 Outputs
 ---------------------
 tables/supplementary/
-  - characteristic_samples.parquet
-  - characteristic_sample_summary.parquet
-  - characteristic_stage_samples.parquet
-  - characteristic_toit_grid.parquet
-  - characteristic_tost_grid.parquet
-  - characteristic_presymptomatic_fraction.parquet
-  - characteristic_model_params.parquet
-  - characteristic_clock_rate_samples.parquet
-  - characteristic_clock_rate_summary.parquet
-  - characteristic_expected_mutations.parquet
-  - characteristic_temporal_linkage.parquet
-  - characteristic_genetic_linkage.parquet
-  - characteristic_genetic_scenarios.parquet
-  - characteristic_probability_surface.parquet
-  - characteristic_prob_vs_snp.parquet
-  - characteristic_prob_vs_days.parquet
+  - OUT_PREFIX_samples.parquet
+  - OUT_PREFIX_sample_summary.parquet
+  - OUT_PREFIX_stage_samples.parquet
+  - OUT_PREFIX_toit_grid.parquet
+  - OUT_PREFIX_tost_grid.parquet
+  - OUT_PREFIX_presymptomatic_fraction.parquet
+  - OUT_PREFIX_model_params.parquet
+  - OUT_PREFIX_clock_rate_samples.parquet
+  - OUT_PREFIX_clock_rate_summary.parquet
+  - OUT_PREFIX_expected_mutations.parquet
+  - OUT_PREFIX_temporal_linkage.parquet
+  - OUT_PREFIX_genetic_linkage.parquet
+  - OUT_PREFIX_genetic_scenarios.parquet
+  - OUT_PREFIX_probability_surface.parquet
+  - OUT_PREFIX_prob_vs_snp.parquet
+  - OUT_PREFIX_prob_vs_days.parquet
+
+Use ``--out-prefix`` to control the file name prefix (default: ``characteristic``).
 """
 from __future__ import annotations
 
@@ -46,8 +48,8 @@ from epilink import (
 
 from utils import *
 
-@dataclass
-class Cfg:
+@dataclass(frozen=True)
+class ParamConfig:
     rng_seed: int
     incubation_shape: float
     incubation_scale: float
@@ -75,48 +77,9 @@ class Cfg:
     expected_mutation_day_step: int
     expected_mutation_sample_size: int
 
-
-def summarize_samples(values: np.ndarray, label: str) -> dict[str, float | str | int]:
-    arr = np.asarray(values, dtype=float)
-    quantiles = np.quantile(arr, [0.025, 0.25, 0.5, 0.75, 0.975])
-    return {
-        "sample_type": label,
-        "n": int(arr.size),
-        "mean": float(np.mean(arr)),
-        "sd": float(np.std(arr, ddof=1)) if arr.size > 1 else 0.0,
-        "q025": float(quantiles[0]),
-        "q25": float(quantiles[1]),
-        "median": float(quantiles[2]),
-        "q75": float(quantiles[3]),
-        "q975": float(quantiles[4]),
-    }
-
-
-def build_grid(start: float, stop: float, step: float) -> np.ndarray:
-    if step <= 0:
-        raise ValueError("step must be positive.")
-    return np.arange(start, stop + step * 0.5, step, dtype=float)
-
-
-# -----------------------------
-# Main
-# -----------------------------
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--defaults", default="../config/default_parameters.yaml")
-    args = parser.parse_args()
-
-    paths_cfg = load_yaml(Path(args.paths))
-    param_cfg = load_yaml(Path(args.defaults))
-
-    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
-
-    tabs_dir = tabs_dir / "characterise_epilink"
-
-    ensure_dirs(tabs_dir)
-    cfg = Cfg(
+def parse_configs(param_yaml: Path):
+    param_cfg = load_yaml(param_yaml)
+    return  ParamConfig(
         rng_seed=int(deep_get(param_cfg, ["rng_seed"], 42)),
         incubation_shape=float(deep_get(param_cfg, ["infectiousness_params", "incubation_shape"], 5.807)),
         incubation_scale=float(deep_get(param_cfg, ["infectiousness_params", "incubation_scale"], 0.948)),
@@ -168,6 +131,52 @@ def main() -> None:
         ),
     )
 
+
+def summarize_samples(values: np.ndarray, label: str) -> dict[str, float | str | int]:
+    arr = np.asarray(values, dtype=float)
+    quantiles = np.quantile(arr, [0.025, 0.25, 0.5, 0.75, 0.975])
+    return {
+        "sample_type": label,
+        "n": int(arr.size),
+        "mean": float(np.mean(arr)),
+        "sd": float(np.std(arr, ddof=1)) if arr.size > 1 else 0.0,
+        "q025": float(quantiles[0]),
+        "q25": float(quantiles[1]),
+        "median": float(quantiles[2]),
+        "q75": float(quantiles[3]),
+        "q975": float(quantiles[4]),
+    }
+
+
+def build_grid(start: float, stop: float, step: float) -> np.ndarray:
+    if step <= 0:
+        raise ValueError("step must be positive.")
+    return np.arange(start, stop + step * 0.5, step, dtype=float)
+
+
+# -----------------------------
+# Main
+# -----------------------------
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--paths", default="../config/paths.yaml")
+    parser.add_argument("--defaults", default="../config/default_parameters.yaml")
+    parser.add_argument("--out-prefix", default="characteristic")
+    args = parser.parse_args()
+
+    paths_cfg = load_yaml(Path(args.paths))
+    out_prefix = args.out_prefix
+    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
+    tabs_dir = tabs_dir / "characterise_epilink"
+
+    ensure_dirs(tabs_dir)
+
+    def table_path(stem: str) -> Path:
+        return tabs_dir / f"{out_prefix}_{stem}.parquet"
+
+    cfg = parse_configs(Path(args.defaults))
+
     rng = default_rng(cfg.rng_seed)
 
     params = InfectiousnessParams(
@@ -200,7 +209,7 @@ def main() -> None:
         "sample_type": (["toit"] * len(toit_samples)) + (["generation_time"] * len(gen_time_samples)),
         "value": np.concatenate([toit_samples, gen_time_samples]).astype(float),
     })
-    samples_df.to_parquet(tabs_dir / "characteristic_samples.parquet", index=False)
+    samples_df.to_parquet(table_path("samples"), index=False)
 
     # --- B) Plausibility surfaces: genetic-only, temporal-only, joint
     snps = np.arange(0, cfg.max_snp + 1, cfg.snp_step)
@@ -246,19 +255,19 @@ def main() -> None:
         "days": Dt.ravel().astype(int),
         "probability": P_joint.ravel().astype(float),
     })
-    surface_df.to_parquet(tabs_dir / "characteristic_probability_surface.parquet", index=False)
+    surface_df.to_parquet(table_path("probability_surface"), index=False)
 
     prob_vs_snp_df = pd.DataFrame({
         "snp": snps.astype(int),
         "probability": P_genetic.astype(float),
     })
-    prob_vs_snp_df.to_parquet(tabs_dir / "characteristic_prob_vs_snp.parquet", index=False)
+    prob_vs_snp_df.to_parquet(table_path("prob_vs_snp"), index=False)
 
     prob_vs_days_df = pd.DataFrame({
         "days": days.astype(int),
         "probability": P_temporal.astype(float),
     })
-    prob_vs_days_df.to_parquet(tabs_dir / "characteristic_prob_vs_days.parquet", index=False)
+    prob_vs_days_df.to_parquet(table_path("prob_vs_days"), index=False)
 
     # --- C) TOIT/TOST grids, stage samples, and summary statistics
     toit_grid = build_grid(0.0, cfg.toit_max_days, cfg.toit_day_step)
@@ -267,7 +276,7 @@ def main() -> None:
         "pdf": toit.pdf(toit_grid).astype(float),
         "cdf": toit.cdf(toit_grid).astype(float),
     })
-    toit_grid_df.to_parquet(tabs_dir / "characteristic_toit_grid.parquet", index=False)
+    toit_grid_df.to_parquet(table_path("toit_grid"), index=False)
 
     tost = TOST(params=params, rng=rng)
     tost_grid = build_grid(cfg.tost_min_days, cfg.tost_max_days, cfg.tost_day_step)
@@ -276,7 +285,7 @@ def main() -> None:
         "pdf": tost.pdf(tost_grid).astype(float),
         "cdf": tost.cdf(tost_grid).astype(float),
     })
-    tost_grid_df.to_parquet(tabs_dir / "characteristic_tost_grid.parquet", index=False)
+    tost_grid_df.to_parquet(table_path("tost_grid"), index=False)
 
     latent_samples = toit.sample_latent(cfg.num_simulations)
     presymptomatic_samples = toit.sample_presymptomatic(cfg.num_simulations)
@@ -294,7 +303,7 @@ def main() -> None:
             [latent_samples, presymptomatic_samples, symptomatic_samples, incubation_samples]
         ).astype(float),
     })
-    stage_samples_df.to_parquet(tabs_dir / "characteristic_stage_samples.parquet", index=False)
+    stage_samples_df.to_parquet(table_path("stage_samples"), index=False)
 
     tost_samples = tost.rvs(cfg.num_simulations)
     presymp_fraction_value = float(presymptomatic_fraction(params))
@@ -309,13 +318,13 @@ def main() -> None:
         summarize_samples(np.array([presymp_fraction_value]), "presymptomatic_fraction"),
     ]
     sample_summary_df = pd.DataFrame(sample_summary)
-    sample_summary_df.to_parquet(tabs_dir / "characteristic_sample_summary.parquet", index=False)
+    sample_summary_df.to_parquet(table_path("sample_summary"), index=False)
 
     presymp_fraction_df = pd.DataFrame({
         "fraction": [presymp_fraction_value],
     })
     presymp_fraction_df.to_parquet(
-        tabs_dir / "characteristic_presymptomatic_fraction.parquet", index=False
+        table_path("presymptomatic_fraction"), index=False
     )
 
     model_params_df = pd.DataFrame(
@@ -335,7 +344,7 @@ def main() -> None:
             {"parameter": "intermediate_hosts", "value": str(cfg.intermediate_hosts)},
         ]
     )
-    model_params_df.to_parquet(tabs_dir / "characteristic_model_params.parquet", index=False)
+    model_params_df.to_parquet(table_path("model_params"), index=False)
 
     # --- D) Molecular clock diagnostics
     clock_rates_per_day = clock.sample_clock_rate_per_day(size=cfg.num_simulations)
@@ -344,14 +353,14 @@ def main() -> None:
         "rate_per_day": clock_rates_per_day.astype(float),
         "rate_per_site_year": clock_rates_per_site_year.astype(float),
     })
-    clock_rates_df.to_parquet(tabs_dir / "characteristic_clock_rate_samples.parquet", index=False)
+    clock_rates_df.to_parquet(table_path("clock_rate_samples"), index=False)
 
     clock_rate_summary_df = pd.DataFrame([
         summarize_samples(clock_rates_per_day, "rate_per_day"),
         summarize_samples(clock_rates_per_site_year, "rate_per_site_year"),
     ])
     clock_rate_summary_df.to_parquet(
-        tabs_dir / "characteristic_clock_rate_summary.parquet", index=False
+        table_path("clock_rate_summary"), index=False
     )
 
     expected_days = np.arange(
@@ -376,7 +385,7 @@ def main() -> None:
             "expected_mutations": expected_mutations.reshape(-1).astype(float),
         })
     expected_mutations_df.to_parquet(
-        tabs_dir / "characteristic_expected_mutations.parquet", index=False
+        table_path("expected_mutations"), index=False
     )
 
     # --- E) Temporal-only and genetic-only linkage components
@@ -390,7 +399,7 @@ def main() -> None:
         "days": temporal_days.astype(int),
         "probability": temporal_only.astype(float),
     })
-    temporal_df.to_parquet(tabs_dir / "characteristic_temporal_linkage.parquet", index=False)
+    temporal_df.to_parquet(table_path("temporal_linkage"), index=False)
 
     genetic_relative = genetic_linkage_probability(
         toit=toit,
@@ -425,7 +434,7 @@ def main() -> None:
         "raw": genetic_raw.astype(float),
         "normalized": genetic_normalized.astype(float),
     })
-    genetic_df.to_parquet(tabs_dir / "characteristic_genetic_linkage.parquet", index=False)
+    genetic_df.to_parquet(table_path("genetic_linkage"), index=False)
 
     genetic_raw_all = genetic_linkage_probability(
         toit=toit,
@@ -467,7 +476,7 @@ def main() -> None:
                 "normalized": float(genetic_normalized_all[idx, m]),
             })
     scenarios_df = pd.DataFrame(scenario_rows)
-    scenarios_df.to_parquet(tabs_dir / "characteristic_genetic_scenarios.parquet", index=False)
+    scenarios_df.to_parquet(table_path("genetic_scenarios"), index=False)
 
     print(f"Saved characteristic tables to: {tabs_dir}")
 

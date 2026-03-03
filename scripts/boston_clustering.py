@@ -31,7 +31,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import chisquare
 
-from epilink import TOIT, InfectiousnessParams, estimate_linkage_probabilities
+from epilink import TOIT, InfectiousnessParams, linkage_probability
 
 from utils import deep_get, ensure_dirs, load_yaml
 
@@ -248,11 +248,10 @@ def main() -> None:
     mutation_model = str(deep_get(bos_cfg, ["inference", "mutation_model"], "deterministic"))
 
     toit = TOIT(params=params, rng_seed=rng_seed, subs_rate=subs_rate, relax_rate=relax_rate, subs_rate_sigma=sigma)
-    pair_data["Probability"] = estimate_linkage_probabilities(
+    pair_data["Probability"] = linkage_probability(
         toit=toit,
         genetic_distance=pair_data["SNP_Distance"].values,
         temporal_distance=pair_data[temporal_col].values,
-        mutation_model=mutation_model,
     )
     pair_data.to_parquet(data_boston / "boston_pairwise_with_probs.parquet", index=False)
 

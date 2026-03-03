@@ -36,7 +36,7 @@ from sklearn.metrics import brier_score_loss, roc_auc_score, average_precision_s
 from epilink import (
     TOIT,
     InfectiousnessParams,
-    estimate_linkage_probabilities
+    linkage_probability
 )
 
 from utils import *

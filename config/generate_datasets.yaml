@@ -1,5 +1,5 @@
 backbone:
-  tree_gml: "../data/processed/synthetic/scovmod_tree.gml"
+  tree_gml: "../data/processed/synthetic/scovmod/scovmod_tree.gml"
   rng_seed: 12345
   gen_length: 29903
 
@@ -11,12 +11,12 @@ scenarios:
     description: "High Signal"
     ######################################
     # Infectiousness (Hart et al.)
-    k_inc: 5.807
-    scale_inc: 0.948
-    k_E: 3.38
-    mu: 0.37
-    k_I: 1.0
-    alpha: 2.29
+    incubation_shape: 5.807
+    incubation_scale: 0.948
+    latent_shape: 3.38
+    symptomatic_rate: 0.37
+    symptomatic_shape: 1.0
+    rel_presymptomatic_infectiousness: 2.29
     ######################################
     # Viral evolution
     subs_rate: 0.001
@@ -66,28 +66,28 @@ scenarios:
   # Incubation period sensitivity (Hart focus)
   # -------------------------------------------------
 
-  low_k_inc:
+  low_incubation_shape:
     description: "Lower incubation shape (more skew)"
-    k_inc: 3.0
+    incubation_shape: 3.0
 
-  high_k_inc:
+  high_incubation_shape:
     description: "Higher incubation shape (less skew)"
-    k_inc: 8.0
+    incubation_shape: 8.0
 
-  low_scale_inc:
+  low_incubation_scale:
     description: "Lower incubation scale (low values)"
-    scale_inc: 0.448 # -0.5 from Hart et al. default
+    incubation_scale: 0.448 # -0.5 from Hart et al. default
 
-  high_scale_inc:
+  high_incubation_scale:
     description: "Higher incubation shape (high values)"
-    scale_inc: 1.448 # +0.5 from Hart et al. default
+    incubation_scale: 1.448 # +0.5 from Hart et al. default
   # -------------------------------------------------
   # Adversarial combined stress test
   # -------------------------------------------------
 
   adversarial:
     description: "Sparse sampling, long delay, low signal, relaxed clock, altered incubation"
-    k_inc: 4.0
+    incubation_shape: 4.0
     subs_rate: 0.0005
     relax_rate: true
     subs_rate_sigma: 0.33

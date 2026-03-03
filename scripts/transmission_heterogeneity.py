@@ -1,15 +1,39 @@
+from __future__ import annotations
+
+"""
+Transmission heterogeneity estimators.
+
+Utilities for fitting a negative binomial offspring distribution and summarizing
+transmission concentration from individual-level offspring counts.
+"""
+
 import warnings
+
 import numpy as np
-from scipy import stats, optimize
+import numpy.typing as npt
+from scipy import optimize, stats
 
 
-def _check_counts(counts) -> np.ndarray:
+def _check_counts(counts: npt.ArrayLike) -> np.ndarray:
+    r"""
+    Validate offspring counts.
+
+    Parameters
+    ----------
+    counts : array-like
+        Offspring counts for each individual.
+
+    Returns
+    -------
+    numpy.ndarray
+        1D array of non-negative integer counts.
+
+    Raises
+    ------
+    ValueError
+        If the input is empty, non-finite, negative, or non-integer valued.
     """
-    Validate counts are non-negative integers.
-    Returns a 1D numpy array of dtype int.
-    Raises ValueError on invalid inputs.
-    """
-    x = np.atleast_1d(np.asarray(counts))
+    x = np.atleast_1d(np.asarray(counts, dtype=float))
     if x.size == 0:
         raise ValueError("Empty offspring array.")
     if np.any(~np.isfinite(x)):
@@ -22,16 +46,46 @@ def _check_counts(counts) -> np.ndarray:
     return np.rint(x).astype(int)
 
 
-def _moments_nb(counts: np.ndarray, tol: float = 1e-12) -> tuple[float, float]:
+def _moments_nb(
+    counts: np.ndarray,
+    *,
+    mean: float | None = None,
+    var: float | None = None,
+    tol: float = 1e-12,
+) -> tuple[float, float]:
+    r"""
+    Method-of-moments fit for a negative binomial model.
+
+    Uses the mean-dispersion parameterization:
+        :math:`\mu = R`,
+        :math:`\mathrm{Var}(X) = R + R^2/k`,
+        :math:`k > 0`.
+    The dispersion estimate is
+        :math:`k = R^2 / (\mathrm{Var}(X) - R)`.
+
+    Parameters
+    ----------
+    counts : numpy.ndarray
+        1D array of non-negative integer counts.
+    mean : float, optional
+        Pre-computed sample mean. If not provided, it is computed from ``counts``.
+    var : float, optional
+        Pre-computed sample variance (ddof=1). If not provided, it is computed
+        from ``counts``.
+    tol : float, optional
+        Tolerance for the variance <= mean check.
+
+    Returns
+    -------
+    mean : float
+        Sample mean (R).
+    dispersion_k : float
+        Method-of-moments dispersion estimate (k). Returns NaN if not
+        identifiable.
     """
-    Method of moments for NB under mean–dispersion parameterisation:
-        mean = R, var = R + R^2/k  (k > 0)
-    => k = R^2 / (var - R)
-    Returns (R_mom, k_mom) where k_mom may be np.nan if var <= R.
-    """
-    x = counts
-    R = float(np.mean(x))
+    x = np.asarray(counts)
     n = x.size
+    R = float(np.mean(x) if mean is None else mean)
 
     if n < 2:
         warnings.warn(
@@ -40,7 +94,7 @@ def _moments_nb(counts: np.ndarray, tol: float = 1e-12) -> tuple[float, float]:
         )
         return R, np.nan
 
-    var = float(np.var(x, ddof=1))
+    var = float(np.var(x, ddof=1) if var is None else var)
 
     if var <= R + tol:
         # Under-dispersed or Poisson boundary; NB dispersion not identifiable
@@ -59,12 +113,37 @@ def _moments_nb(counts: np.ndarray, tol: float = 1e-12) -> tuple[float, float]:
 
 
 def _fit_nb_mle(counts: np.ndarray, eps: float = 1e-9) -> tuple[float, float]:
-    """
-    Fit Negative Binomial by MLE under mean–dispersion parameterisation:
-        mean = R, variance = R + R^2 / k   (k > 0)
-    scipy.stats.nbinom uses parameters (r=k, p=k/(k+R)).
+    r"""
+    Fit a negative binomial model by maximum likelihood.
 
-    Returns (R_hat, k_hat). Raises RuntimeError if optimisation fails.
+    Mean-dispersion parameterization:
+        :math:`\mu = R`,
+        :math:`\mathrm{Var}(X) = R + R^2/k`,
+        :math:`k > 0`.
+    ``scipy.stats.nbinom`` uses parameters :math:`(r=k, p=k/(k+R))`.
+
+    Parameters
+    ----------
+    counts : numpy.ndarray
+        1D array of non-negative integer counts.
+    eps : float, optional
+        Small positive value for numerical stability.
+
+    Returns
+    -------
+    mean : float
+        Estimated mean (R).
+    dispersion_k : float
+        Estimated dispersion (k).
+
+    Raises
+    ------
+    RuntimeError
+        If the optimization fails.
+
+    Notes
+    -----
+    This function expects validated integer counts.
     """
     x = np.asarray(counts, dtype=int)
     if x.size == 0:
@@ -77,7 +156,7 @@ def _fit_nb_mle(counts: np.ndarray, eps: float = 1e-9) -> tuple[float, float]:
     var = x.var(ddof=1) if x.size > 1 else Rt + 1.0
     k0 = max((Rt ** 2) / max(var - Rt, eps), 0.3)
 
-    def nll(params):
+    def nll(params: np.ndarray) -> float:
         R, logk = params
         if R <= 0:
             return np.inf
@@ -87,7 +166,7 @@ def _fit_nb_mle(counts: np.ndarray, eps: float = 1e-9) -> tuple[float, float]:
         ll = stats.nbinom.logpmf(x, k, p)
         if not np.all(np.isfinite(ll)):
             return np.inf
-        return -np.sum(ll)
+        return -float(np.sum(ll))
 
     res = optimize.minimize(
         nll,
@@ -104,9 +183,30 @@ def _fit_nb_mle(counts: np.ndarray, eps: float = 1e-9) -> tuple[float, float]:
 
 
 def _fit_nb_safely(counts: np.ndarray, tol: float = 1e-12) -> tuple[float, float, str, str]:
-    """
-    Safe NB fitting: prefer MLE when identifiable (var > mean); otherwise use MoM.
-    Returns (R_hat, k_hat, method, notes). k_hat may be NaN if not identifiable.
+    r"""
+    Fit a negative binomial model with robust fallbacks.
+
+    The fit prefers MLE when :math:`\mathrm{Var}(X) > \mu`; otherwise it
+    falls back to method-of-moments. Dispersion estimates can be NaN when
+    the model is not identifiable.
+
+    Parameters
+    ----------
+    counts : numpy.ndarray
+        1D array of non-negative integer counts.
+    tol : float, optional
+        Tolerance for the variance <= mean check.
+
+    Returns
+    -------
+    mean : float
+        Estimated mean (R).
+    dispersion_k : float
+        Estimated dispersion (k). NaN if not identifiable.
+    method : str
+        Fitting method used ("mle", "moments", "moments-fallback").
+    notes : str
+        Diagnostic note for edge cases or fallback paths.
     """
     x = np.asarray(counts, dtype=int)
     n = x.size
@@ -114,14 +214,14 @@ def _fit_nb_safely(counts: np.ndarray, tol: float = 1e-12) -> tuple[float, float
 
     # Handle trivial cases
     if n < 2:
-        R_mom, k_mom = _moments_nb(x, tol=tol)
+        R_mom, k_mom = _moments_nb(x, mean=R_emp, tol=tol)
         return R_mom, k_mom, "moments", "n<2"
 
     var = float(np.var(x, ddof=1))
 
     if var <= R_emp + tol:
         # NB dispersion not identifiable; MoM returns NaN for k
-        R_mom, k_mom = _moments_nb(x, tol=tol)
+        R_mom, k_mom = _moments_nb(x, mean=R_emp, var=var, tol=tol)
         return R_mom, k_mom, "moments", "variance<=mean"
 
     # Try MLE, fall back to MoM if optimisation fails
@@ -135,8 +235,18 @@ def _fit_nb_safely(counts: np.ndarray, tol: float = 1e-12) -> tuple[float, float
 
 
 def _prop_for_80_percent(counts: np.ndarray) -> float:
-    """
+    r"""
     Minimum fraction of individuals accounting for 80% of transmissions.
+
+    Parameters
+    ----------
+    counts : numpy.ndarray
+        1D array of non-negative integer counts.
+
+    Returns
+    -------
+    float
+        Fraction of individuals needed to reach 80% of total transmissions.
     """
     x = np.asarray(counts, dtype=int)
     n = x.size
@@ -151,34 +261,64 @@ def _prop_for_80_percent(counts: np.ndarray) -> float:
     return (idx + 1) / n
 
 
-def _bootstrap_nb(counts: np.ndarray, B: int = 200, seed: int | None = 123) -> dict[str, object]:
-    """
-    Non-parametric bootstrap CIs for (R, k). Returns dict with arrays and 95% CIs.
+def _bootstrap_nb(
+    counts: np.ndarray,
+    bootstrap: int = 200,
+    seed: int | None = 123,
+    tol: float = 1e-12,
+) -> dict[str, object]:
+    r"""
+    Non-parametric bootstrap confidence intervals for ``R`` and ``k``.
+
     Uses the same safe fitter as the main estimate.
+
+    Parameters
+    ----------
+    counts : numpy.ndarray
+        1D array of non-negative integer counts.
+    bootstrap : int, optional
+        Number of bootstrap replicates.
+    seed : int or None, optional
+        Seed for the RNG.
+    tol : float, optional
+        Tolerance for variance <= mean checks in fitting.
+
+    Returns
+    -------
+    dict
+        Dictionary with the following keys:
+        - ``R_samples``: array of bootstrap means.
+        - ``k_samples``: array of bootstrap dispersions (finite only).
+        - ``R_CI95``: 95% CI tuple for the mean.
+        - ``k_CI95``: 95% CI tuple for the dispersion.
+        - ``kept``: count of successful bootstrap estimates.
+        - ``kept_R``: count of finite mean estimates.
+        - ``kept_k``: count of finite dispersion estimates.
     """
     x = np.asarray(counts, dtype=int)
     rng = np.random.default_rng(seed)
     n = len(x)
-    if n < 2 or B <= 0:
+    if n < 2 or bootstrap <= 0:
         return {
             "R_samples": np.array([]),
             "k_samples": np.array([]),
             "R_CI95": (np.nan, np.nan),
             "k_CI95": (np.nan, np.nan),
-            "kept": 0
+            "kept": 0,
+            "kept_R": 0,
+            "kept_k": 0,
         }
 
-    Rs, ks = [], []
-    for _ in range(B):
+    Rs = np.full(bootstrap, np.nan, dtype=float)
+    ks = np.full(bootstrap, np.nan, dtype=float)
+    for i in range(bootstrap):
         sample = x[rng.integers(0, n, n)]
-        Rb, kb, _, _ = _fit_nb_safely(sample)
-        if np.isfinite(Rb):
-            Rs.append(Rb)
-        if np.isfinite(kb):
-            ks.append(kb)
+        Rb, kb, _, _ = _fit_nb_safely(sample, tol=tol)
+        Rs[i] = Rb
+        ks[i] = kb
 
-    Rs = np.asarray(Rs)
-    ks = np.asarray(ks)
+    Rs = Rs[np.isfinite(Rs)]
+    ks = ks[np.isfinite(ks)]
 
     def _ci95(arr):
         if arr.size == 0:
@@ -190,21 +330,22 @@ def _bootstrap_nb(counts: np.ndarray, B: int = 200, seed: int | None = 123) -> d
         "k_samples": ks,
         "R_CI95": _ci95(Rs),
         "k_CI95": _ci95(ks),
-        "kept": int(max(len(Rs), len(ks)))
+        "kept": int(max(len(Rs), len(ks))),
+        "kept_R": int(len(Rs)),
+        "kept_k": int(len(ks)),
     }
     return out
 
 
 def heterogeneity(
-    offspring_dist,
+    offspring_dist: npt.ArrayLike,
     bootstrap: int = 200,
     bootstrap_seed: int | None = 123,
     superspreading_quantile: float = 0.99,
-    superspreading_reference: str = "poisson",
     tol: float = 1e-12
 ) -> dict[str, object]:
-    """
-    Enhanced heterogeneity estimator.
+    r"""
+    Estimate transmission heterogeneity from offspring counts.
 
     Parameters
     ----------
@@ -215,25 +356,23 @@ def heterogeneity(
     bootstrap_seed : int or None
         RNG seed for bootstrap.
     superspreading_quantile : float in (0,1)
-        Quantile for the 'superspreading threshold' (default 0.99).
-    superspreading_reference : {"poisson","nb"}
-        Distribution used to define the threshold: Poisson(mean=R) or NB(R,k).
-        If k is not finite, Poisson is used.
+        Quantile :math:`q` for the superspreading threshold (default 0.99).
     tol : float
         Tolerance for variance <= mean checks.
 
     Returns
     -------
-    dict with keys:
-        mean_Rt
-        dispersion_k
-        Rt_CI95 (tuple)                # if bootstrapped, else (nan, nan)
-        k_CI95 (tuple)                 # if bootstrapped, else (nan, nan)
-        superspreading_threshold
-        prop_80_percent_transmitters
-        pct_zero_transmitters
-        pct_superspreaders
-        meta (diagnostics)
+    dict
+        Dictionary with keys:
+        - ``meanRt``: mean of the offspring distribution.
+        - ``disp_k``: dispersion parameter (k) of the negative binomial.
+        - ``RtCI95``: 95% CI tuple for the mean (NaN if bootstrapping disabled).
+        - ``kCI95``: 95% CI tuple for the dispersion (NaN if not identifiable).
+        - ``superspreading_threshold``: Poisson :math:`q`-quantile threshold.
+        - ``prop_80_percent_transmitters``: fraction accounting for 80% of transmission.
+        - ``pct_zero_transmitters``: percentage with zero offspring.
+        - ``pct_superspreaders``: percentage above the threshold.
+        - ``meta``: diagnostic metadata.
     """
     x = _check_counts(offspring_dist)
     n = x.size
@@ -242,45 +381,35 @@ def heterogeneity(
         raise ValueError("superspreading_quantile must be in (0, 1).")
     q = float(superspreading_quantile)
 
-    ref = str(superspreading_reference).lower().strip()
-    if ref not in {"poisson", "nb"}:
-        raise ValueError("superspreading_reference must be 'poisson' or 'nb'.")
-
     mean_Rt_emp = float(np.mean(x))
-    pct_zero = float(np.mean((x == 0)) * 100)
+    pct_zero = float(np.mean(x == 0) * 100.0)
 
     # If mean = 0 (no transmissions), simple deterministic outputs
     if mean_Rt_emp == 0.0:
         return {
-            'dispersion_k': np.nan,
-            'mean_Rt': 0.0,
-            'Rt_CI95': (np.nan, np.nan),
-            'k_CI95': (np.nan, np.nan),
-            'superspreading_threshold': 0.0,
-            'prop_80_percent_transmitters': 1.0,
-            'pct_zero_transmitters': pct_zero,
-            'pct_superspreaders': 0.0,
-            'meta': {
-                'n': int(n),
-                'total_transmissions': 0,
-                'bootstrap_kept': 0,
-                'fit_method': 'degenerate',
-                'fit_notes': 'mean=0',
-                'superspreading_reference': ref,
-                'quantile': q
+            "disp_k": np.nan,
+            "meanRt": 0.0,
+            "RtCI95": (np.nan, np.nan),
+            "kCI95": (np.nan, np.nan),
+            "superspreading_threshold": 0.0,
+            "prop_80_percent_transmitters": 1.0,
+            "pct_zero_transmitters": pct_zero,
+            "pct_superspreaders": 0.0,
+            "meta": {
+                "n": int(n),
+                "total_transmissions": 0,
+                "bootstrap_kept": 0,
+                "bootstrap_kept_R": 0,
+                "bootstrap_kept_k": 0,
+                "fit_method": "degenerate",
+                "fit_notes": "mean=0",
+                "quantile": q,
             }
         }
 
     # Fit NB safely (MLE if possible, otherwise MoM with warnings)
     R_hat, k_hat, method, notes = _fit_nb_safely(x, tol=tol)
-
-    # Superspreading threshold based on chosen reference
-    if ref == "nb" and np.isfinite(k_hat) and k_hat > 0:
-        p = k_hat / (k_hat + R_hat)
-        sse_thr = int(stats.nbinom.ppf(q, k_hat, p))
-    else:
-        # Poisson fallback when NB not identifiable
-        sse_thr = int(stats.poisson.ppf(q, R_hat))
+    sse_thr = int(stats.poisson.ppf(q, R_hat))
 
     # Concentration metrics
     prop80 = float(_prop_for_80_percent(x))
@@ -290,27 +419,33 @@ def heterogeneity(
     R_CI = (np.nan, np.nan)
     k_CI = (np.nan, np.nan)
     kept = 0
+    kept_R = 0
+    kept_k = 0
     if isinstance(bootstrap, int) and bootstrap > 0 and n >= 2:
-        boot = _bootstrap_nb(x, B=bootstrap, seed=bootstrap_seed)
-        R_CI, k_CI, kept = boot["R_CI95"], boot["k_CI95"], boot["kept"]
+        boot = _bootstrap_nb(x, bootstrap=bootstrap, seed=bootstrap_seed, tol=tol)
+        R_CI, k_CI = boot["R_CI95"], boot["k_CI95"]
+        kept = boot["kept"]
+        kept_R = boot["kept_R"]
+        kept_k = boot["kept_k"]
 
     return {
-        'dispersion_k': float(k_hat) if np.isfinite(k_hat) else np.nan,
-        'mean_Rt': float(R_hat),
-        'Rt_CI95': R_CI,
-        'k_CI95': k_CI,
-        'superspreading_threshold': float(sse_thr),
-        'prop_80_percent_transmitters': prop80,
-        'pct_zero_transmitters': pct_zero,
-        'pct_superspreaders': pct_superspreaders,
-        'meta': {
-            'n': int(n),
-            'total_transmissions': int(x.sum()),
-            'bootstrap_kept': int(kept),
-            'fit_method': method,
-            'fit_notes': notes,
-            'superspreading_reference': ref,
-            'quantile': q
+        "disp_k": float(k_hat) if np.isfinite(k_hat) else np.nan,
+        "meanRt": float(R_hat),
+        "RtCI95": R_CI,
+        "kCI95": k_CI,
+        "superspreading_threshold": float(sse_thr),
+        "prop_80_percent_transmitters": prop80,
+        "pct_zero_transmitters": pct_zero,
+        "pct_superspreaders": pct_superspreaders,
+        "meta": {
+            "n": int(n),
+            "total_transmissions": int(x.sum()),
+            "bootstrap_kept": int(kept),
+            "bootstrap_kept_R": int(kept_R),
+            "bootstrap_kept_k": int(kept_k),
+            "fit_method": method,
+            "fit_notes": notes,
+            "quantile": q,
         }
     }
 

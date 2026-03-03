@@ -1,37 +1,27 @@
 #!/usr/bin/env python3
 """
-generate_tree.py
+scripts/generate_tree.py
 
-Reconstruct a (rooted, acyclic) transmission tree from SCoVMod-style outputs.
+Generate a rooted transmission tree from SCoVMod-style outputs.
 
-What this script does
----------------------
-1) Parse ragged SCoVMod CSVs:
-   - Infection history: (TimeStep, Location, [Ids])
-   - Transmission events: (TimeStep, Location, [Ids]) for newly exposed individuals
+This script reconstructs a directed tree from infection history and
+transmission event tables by sampling infectors, cleaning reinfections,
+selecting a component near a target size, and enforcing acyclicity with
+a maximum spanning arborescence.
 
-2) Build a directed "raw" transmission network:
-   - For each exposed person at (t, location), choose one infector at random from
-     the infectious pool at the same (t, location), excluding self-loops.
-
-3) Clean anomalies:
-   - Resolve reinfections / multiple parents: keep only the earliest incoming edge
-     (minimum timeStep) per node.
-
-4) Select one connected component (introduction) near a target size.
-
-5) Enforce a tree structure via Maximum Spanning Arborescence (MSA):
-   - Use negative timeStep as a weight so earlier edges are preferred in cycles.
-
-6) Save outputs:
-   - Tree as GML (and optional edge list CSV)
-   - Summary statistics (CSV)
-   - Diagnostics tables (component sizes, degree distributions, edge timesteps)
+Outputs
+-------
+data/processed/synthetic/scovmod/
+    - OUT_PREFIX.gml
+    - OUT_PREFIX_heterogeneity.json
+tables/supplementary/scovmod/
+    - OUT_PREFIX_summary.parquet
+    - OUT_PREFIX_component_sizes.parquet
+    - OUT_PREFIX_degree_distributions.parquet
 
 Notes
 -----
-- This repo is for the paper; the modelling framework lives in `epilink`.
-- The tree reconstruction is intended as a realistic synthetic backbone for experiments.
+Use ``--out-prefix`` to match the table prefix (default: ``scovmod_tree``).
 """
 
 from __future__ import annotations
@@ -72,6 +62,23 @@ def parse_configs(
     paths_yaml: Path,
     scovmod_yaml: Path,
 ) -> tuple[PathsConfig, TreeConfig]:
+    """
+    Load paths and transmission-tree settings from YAML configs.
+
+    Parameters
+    ----------
+    paths_yaml : Path
+        Path to ``config/paths.yaml``.
+    scovmod_yaml : Path
+        Path to ``config/scovmod.yaml``.
+
+    Returns
+    -------
+    paths : PathsConfig
+        Resolved input/output directories.
+    tree_cfg : TreeConfig
+        Transmission tree settings derived from the simulation config.
+    """
     paths_cfg = load_yaml(paths_yaml)
     scovmod_cfg = load_yaml(scovmod_yaml)
 
@@ -82,8 +89,8 @@ def parse_configs(
 
     paths = PathsConfig(
         scovmod_output_dir=scovmod_output,
-        processed_dir=processed,
-        tables_out_dir=tables_supp,
+        processed_dir=processed / "scovmod",
+        tables_out_dir=tables_supp / "scovmod",
     )
 
     # Tree settings
@@ -105,18 +112,22 @@ def parse_configs(
 
 def parse_scovmod_outputs(filepath: Path) -> pd.DataFrame:
     """
-    Parse SCoVMod CSVs where columns 2 onwards represent a list of IDs.
+    Parse a SCoVMod CSV with ragged ID lists.
 
-    Why custom parsing:
-    - SCoVMod outputs may place ragged lists across multiple CSV columns.
-    - Standard pandas parsing struggles with these variable-length rows.
+    Parameters
+    ----------
+    filepath : Path
+        CSV with columns ``TimeStep``, ``Location``, and a ragged list of IDs.
 
     Returns
     -------
-    DataFrame with columns:
-      - TimeStep (int)
-      - Location (int)
-      - Ids (List[int])
+    pandas.DataFrame
+        DataFrame with columns ``TimeStep``, ``Location``, and ``Ids``.
+
+    Notes
+    -----
+    SCoVMod exports may spread the ID list across multiple CSV columns, so a
+    custom parser is used instead of ``pandas.read_csv``.
     """
     data = []
 
@@ -146,17 +157,26 @@ def build_transmission_network(
     rng_seed: int = 12345,
 ) -> nx.DiGraph:
     """
-    Construct a directed transmission network from:
-      - transmission events (who becomes exposed at time t in location L)
-      - infection history (who is infectious at time t in location L)
+    Build a directed transmission network from event and history tables.
 
-    Core logic:
-    - For each infectee in the transmission events row (t, L),
-      sample one infector uniformly from the infectious pool at (t, L),
-      excluding self.
+    Parameters
+    ----------
+    trans_events_df : pandas.DataFrame
+        Transmission events with columns ``TimeStep``, ``Location``, ``Ids``.
+    infect_hist_df : pandas.DataFrame
+        Infection history with columns ``TimeStep``, ``Location``, ``Ids``.
+    rng_seed : int, optional
+        Seed for uniform infector sampling.
 
-    Output:
-    - nx.DiGraph with edge attributes: timeStep, location
+    Returns
+    -------
+    networkx.DiGraph
+        Directed graph with edge attributes ``timeStep`` and ``location``.
+
+    Notes
+    -----
+    For each exposed individual at (t, L), one infector is sampled uniformly
+    from the infectious pool at (t, L), excluding self-loops.
     """
     rng = default_rng(rng_seed)
 
@@ -195,11 +215,21 @@ def remove_reinfections(graph: nx.DiGraph) -> nx.DiGraph:
     """
     Resolve nodes with multiple parents by keeping the earliest incoming edge.
 
-    Interpretation:
-    - In-degree > 1 in raw reconstruction can reflect reinfections, ambiguity,
-      or multiple plausible infectors in the same time/location.
-    - For a single-outbreak synthetic backbone, we retain only the earliest
-      inferred event as a pragmatic simplification.
+    Parameters
+    ----------
+    graph : networkx.DiGraph
+        Raw transmission network.
+
+    Returns
+    -------
+    networkx.DiGraph
+        Copy of the graph with at most one parent per node.
+
+    Notes
+    -----
+    The earliest edge is defined by the smallest ``timeStep`` attribute; missing
+    values are treated as +inf. This is a pragmatic simplification for a single
+    outbreak backbone.
     """
     cleaned = graph.copy()
     nodes_multi = [n for n, d in cleaned.in_degree(cleaned.nodes) if d > 1]
@@ -216,7 +246,19 @@ def remove_reinfections(graph: nx.DiGraph) -> nx.DiGraph:
 
 def select_target_component(graph: nx.DiGraph, target_size: int) -> nx.DiGraph:
     """
-    Select a weakly-connected component with size closest to target_size.
+    Select a weakly connected component closest to the target size.
+
+    Parameters
+    ----------
+    graph : networkx.DiGraph
+        Input graph with one or more weakly connected components.
+    target_size : int
+        Desired component size in nodes.
+
+    Returns
+    -------
+    networkx.DiGraph
+        Subgraph induced by the selected component.
     """
     comps = list(nx.weakly_connected_components(graph))
     comps.sort(key=len, reverse=True)
@@ -229,13 +271,20 @@ def build_msa_tree(graph: nx.DiGraph) -> nx.DiGraph:
     """
     Compute a Maximum Spanning Arborescence (MSA) to enforce a rooted, acyclic tree.
 
-    Weights:
-    - weight = -timeStep so that earlier transmission edges are preferred
-      when the algorithm must break cycles.
+    Parameters
+    ----------
+    graph : networkx.DiGraph
+        Input directed graph for a single connected component.
 
-    Note:
-    - networkx returns a branching/arborescence (directed spanning tree per component).
-    - On a connected component, this yields one arborescence.
+    Returns
+    -------
+    networkx.DiGraph
+        A directed arborescence with preserved edge attributes.
+
+    Notes
+    -----
+    Edge weights are set to ``-timeStep`` so earlier transmission edges are
+    preferred when cycles must be broken.
     """
     weighted = graph.copy()
     for u, v, d in weighted.edges(data=True):
@@ -247,6 +296,21 @@ def build_msa_tree(graph: nx.DiGraph) -> nx.DiGraph:
 
 
 def _degree_rows(graph: nx.DiGraph, label: str) -> list[dict[str, object]]:
+    """
+    Expand in/out degrees into row-wise records.
+
+    Parameters
+    ----------
+    graph : networkx.DiGraph
+        Graph to summarize.
+    label : str
+        Graph label stored in each row.
+
+    Returns
+    -------
+    list of dict
+        Each dict has keys ``graph``, ``degree_type``, and ``value``.
+    """
     in_deg = np.array([d for _, d in graph.in_degree(graph.nodes)], dtype=int)
     out_deg = np.array([d for _, d in graph.out_degree(graph.nodes)], dtype=int)
 
@@ -257,6 +321,22 @@ def _degree_rows(graph: nx.DiGraph, label: str) -> list[dict[str, object]]:
 
 
 def summarise_graph(graph: nx.DiGraph, label: str) -> Dict[str, Any]:
+    """
+    Summarize degree and component statistics for a directed graph.
+
+    Parameters
+    ----------
+    graph : networkx.DiGraph
+        Graph to summarize.
+    label : str
+        Label stored in the summary row.
+
+    Returns
+    -------
+    dict
+        Summary metrics keyed by name, including node/edge counts and degree
+        statistics.
+    """
     in_degs = np.array([d for _, d in graph.in_degree(graph.nodes)], dtype=int)
     out_degs = np.array([d for _, d in graph.out_degree(graph.nodes)], dtype=int)
 
@@ -279,6 +359,9 @@ def summarise_graph(graph: nx.DiGraph, label: str) -> Dict[str, Any]:
 # -----------------------------
 
 def main() -> None:
+    """
+    Run the command-line workflow to reconstruct and save the tree.
+    """
     parser = argparse.ArgumentParser(description="Generate a transmission tree from SCoVMod outputs.")
     parser.add_argument("--paths", type=str, default="../config/paths.yaml", help="Path to config/paths.yaml")
     parser.add_argument("--simulation", type=str, default="../config/scovmod.yaml", help="Path to config/scovmod.yaml")
@@ -323,16 +406,6 @@ def main() -> None:
         "component_size": np.array(raw_components, dtype=int),
     })
 
-    raw_edge_timesteps = [
-        d.get("timeStep")
-        for _, _, d in raw_G.edges(data=True)
-        if d.get("timeStep") is not None
-    ]
-    raw_edge_ts_df = pd.DataFrame({
-        "graph": "raw",
-        "timeStep": np.array(raw_edge_timesteps, dtype=int),
-    })
-
     # Clean multiple parents
     clean_G = remove_reinfections(raw_G)
     print(
@@ -358,21 +431,13 @@ def main() -> None:
     print(f"MSA tree: {tree_G.number_of_nodes():,} nodes, {tree_G.number_of_edges():,} edges.")
 
     # Save graph
-    gml_path = paths.processed_dir / f"scovmod_tree.gml"
+    gml_path = paths.processed_dir / f"{args.out_prefix}.gml"
     nx.write_gml(tree_G, gml_path)
     print(f"Saved tree to: {gml_path}")
 
-    # Save edge list for interoperability (handy for igraph / R)
-    edges_csv = paths.processed_dir / f"scovmod_tree_edges.parquet"
-    edge_rows = []
-    for u, v, d in tree_G.edges(data=True):
-        edge_rows.append({"infector": u, "infectee": v, "timeStep": d.get("timeStep"), "location": d.get("location")})
-    pd.DataFrame(edge_rows).to_parquet(edges_csv, index=False)
-    print(f"Saved edge list to: {edges_csv}")
-
     offspring_counts = np.array(list(dict(clean_G.out_degree(clean_G.nodes)).values()))
     results = heterogeneity(offspring_counts)
-    heterogeneity_path = paths.processed_dir / f"scovmod_tree_heterogeneity.json"
+    heterogeneity_path = paths.processed_dir / f"{args.out_prefix}_tree_heterogeneity.json"
     heterogeneity_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
 
     # Save summary stats
@@ -384,13 +449,12 @@ def main() -> None:
     ]
 
     summary_df = pd.DataFrame(summaries)
-    summary_parquet = paths.tables_out_dir / "scovmod_tree_summary.parquet"
+    summary_parquet = paths.tables_out_dir / f"{args.out_prefix}_summary.parquet"
     summary_df.to_parquet(summary_parquet, index=False)
     print(f"Saved summary to: {summary_parquet}")
 
-    raw_component_df.to_parquet(paths.tables_out_dir / "scovmod_tree_component_sizes.parquet", index=False)
-    raw_edge_ts_df.to_parquet(paths.tables_out_dir / "scovmod_tree_edge_timesteps.parquet", index=False)
-    degree_df.to_parquet(paths.tables_out_dir / "scovmod_tree_degree_distributions.parquet", index=False)
+    raw_component_df.to_parquet(paths.tables_out_dir / f"{args.out_prefix}_component_sizes.parquet", index=False)
+    degree_df.to_parquet(paths.tables_out_dir / f"{args.out_prefix}_degree_distributions.parquet", index=False)
 
     print("Done.")
 
