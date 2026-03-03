@@ -10,7 +10,7 @@ clock:
   subs_rate: 0.001
   relax_rate: True
   subs_rate_sigma: 0.33
-  gen_length: 29903
+  gen_len: 29903
 inference:
   num_simulations: 10000
   intermediate_generations: [0,1]

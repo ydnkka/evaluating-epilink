@@ -4,6 +4,10 @@ scripts/generate_tree_plot.py
 
 Generate supplementary figures from transmission-tree outputs.
 
+Config
+------
+config/paths.yaml
+
 Outputs
 ---------------------
 figures/supplementary/scovmod/

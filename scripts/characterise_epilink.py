@@ -60,7 +60,7 @@ class ParamConfig:
     subs_rate: float
     relax_rate: bool
     subs_rate_sigma: float
-    gen_length: int
+    gen_len: int
     num_simulations: int
     intermediate_generations: tuple[int, ...]
     intermediate_hosts: int
@@ -93,7 +93,7 @@ def parse_configs(param_yaml: Path):
         subs_rate=float(deep_get(param_cfg, ["clock", "subs_rate"], 0.001)),
         relax_rate=bool(deep_get(param_cfg, ["clock", "relax_rate"], True)),
         subs_rate_sigma=float(deep_get(param_cfg, ["clock", "subs_rate_sigma"], 0.33)),
-        gen_length=int(deep_get(param_cfg, ["clock", "gen_length"], 5)),
+        gen_len=int(deep_get(param_cfg, ["clock", "gen_len"], 5)),
 
         num_simulations=int(deep_get(param_cfg, ["inference", "num_simulations"], 10_000)),
         intermediate_generations=tuple(
@@ -197,7 +197,7 @@ def main() -> None:
         subs_rate=cfg.subs_rate,
         relax_rate=cfg.relax_rate,
         subs_rate_sigma=cfg.subs_rate_sigma,
-        gen_len=cfg.gen_length,
+        gen_len=cfg.gen_len,
         rng=rng,
     )
 

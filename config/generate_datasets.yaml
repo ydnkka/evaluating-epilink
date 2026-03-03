@@ -1,7 +1,7 @@
 backbone:
   tree_gml: "../data/processed/synthetic/scovmod/scovmod_tree.gml"
   rng_seed: 12345
-  gen_length: 29903
+  gen_len: 29903
 
 # All simulation scenarios are defined as perturbations of a common baseline parameterisation corresponding to the
 # estimates of Hart et al. Parameters not explicitly listed for a given scenario take their baseline values.
@@ -68,7 +68,7 @@ scenarios:
 
   low_incubation_shape:
     description: "Lower incubation shape (more skew)"
-    incubation_shape: 3.0
+    incubation_shape: 3.5
 
   high_incubation_shape:
     description: "Higher incubation shape (less skew)"

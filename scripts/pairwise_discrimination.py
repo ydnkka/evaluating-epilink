@@ -17,8 +17,8 @@ config/default_parameters.yaml
 
 Outputs
 -------
-tables/supplementary/
-  - edge_eval_metrics.parquet
+tables/supplementary/discrimination/
+  - discrimination_metrics.parquet
 """
 
 from __future__ import annotations
@@ -27,14 +27,16 @@ import argparse
 from itertools import product
 
 import numpy as np
+from numpy.random import default_rng
 import pandas as pd
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import brier_score_loss, roc_auc_score, average_precision_score, log_loss
+from sklearn.metrics import average_precision_score, roc_auc_score, brier_score_loss
 
 from epilink import (
     TOIT,
+    MolecularClock,
     InfectiousnessParams,
     linkage_probability
 )
@@ -44,40 +46,31 @@ from utils import *
 MODELS = {
     "LinearDistScore": "Lin–Score",
     "PoissonDistScore": "Pois–Score",
-    "MechProbLinearDist": "Lin–Mech",
-    "MechProbPoissonDist": "Pois–Mech",
-    "LogitProbLinearDist_0.1": "Lin–Logit(0.1)",
-    "LogitProbLinearDist_1.0": "Lin–Logit(1)",
-    "LogitProbPoissonDist_0.1": "Pois–Logit(0.1)",
-    "LogitProbPoissonDist_1.0": "Pois–Logit(1)",
+    "ProbLinearDist": "Lin–Prob",
+    "ProbPoissonDist": "Pois–Prob",
+    "LogitLinearDist10": "Lin–Logit(10)",
+    "LogitLinearDist100": "Lin–Logit(100)",
+    "LogitPoissonDist10": "Pois–Logit(10)",
+    "LogitPoissonDist100": "Pois–Logit(100)",
 }
 
 SCENARIOS = {
     "baseline": "Baseline",
     "surveillance_moderate": "Surveillance (moderate)",
     "surveillance_severe": "Surveillance (severe)",
-
-    # Low evolutionary signal scenarios
     "low_clock_signal": "Low clock signal",
-    "low_k_inc": "Low incubation shape",
-    "low_scale_inc": "Low incubation scale",
-    # High evolutionary signal scenarios
+    "low_incubation_shape": "Low incubation shape",
+    "low_incubation_scale": "Low incubation scale",
     "high_clock_signal": "High clock signal",
-    "high_k_inc": "High incubation shape",
-    "high_scale_inc": "High incubation scale",
-
+    "high_incubation_shape": "High incubation shape",
+    "high_incubation_scale": "High incubation scale",
     "relaxed_clock": "Relaxed clock",
     "adversarial": "Adversarial",
 }
 
-def safe_log_loss(y: np.ndarray, p: np.ndarray, eps: float = 1e-15) -> float:
-    p = np.clip(p, eps, 1 - eps)
-    return float(log_loss(y, p))
-
 def evaluate(y: np.ndarray, score: np.ndarray, is_prob: bool) -> Dict[str, float]:
     out = {"ROC_AUC": float(roc_auc_score(y, score)) if len(np.unique(y)) == 2 else np.nan,
            "PR_AUC": float(average_precision_score(y, score)) if len(np.unique(y)) == 2 else np.nan,
-           "LogLoss": safe_log_loss(y, score) if is_prob else np.nan,
            "Brier": float(brier_score_loss(y, score)) if is_prob else np.nan}
     return out
 
@@ -93,24 +86,26 @@ def main() -> None:
     scenarios_cfg = load_yaml(Path(args.scenarios))
     defaults_cfg = load_yaml(Path(args.defaults))
 
-    processed_dir = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
-    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
-    ensure_dirs(processed_dir, tabs_dir)
+    processed_dir = Path(
+        deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic")
+    )
 
-    rng_seed = int(deep_get(defaults_cfg, ["toit", "rng_seed"], 12345))
-    params_cfg = deep_get(defaults_cfg, ["toit", "infectiousness_params"], {})
-    evol_cfg = deep_get(defaults_cfg, ["toit", "evolution"], {})
+    tabs_dir = Path(
+        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+    )
+    tabs_dir = tabs_dir / "discrimination"
+    ensure_dirs(tabs_dir)
+
+    rng_seed = int(deep_get(defaults_cfg, ["rng_seed"], 12345))
+    params_cfg = deep_get(defaults_cfg, ["infectiousness_params"], {})
+    evol_cfg = deep_get(defaults_cfg, ["clock"], {})
     inference_cfg = deep_get(defaults_cfg, ["inference"], {})
 
+    rng = default_rng(rng_seed)
+
     params = InfectiousnessParams(**params_cfg)
-    toit = TOIT(
-        params=params,
-        rng_seed=rng_seed,
-        subs_rate=float(evol_cfg["subs_rate"]),
-        relax_rate=bool(evol_cfg["relax_rate"]),
-        subs_rate_sigma=float(evol_cfg["subs_rate_sigma"]),
-        gen_len=int(evol_cfg["gen_length"]),
-    )
+    toit = TOIT(params=params,rng=rng)
+    clock = MolecularClock(**evol_cfg)
 
     scenarios = deep_get(scenarios_cfg, ["scenarios"], {})
 
@@ -125,22 +120,24 @@ def main() -> None:
         df = pd.read_parquet(pw_path)
         df = df[df["Sampled"]].copy()
 
-        # Mechanistic probability
-        df["MechProbLinearDist"] = estimate_linkage_probabilities(
+        # Model probability
+        df["ProbLinearDist"] = linkage_probability(
             toit=toit,
+            clock=clock,
             genetic_distance=df["LinearDist"].values,
             temporal_distance=df["TemporalDist"].values,
-            intermediate_generations = tuple(inference_cfg["inter_generations"]),
-            no_intermediates = int(inference_cfg["num_intermediates"]),
+            intermediate_generations = tuple(inference_cfg["intermediate_generations"]),
+            intermediate_hosts = int(inference_cfg["intermediate_hosts"]),
             num_simulations = int(inference_cfg["num_simulations"]),
         )
 
-        df["MechProbPoissonDist"] = estimate_linkage_probabilities(
+        df["ProbPoissonDist"] = linkage_probability(
             toit=toit,
+            clock=clock,
             genetic_distance=df["PoissonDist"].values,
             temporal_distance=df["TemporalDist"].values,
-            intermediate_generations=tuple(inference_cfg["inter_generations"]),
-            no_intermediates=int(inference_cfg["num_intermediates"]),
+            intermediate_generations=tuple(inference_cfg["intermediate_generations"]),
+            intermediate_hosts=int(inference_cfg["intermediate_hosts"]),
             num_simulations=int(inference_cfg["num_simulations"]),
         )
 
@@ -149,33 +146,31 @@ def main() -> None:
 
         for p, dist_col in product((0.1, 1.0), ("LinearDist", "PoissonDist")):
             X = df[["TemporalDist", dist_col]].values
-            col = f"LogitProb{dist_col}_{p}"
-            try:
-                clf = LogisticRegression(solver="lbfgs", max_iter=200)
-                if p == 1.0:
-                    clf.fit(X, y)
-                    df[col] = clf.predict_proba(X)[:, 1]
-                else:
-                    X_tr, _, y_tr, _ = train_test_split(X, y, train_size=p, stratify=y, random_state=rng_seed)
-                    clf.fit(X_tr, y_tr)
-                    df[col] = clf.predict_proba(X)[:, 1]
-            except Exception:
-                df[col] = np.nan
+            col = f"Logit{dist_col}{int(p * 100)}"
+
+            clf = LogisticRegression(solver="lbfgs", max_iter=200)
+            if p == 1.0:
+                clf.fit(X, y)
+                df[col] = clf.predict_proba(X)[:, 1]
+            else:
+                X_tr, _, y_tr, _ = train_test_split(X, y, train_size=p, stratify=y, random_state=rng_seed)
+                clf.fit(X_tr, y_tr)
+                df[col] = clf.predict_proba(X)[:, 1]
 
         df["LinearDistScore"] = 1.0 / (df["LinearDist"] + 1.0)
         df["PoissonDistScore"] = 1.0 / (df["PoissonDist"] + 1.0)
 
-        df.to_parquet(sc_dir / "pairwise_eval.parquet", index=False)
+        df.to_parquet(sc_dir / "pairwise.parquet", index=False)
 
         models = [
             ("LinearDistScore", False),
             ("PoissonDistScore", False),
-            ("MechProbLinearDist", True),
-            ("MechProbPoissonDist", True),
-            ("LogitProbLinearDist_0.1", True),
-            ("LogitProbPoissonDist_0.1", True),
-            ("LogitProbLinearDist_1.0", True),
-            ("LogitProbPoissonDist_1.0", True),
+            ("ProbLinearDist", True),
+            ("ProbPoissonDist", True),
+            ("LogitLinearDist10", True),
+            ("LogitPoissonDist10", True),
+            ("LogitLinearDist100", True),
+            ("LogitPoissonDist100", True),
         ]
 
         for m, is_prob in models:
@@ -192,8 +187,8 @@ def main() -> None:
             rows.append(row)
 
     out = pd.DataFrame(rows)
-    out.to_parquet(tabs_dir / "edge_eval_metrics.parquet", index=False)
-    print(f"Saved edge evaluation metrics to: {tabs_dir / 'edge_eval_metrics.parquet'}")
+    out.to_parquet(tabs_dir / "discrimination_metrics.parquet", index=False)
+    print(f"Saved evaluation metrics to: {tabs_dir / 'discrimination_metrics.parquet'}")
 
 if __name__ == "__main__":
     main()

@@ -4,6 +4,10 @@ scripts/characterise_epilink_plot.py
 
 Generate supplementary figures from characteristic tables.
 
+Config
+------
+config/paths.yaml
+
 Outputs
 ---------------------
 figures/supplementary/

@@ -9,6 +9,11 @@ transmission event tables by sampling infectors, cleaning reinfections,
 selecting a component near a target size, and enforcing acyclicity with
 a maximum spanning arborescence.
 
+Config
+------
+config/paths.yaml
+config/scovmod.yaml
+
 Outputs
 -------
 data/processed/synthetic/scovmod/
@@ -34,8 +39,8 @@ from dataclasses import dataclass
 
 import networkx as nx
 import numpy as np
-import pandas as pd
 from numpy.random import default_rng
+import pandas as pd
 
 from networkx.algorithms.tree.branchings import maximum_spanning_arborescence
 
@@ -83,9 +88,15 @@ def parse_configs(
     scovmod_cfg = load_yaml(scovmod_yaml)
 
     # Paths
-    scovmod_output = Path(deep_get(paths_cfg, ["data", "raw", "scovmod_output"], "../data/raw/scovmod_output"))
-    processed = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
-    tables_supp = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
+    scovmod_output = Path(
+        deep_get(paths_cfg, ["data", "raw", "scovmod_output"], "../data/raw/scovmod_output")
+    )
+    processed = Path(
+        deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic")
+    )
+    tables_supp = Path(
+        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+    )
 
     paths = PathsConfig(
         scovmod_output_dir=scovmod_output,

@@ -16,7 +16,7 @@ Inputs
 ------
 A *pairwise* DataFrame stored as parquet:
   - NodeA, NodeB
-  - weight_col (e.g. "MechProbLinearDist")
+  - weight_col (e.g. "ProbLinearDist")
   - Related (optional; not used here)
 
 Outputs

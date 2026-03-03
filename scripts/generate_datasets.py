@@ -25,12 +25,14 @@ from __future__ import annotations
 import argparse
 
 import numpy as np
+from numpy.random import default_rng
 import pandas as pd
 
 import networkx as nx
 
 from epilink import (
     TOIT,
+    MolecularClock,
     InfectiousnessParams,
     populate_epidemic_data,
     simulate_genomic_data,
@@ -80,16 +82,19 @@ def main() -> None:
     paths_cfg = load_yaml(Path(args.paths))
     scenarios_cfg = load_yaml(Path(args.scenarios))
 
-    processed_dir = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
-    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
+    processed_dir = Path(
+        deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic")
+    )
+    tabs_dir = Path(
+        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+    )
     tabs_dir = tabs_dir / "scovmod"
-
-    ensure_dirs(processed_dir, tabs_dir)
+    ensure_dirs(tabs_dir)
 
     tree_path = Path(deep_get(scenarios_cfg, ["backbone", "tree_gml"],
                               ".../data/processed/synthetic/scovmod/scovmod_tree.gml"))
     rng_seed = int(deep_get(scenarios_cfg, ["backbone", "rng_seed"], 12345))
-    gen_length = int(deep_get(scenarios_cfg, ["backbone", "gen_length"], 29903))
+    gen_len = int(deep_get(scenarios_cfg, ["backbone", "gen_len"], 29903))
 
     base_tree = nx.read_gml(tree_path)
 
@@ -111,22 +116,25 @@ def main() -> None:
         sc_dir = processed_dir / f"scenario={name}"
         ensure_dirs(sc_dir)
 
+        rng = default_rng(cfg.rng_seed)
+
         params = InfectiousnessParams(
-            k_inc=float(cfg["k_inc"]),
-            scale_inc=float(cfg["scale_inc"]),
-            k_E=float(cfg["k_E"]),
-            mu=float(cfg["mu"]),
-            k_I=float(cfg["k_I"]),
-            alpha=float(cfg["alpha"]),
+            incubation_shape=float(cfg["incubation_shape"]),
+            incubation_scale=float(cfg["incubation_scale"]),
+            latent_shape=float(cfg["latent_shape"]),
+            symptomatic_rate=float(cfg["symptomatic_rate"]),
+            symptomatic_shape=float(cfg["symptomatic_shape"]),
+            rel_presymptomatic_infectiousness=float(cfg["rel_presymptomatic_infectiousness"]),
         )
 
-        toit = TOIT(
-            params=params,
-            rng_seed=rng_seed,
+        toit = TOIT(params=params,rng=rng)
+
+        clock = MolecularClock(
             subs_rate=float(cfg["subs_rate"]),
             relax_rate=bool(cfg["relax_rate"]),
             subs_rate_sigma=float(cfg["subs_rate_sigma"]),
-            gen_len=gen_length,
+            gen_len=gen_len,
+            rng=rng
         )
 
         populated_tree = populate_epidemic_data(
@@ -138,7 +146,7 @@ def main() -> None:
         )
 
         gen_results = simulate_genomic_data(
-            toit=toit,
+            clock=clock,
             tree=populated_tree
         )
 
@@ -155,12 +163,12 @@ def main() -> None:
         metrics = ["TemporalDist", "PoissonDist", "LinearDist"]
 
         params_row = {
-            "k_inc": float(cfg["k_inc"]),
-            "scale_inc": float(cfg["scale_inc"]),
-            "k_E": float(cfg["k_E"]),
-            "mu": float(cfg["mu"]),
-            "k_I": float(cfg["k_I"]),
-            "alpha": float(cfg["alpha"]),
+            "incubation_shape": float(cfg["incubation_shape"]),
+            "incubation_scale": float(cfg["incubation_scale"]),
+            "latent_shape": float(cfg["latent_shape"]),
+            "symptomatic_rate": float(cfg["symptomatic_rate"]),
+            "symptomatic_shape": float(cfg["symptomatic_shape"]),
+            "rel_presymptomatic_infectiousness": float(cfg["rel_presymptomatic_infectiousness"]),
             "prop_sampled": float(cfg["prop_sampled"]),
             "sampling_shape": float(cfg["sampling_shape"]),
             "sampling_scale": float(cfg["sampling_scale"]),
