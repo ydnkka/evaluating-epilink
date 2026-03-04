@@ -15,13 +15,10 @@ tables/supplementary/characterise_epilink/
   - OUT_PREFIX_presymptomatic_fraction.parquet
   - OUT_PREFIX_clock_rate_samples.parquet
   - OUT_PREFIX_clock_rate_summary.parquet
-  - OUT_PREFIX_expected_mutations.parquet
   - OUT_PREFIX_temporal_linkage.parquet
   - OUT_PREFIX_genetic_linkage.parquet
   - OUT_PREFIX_genetic_scenarios.parquet
   - OUT_PREFIX_probability_surface.parquet
-  - OUT_PREFIX_prob_vs_snp.parquet
-  - OUT_PREFIX_prob_vs_days.parquet
 
 Use ``--out-prefix`` to control the file name prefix (default: ``characteristic``).
 """
@@ -62,9 +59,6 @@ class ParamConfig:
     tost_min_days: float
     tost_max_days: float
     tost_day_step: float
-    expected_mutation_max_days: int
-    expected_mutation_day_step: int
-    expected_mutation_sample_size: int
 
 def parse_configs(param_yaml: Path):
     param_cfg = load_yaml(param_yaml)
@@ -85,11 +79,8 @@ def parse_configs(param_yaml: Path):
         tost_min_days=float(deep_get(param_cfg, ["characterisation", "tost_grid", "min_days"], -30.0)),
         tost_max_days=float(deep_get(param_cfg, ["characterisation", "tost_grid", "max_days"], 30.0)),
         tost_day_step=float(deep_get(param_cfg, ["characterisation", "tost_grid", "step"], 0.1)),
-        expected_mutation_max_days=int(deep_get(param_cfg, ["characterisation", "expected_mutations_grid", "max_days"], 60)),
-        expected_mutation_day_step=int(
-        deep_get(param_cfg, ["characterisation", "expected_mutations_grid", "step"], 1)),
-        expected_mutation_sample_size=int(deep_get(param_cfg, ["characterisation", "expected_mutations_grid", "sample_size"], 300)),
     )
+
 
 
 def summarize_samples(values: np.ndarray, label: str) -> dict[str, float | str | int]:
@@ -152,14 +143,11 @@ def main() -> None:
     })
     samples_df.to_parquet(table_path("samples"), index=False)
 
-    # --- B) Plausibility surfaces: genetic-only, temporal-only, joint
+    # --- B) Plausibility surface
     snps = np.arange(0, cfg.max_snp + 1, cfg.snp_step)
     days = np.arange(0, cfg.max_days + 1, cfg.day_step)
     Dg, Dt = np.meshgrid(snps.astype(float), days.astype(float))
 
-    # Genetic plausibility at Dt=0: treat temporal_distance as fixed
-    # Temporal synchrony at Dg=0: treat genetic_distance as fixed
-    # Joint: both varying
     P_joint = linkage_probability(
         toit=toit,
         clock=clock,
@@ -169,40 +157,12 @@ def main() -> None:
 
     ).reshape(Dg.shape)
 
-    # Slices to help interpretation
-    P_genetic = linkage_probability(
-        toit=toit,
-        clock=clock,
-        genetic_distance=snps.astype(float),
-        temporal_distance=np.zeros_like(snps, dtype=float),
-        **cfg.inference_cfg
-    )
-    P_temporal = linkage_probability(
-        toit=toit,
-        clock=clock,
-        genetic_distance=np.zeros_like(days, dtype=float),
-        temporal_distance=days.astype(float),
-        **cfg.inference_cfg
-    )
-
     surface_df = pd.DataFrame({
         "snp": Dg.ravel().astype(int),
         "days": Dt.ravel().astype(int),
         "probability": P_joint.ravel().astype(float),
     })
     surface_df.to_parquet(table_path("probability_surface"), index=False)
-
-    prob_vs_snp_df = pd.DataFrame({
-        "snp": snps.astype(int),
-        "probability": P_genetic.astype(float),
-    })
-    prob_vs_snp_df.to_parquet(table_path("prob_vs_snp"), index=False)
-
-    prob_vs_days_df = pd.DataFrame({
-        "days": days.astype(int),
-        "probability": P_temporal.astype(float),
-    })
-    prob_vs_days_df.to_parquet(table_path("prob_vs_days"), index=False)
 
     # --- C) TOIT/TOST grids, stage samples, and summary statistics
     toit_grid = build_grid(0.0, cfg.toit_max_days, cfg.toit_day_step)
@@ -279,40 +239,14 @@ def main() -> None:
         table_path("clock_rate_summary"), index=False
     )
 
-    expected_days = np.arange(
-        0,
-        cfg.expected_mutation_max_days + 1,
-        cfg.expected_mutation_day_step,
-        dtype=float,
-    )
-    expected_mutations = clock.expected_mutations(
-        expected_days, size=cfg.expected_mutation_sample_size
-    )
-    if expected_mutations.ndim == 1:
-        expected_mutations_df = pd.DataFrame({
-            "days": expected_days.astype(int),
-            "expected_mutations": expected_mutations.astype(float),
-        })
-    else:
-        sample_ids = np.arange(expected_mutations.shape[0], dtype=int)
-        expected_mutations_df = pd.DataFrame({
-            "sample_id": np.repeat(sample_ids, expected_days.size),
-            "days": np.tile(expected_days, expected_mutations.shape[0]).astype(int),
-            "expected_mutations": expected_mutations.reshape(-1).astype(float),
-        })
-    expected_mutations_df.to_parquet(
-        table_path("expected_mutations"), index=False
-    )
-
     # --- E) Temporal-only and genetic-only linkage components
-    temporal_days = np.arange(-cfg.max_days, cfg.max_days + 1, cfg.day_step, dtype=float)
     temporal_only = temporal_linkage_probability(
-        temporal_distance=temporal_days,
+        temporal_distance=days,
         toit=toit,
         num_simulations=cfg.inference_cfg["num_simulations"],
     )
     temporal_df = pd.DataFrame({
-        "days": temporal_days.astype(int),
+        "days": days.astype(int),
         "probability": temporal_only.astype(float),
     })
     temporal_df.to_parquet(table_path("temporal_linkage"), index=False)

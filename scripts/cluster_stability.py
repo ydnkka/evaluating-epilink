@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/cluster_stability.py
+scripts/temporal_stability.py
 
 Evaluate cluster stability over time for different edge-weight models.
 
@@ -9,11 +9,11 @@ Config
 config/paths.yaml
 config/default_parameters.yaml
 config/generate_datasets.yaml
-config/cluster_stability.yaml
+config/temporal_stability.yaml
 
 Outputs
 -------
-tables/supplementary/cluster_stability/
+tables/supplementary/temporal_stability/
   - case_counts_over_time.parquet
   - stability_summary_<method>.parquet
 """
@@ -257,7 +257,7 @@ def main() -> None:
     parser.add_argument("--paths", default="../config/paths.yaml")
     parser.add_argument("--defaults", default="../config/default_parameters.yaml")
     parser.add_argument("--datasets", default="../config/generate_datasets.yaml")
-    parser.add_argument("--stability", default="../config/cluster_stability.yaml")
+    parser.add_argument("--stability", default="../config/temporal_stability.yaml")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))

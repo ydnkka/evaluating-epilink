@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 import yaml
-
+import seaborn as sns
 from matplotlib.figure import Figure
 
 
@@ -32,18 +32,30 @@ def save_figure(fig: "Figure", out_base: Path, formats: list[str]) -> None:
 
 
 def set_seaborn_paper_context(font_scale=1.5) -> None:
-    import seaborn as sns
-
     sns.set_theme(
         context="paper",       # scales fonts/lines appropriately
-        style="whitegrid",     # subtle horizontal grid
+        style="white",     # subtle horizontal grid
         font="sans-serif",
         font_scale=font_scale,
         rc={
             "axes.spines.right": False,
             "axes.spines.top": False,
-            "grid.linewidth": 0.5,
             "grid.alpha": 0.3,
+            "figure.dpi": 300,
+            "savefig.dpi": 300,
+            "font.size": 11,
+            "axes.titlesize": 12,
+            "axes.labelsize": 11,
+            "xtick.labelsize": 10,
+            "ytick.labelsize": 10,
+            "legend.fontsize": 10,
+            "axes.edgecolor": "black",
+            "axes.labelcolor": "black",
+            "text.color": "black",
+            "xtick.color": "black",
+            "ytick.color": "black",
             "axes.linewidth": 0.8,
+            "grid.linewidth": 0.6,
         }
+
     )

@@ -20,9 +20,5 @@ characterisation:
     max_snp: 10
     step: 1
   temporal_distance_grid:
-    max_days: 21
+    max_days: 15
     step: 1
-  expected_mutations_grid:
-    max_days: 60
-    step: 1
-    sample_size: 300
