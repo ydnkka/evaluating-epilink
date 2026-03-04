@@ -76,29 +76,32 @@ def summarise_data(
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
+    parser.add_argument("--datasets", default="../config/generate_datasets.yaml")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))
-    scenarios_cfg = load_yaml(Path(args.scenarios))
+    datasets_cfg = load_yaml(Path(args.datasets))
 
     processed_dir = Path(
         deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic")
     )
     tabs_dir = Path(
-        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+        deep_get(paths_cfg, ["outputs", "tables"], "../tables")
     )
     tabs_dir = tabs_dir / "scovmod"
     ensure_dirs(tabs_dir)
 
-    tree_path = Path(deep_get(scenarios_cfg, ["backbone", "tree_gml"],
-                              ".../data/processed/synthetic/scovmod/scovmod_tree.gml"))
-    rng_seed = int(deep_get(scenarios_cfg, ["backbone", "rng_seed"], 12345))
-    gen_len = int(deep_get(scenarios_cfg, ["backbone", "gen_len"], 29903))
+    tree_path = Path(
+        deep_get(datasets_cfg, ["backbone", "tree_gml"],".../data/processed/synthetic/scovmod/scovmod_tree.gml")
+    )
+    rng_seed = int(deep_get(datasets_cfg, ["backbone", "rng_seed"], 12345))
+    gen_len = int(deep_get(datasets_cfg, ["backbone", "gen_len"], 29903))
+
+    rng = default_rng(rng_seed)
 
     base_tree = nx.read_gml(tree_path)
 
-    scenarios = deep_get(scenarios_cfg, ["scenarios"], None)
+    scenarios = deep_get(datasets_cfg, ["scenarios"], None)
     if not isinstance(scenarios, dict) or len(scenarios) == 0:
         raise ValueError("generate_datasets.yaml must define a `scenarios:` mapping.")
 
@@ -115,8 +118,6 @@ def main() -> None:
         print(f"\n>>> Simulating scenario: {name} | {cfg.get('description','')}")
         sc_dir = processed_dir / f"scenario={name}"
         ensure_dirs(sc_dir)
-
-        rng = default_rng(cfg.rng_seed)
 
         params = InfectiousnessParams(
             incubation_shape=float(cfg["incubation_shape"]),

@@ -7,9 +7,7 @@ data:
     boston: ../data/processed/boston
 
 outputs:
-    tables:
-      main: ../tables/main
-      supplementary: ../tables/supplementary
+    tables: ../tables
     figures:
       main: ../figures/main
       supplementary: ../figures/supplementary

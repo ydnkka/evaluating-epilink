@@ -4,27 +4,26 @@ scripts/cluster_stability.py
 
 Evaluate cluster stability over time for different edge-weight models.
 
-Outputs
--------
-tables/main/
-  - stability_summary_<method>.parquet
-tables/supplementary/
-  - case_counts_over_time.parquet
-
 Config
 ------
 config/paths.yaml
 config/default_parameters.yaml
 config/generate_datasets.yaml
 config/cluster_stability.yaml
+
+Outputs
+-------
+tables/supplementary/cluster_stability/
+  - case_counts_over_time.parquet
+  - stability_summary_<method>.parquet
 """
 from __future__ import annotations
 
 import argparse
 from collections import defaultdict
-from typing import Iterable
 
 import numpy as np
+from numpy.random import default_rng
 import pandas as pd
 import networkx as nx
 import igraph as ig
@@ -34,6 +33,7 @@ from sklearn.linear_model import LogisticRegression
 
 from epilink import (
     TOIT,
+    MolecularClock,
     InfectiousnessParams,
     populate_epidemic_data,
     simulate_genomic_data,
@@ -44,38 +44,7 @@ from epilink import (
 from utils import *
 
 
-def _gamma_grid(cfg: dict) -> tuple[float, ...]:
-    gammas = deep_get(cfg, ["leiden", "gammas"], None)
-    if isinstance(gammas, dict):
-        gmin = float(gammas.get("min", 0.0))
-        gmax = float(gammas.get("max", 1.0))
-        gstep = float(gammas.get("step", 0.05))
-        return tuple(np.round(np.arange(gmin, gmax + 1e-9, gstep), 10))
-    if isinstance(gammas, Iterable):
-        return tuple(float(g) for g in gammas)
-    return tuple(np.round(np.arange(0, 1 + 1e-9, 0.05), 10))
-
-
-def _build_toit(defaults_cfg: dict) -> tuple[TOIT, dict]:
-    rng_seed = int(deep_get(defaults_cfg, ["toit", "rng_seed"], 12345))
-    params_cfg = deep_get(defaults_cfg, ["toit", "infectiousness_params"], {})
-    evol_cfg = deep_get(defaults_cfg, ["toit", "evolution"], {})
-
-    params = InfectiousnessParams(**params_cfg)
-    toit = TOIT(
-        params=params,
-        rng_seed=rng_seed,
-        subs_rate=float(evol_cfg["subs_rate"]),
-        relax_rate=bool(evol_cfg["relax_rate"]),
-        subs_rate_sigma=float(evol_cfg["subs_rate_sigma"]),
-        gen_len=int(evol_cfg["gen_length"]),
-    )
-
-    inference_cfg = deep_get(defaults_cfg, ["inference"], {})
-    return toit, inference_cfg
-
-
-def sampling_times(tree: nx.Graph, step: int = 7) -> pd.DataFrame:
+def sampling_times(tree: nx.Graph, step: int) -> pd.DataFrame:
     """Create per-case availability bins."""
     sampling = {n: int(round(d)) for n, d in tree.nodes(data="sample_date")}
     case_meta = pd.DataFrame({
@@ -103,21 +72,12 @@ def sampling_times(tree: nx.Graph, step: int = 7) -> pd.DataFrame:
 def build_igraph(
     df: pd.DataFrame,
     weight_col: str,
-    minimum_weight: float | None = None,
-    probability: bool = True,
-    all_nodes: list | None = None,
+    minimum_weight: float,
+    all_nodes: list,
 ) -> ig.Graph:
     """Build an undirected igraph graph from an edge list."""
-    work = df[["NodeA", "NodeB", weight_col]].copy()
-
-    if minimum_weight is not None:
-        if probability:
-            work = work[work[weight_col] >= float(minimum_weight)]
-        else:
-            thr = 1.0 / (float(minimum_weight) + 1.0)
-            work = work[work[weight_col] >= thr]
-
-    edges = work[["NodeA", "NodeB", weight_col]].to_records(index=False).tolist()
+    sub_df = df[df[weight_col] >= minimum_weight]
+    edges = sub_df[["NodeA", "NodeB", weight_col]].to_records(index=False).tolist()
 
     g = ig.Graph.TupleList(
         edges=edges,
@@ -126,11 +86,10 @@ def build_igraph(
         edge_attrs=weight_col,
     )
 
-    if all_nodes is not None:
-        present = set(g.vs["case_id"]) if g.vcount() else set()
-        missing = [n for n in all_nodes if n not in present]
-        if missing:
-            g.add_vertices(missing, attributes={"case_id": missing})
+    present = set(g.vs["case_id"]) if g.vcount() else set()
+    missing = [n for n in all_nodes if n not in present]
+    if missing:
+        g.add_vertices(missing, attributes={"case_id": missing})
     return g
 
 
@@ -156,7 +115,6 @@ def bcubed_scores(
     truth: dict[int, set[int]],
 ) -> tuple[float, float, float]:
     cases = sorted(set(pred) & set(truth))
-
     pred = {c: pred[c] for c in cases if pred[c]}
     truth = {c: truth[c] for c in cases if truth[c]}
 
@@ -173,40 +131,38 @@ def run_clustering(
     df: pd.DataFrame,
     nodes_present: set,
     weight_col: str,
-    resolution: float | None = None,
-    minimum_weight: float | None = None,
-    probability: bool = True,
-    n_restarts: int = 10,
+    minimum_weight: float,
+    resolution: float,
+    n_restarts: int,
 ) -> dict:
     g = build_igraph(
         df[["NodeA", "NodeB", weight_col]],
         weight_col,
         minimum_weight=minimum_weight,
-        probability=probability,
         all_nodes=sorted(nodes_present),
     )
 
-    if probability:
-        best = None
-        best_q = -np.inf
+    best = None
+    best_q = -np.inf
 
-        for _ in range(n_restarts):
-            part = g.community_leiden(
-                weights=weight_col,
-                resolution=resolution,
-                n_iterations=-1,
-            )
+    for _ in range(n_restarts):
+        part = g.community_leiden(
+            weights=weight_col,
+            resolution=resolution,
+            n_iterations=-1,
+        )
 
-            q = g.modularity(membership=part, weights=weight_col)
+        q = g.modularity(
+            membership=part,
+            weights=weight_col,
+            resolution=resolution,
+        )
 
-            if q > best_q:
-                best_q = q
-                best = part
+        if q > best_q:
+            best_q = q
+            best = part
 
-        memb = best.membership if best is not None else None
-    else:
-        part = g.connected_components(mode="weak")
-        memb = part.membership if part is not None else None
+    memb = best.membership if best is not None else None
 
     if memb is None:
         memb = list(range(g.vcount()))
@@ -259,10 +215,9 @@ def cumulative_stability(
     pairwise_df: pd.DataFrame,
     case_meta: pd.DataFrame,
     weight_col: str,
-    resolution: float | None = None,
-    minimum_weight: float | None = None,
-    probability: bool = True,
-    n_restarts: int = 10,
+    resolution: float,
+    minimum_weight: float,
+    n_restarts: int,
 ) -> pd.DataFrame:
     """Run cumulative clustering and compute overlap metrics for each transition."""
 
@@ -282,7 +237,6 @@ def cumulative_stability(
             weight_col=weight_col,
             resolution=resolution,
             minimum_weight=minimum_weight,
-            probability=probability,
             n_restarts=n_restarts,
         )
 
@@ -311,29 +265,37 @@ def main() -> None:
     datasets_cfg = load_yaml(Path(args.datasets))
     stability_cfg = load_yaml(Path(args.stability))
 
-    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "main"], "../tables/main"))
-    sup_tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
+    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables"], "../tables"))
+    tabs_dir =tabs_dir / "temporal_stability"
+    ensure_dirs(tabs_dir)
 
-    ensure_dirs(tabs_dir, sup_tabs_dir)
+    step_days = int(deep_get(stability_cfg, ["case_sampling", "step_days"], 7))
+    train_max_time_index = int(deep_get(stability_cfg, ["case_sampling", "train_max_time_index"], 2))
+    rng_seed = int(deep_get(defaults_cfg, ["rng_seed"], 12345))
+    toit_cfg = deep_get(defaults_cfg, ["infectiousness_params"], {})
+    clock_cfg = deep_get(defaults_cfg, ["clock"], {})
+    inference_cfg = deep_get(defaults_cfg, ["inference"], {})
+    inference_cfg["intermediate_generations"] = tuple(inference_cfg["intermediate_generations"])
+    n_restarts = int(deep_get(stability_cfg, ["community_detection", "n_restarts"], 10))
+    min_edge_weight = float(deep_get(stability_cfg, ["community_detection", "min_edge_weight"], 1e-4))
+    gmin = float(deep_get(stability_cfg, ["community_detection", "resolution", "min"], 0.1))
+    gmax = float(deep_get(stability_cfg, ["community_detection", "resolution", "max"], 1.0))
+    gstep = float(deep_get(stability_cfg, ["community_detection", "resolution", "step"], 0.05))
+    resolutions = np.round(np.arange(gmin, gmax + 1e-9, gstep), 10)
 
-    step_days = int(deep_get(stability_cfg, ["sampling", "step_days"], 7))
-    train_max_time_index = int(deep_get(stability_cfg, ["sampling", "train_max_time_index"], 2))
-
-    n_restarts = int(deep_get(stability_cfg, ["leiden", "n_restarts"], 10))
-    min_prob_weight = float(deep_get(stability_cfg, ["leiden", "min_prob_weight"], 1e-4))
-    gammas = _gamma_grid(stability_cfg)
-
-    snp_thresholds = tuple(deep_get(stability_cfg, ["scores", "snp_thresholds"], [0, 1, 2, 3, 4, 5]))
-    logit_max_iter = int(deep_get(stability_cfg, ["logistic_regression", "max_iter"], 200))
-    tree_path = Path(deep_get(datasets_cfg, ["backbone", "tree_gml"],
-                              "../data/processed/synthetic/scovmod_tree.gml"))
-
-    toit, inference_cfg = _build_toit(defaults_cfg)
+    tree_path = Path(
+        deep_get(datasets_cfg, ["backbone", "tree_gml"],"../data/processed/synthetic/scovmod/scovmod_tree.gml")
+    )
 
     trans_tree = nx.read_gml(tree_path)
+    rng = default_rng(rng_seed)
+
+    params = InfectiousnessParams(**toit_cfg)
+    toit = TOIT(params=params, rng=rng)
+    clock = MolecularClock(**clock_cfg)
 
     populated_tree = populate_epidemic_data(toit=toit, tree=trans_tree)
-    gen_results = simulate_genomic_data(toit=toit, tree=populated_tree)
+    gen_results = simulate_genomic_data(clock=clock, tree=populated_tree)
     pairwise = generate_pairwise_data(
         packed_genomic_data=gen_results["packed"],
         tree=populated_tree,
@@ -346,28 +308,22 @@ def main() -> None:
         .size()
         .rename(columns={"size": "n_cases"})
     )
-    case_counts.to_parquet(sup_tabs_dir / "case_counts_over_time.parquet", index=False)
+    case_counts.to_parquet(tabs_dir / "case_counts_over_time.parquet", index=False)
 
-    inter_gens = tuple(deep_get(inference_cfg, ["inter_generations"], [0, 1]))
-    no_intermediates = int(deep_get(inference_cfg, ["num_intermediates"], 10))
-    num_simulations = int(deep_get(inference_cfg, ["num_simulations"], 10000))
-
-    pairwise["MechProbLinearDist"] = estimate_linkage_probabilities(
+    pairwise["ProbLinearDist"] = linkage_probability(
         toit=toit,
+        clock=clock,
         genetic_distance=pairwise["LinearDist"].values,
         temporal_distance=pairwise["TemporalDist"].values,
-        intermediate_generations=inter_gens,
-        no_intermediates=no_intermediates,
-        num_simulations=num_simulations,
+        **inference_cfg
     )
 
-    pairwise["MechProbPoissonDist"] = estimate_linkage_probabilities(
+    pairwise["ProbPoissonDist"] = linkage_probability(
         toit=toit,
+        clock=clock,
         genetic_distance=pairwise["PoissonDist"].values,
         temporal_distance=pairwise["TemporalDist"].values,
-        intermediate_generations=inter_gens,
-        no_intermediates=no_intermediates,
-        num_simulations=num_simulations,
+        **inference_cfg
     )
 
     initial_nodes = set(sample_dates.loc[sample_dates["available_time"] <= train_max_time_index, "node"])
@@ -379,21 +335,24 @@ def main() -> None:
     y = initial_data["Related"].astype(int).values
     for dist_col in ("LinearDist", "PoissonDist"):
         X = initial_data[["TemporalDist", dist_col]].values
-        col = f"LogitProb{dist_col}"
-        clf = LogisticRegression(solver="lbfgs", max_iter=logit_max_iter)
+        col = f"Logit{dist_col}"
+        clf = LogisticRegression(solver="lbfgs", max_iter=200)
         clf.fit(X, y)
         pairwise[col] = clf.predict_proba(pairwise[["TemporalDist", dist_col]].values)[:, 1]
 
-    pairwise["LinearDistScore"] = 1.0 / (pairwise["LinearDist"] + 1.0)
-    pairwise["PoissonDistScore"] = 1.0 / (pairwise["PoissonDist"] + 1.0)
-
     truth = build_ground_truth_memberships(tree_path)
 
+    # Infer best resolution
+    initial_data = pairwise[
+        pairwise["NodeA"].isin(initial_nodes) &
+        pairwise["NodeB"].isin(initial_nodes)
+        ]
+
     prob_weight_columns = [
-        "MechProbLinearDist",
-        "MechProbPoissonDist",
-        "LogitProbLinearDist",
-        "LogitProbPoissonDist",
+        "ProbLinearDist",
+        "ProbPoissonDist",
+        "LogitLinearDist",
+        "LogitPoissonDist",
     ]
 
     metrics_rows = []
@@ -402,26 +361,25 @@ def main() -> None:
         graph = build_igraph(
             initial_data[["NodeA", "NodeB", weight]],
             weight,
-            minimum_weight=min_prob_weight,
-            probability=True,
+            minimum_weight=min_edge_weight,
             all_nodes=sorted(initial_nodes),
         )
 
-        for gamma in gammas:
+        for res in resolutions:
             best = None
             best_q = -np.inf
 
             for _ in range(n_restarts):
                 part = graph.community_leiden(
                     weights=weight,
-                    resolution=float(gamma),
+                    resolution=res,
                     n_iterations=-1,
                 )
 
                 q = graph.modularity(
                     membership=part,
                     weights=weight,
-                    resolution=gamma,
+                    resolution=res,
                     directed=False,
                 )
 
@@ -434,19 +392,18 @@ def main() -> None:
                 memb = list(range(graph.vcount()))
             rows.append(pd.DataFrame({
                 "case_id": graph.vs["case_id"],
-                "gamma": gamma,
+                "resolution": res,
                 "cluster_id": np.array(memb, dtype=int),
                 "weight": weight,
             }))
 
     partitions = pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
 
-    for (weight, gamma), sub in partitions.groupby(["weight", "gamma"], observed=True):
-        pred = dict(zip(sub["case_id"].tolist(), sub["cluster_id"].tolist()))
-        pred = {int(k): {int(v)} for k, v in pred.items()}
+    for (weight, res), sub in partitions.groupby(["weight", "resolution"], observed=True):
+        pred = {int(k): {int(v)} for k, v in zip(sub["case_id"].tolist(), sub["cluster_id"].tolist())}
         prec, rec, f1 = bcubed_scores(pred=pred, truth=truth)
         metrics_rows.append({
-            "gamma": float(gamma),
+            "Resolution": res,
             "Weight": weight,
             "BCubed_Precision": prec,
             "BCubed_Recall": rec,
@@ -456,111 +413,33 @@ def main() -> None:
 
     eval_metrics = pd.DataFrame(metrics_rows)
     idx = eval_metrics.groupby("Weight")["BCubed_F1_Score"].idxmax()
-    best_f1 = eval_metrics.loc[idx, ["Weight", "BCubed_F1_Score", "gamma"]]
-    model_res = best_f1.set_index("Weight")["gamma"].to_dict()
-
-    score_weight_columns = [
-        "LinearDistScore",
-        "PoissonDistScore",
-    ]
-
-    metrics_rows = []
-    rows = []
-    for weight in score_weight_columns:
-        for snp in snp_thresholds:
-            graph = build_igraph(
-                initial_data[["NodeA", "NodeB", weight]],
-                weight,
-                minimum_weight=snp,
-                probability=False,
-                all_nodes=sorted(initial_nodes),
-            )
-
-            cluster = graph.connected_components(mode="weak")
-            memb = cluster.membership if cluster is not None else None
-
-            if memb is None:
-                memb = list(range(graph.vcount()))
-            rows.append(pd.DataFrame({
-                "case_id": graph.vs["case_id"],
-                "snp": snp,
-                "cluster_id": np.array(memb, dtype=int),
-                "weight": weight,
-            }))
-
-    partitions = pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
-
-    for (weight, snp), sub in partitions.groupby(["weight", "snp"], observed=True):
-        pred = dict(zip(sub["case_id"].tolist(), sub["cluster_id"].tolist()))
-        pred = {int(k): {int(v)} for k, v in pred.items()}
-        prec, rec, f1 = bcubed_scores(pred=pred, truth=truth)
-        metrics_rows.append({
-            "snp": snp,
-            "Weight": weight,
-            "BCubed_Precision": prec,
-            "BCubed_Recall": rec,
-            "BCubed_F1_Score": f1,
-            "N_cases": len(pred),
-        })
-
-    eval_metrics = pd.DataFrame(metrics_rows)
-    idx = eval_metrics.groupby("Weight")["BCubed_F1_Score"].idxmax()
-    best_f1 = eval_metrics.loc[idx, ["Weight", "BCubed_F1_Score", "snp"]]
-    model_snp = best_f1.set_index("Weight")["snp"].to_dict()
+    best_f1 = eval_metrics.loc[idx, ["Weight", "BCubed_F1_Score", "Resolution"]]
+    model_res = best_f1.set_index("Weight")["Resolution"].to_dict()
 
     methods = {
-        "mech_linear": {
-            "weight_col": "MechProbLinearDist",
-            "probability": True,
-            "minimum_weight": min_prob_weight,
-            "resolution": model_res.get("MechProbLinearDist"),
+        "prob_linear": {
+            "weight_col": "ProbLinearDist",
+            "minimum_weight": min_edge_weight,
+            "resolution": model_res.get("ProbLinearDist"),
         },
-        "mech_poisson": {
-            "weight_col": "MechProbPoissonDist",
-            "probability": True,
-            "minimum_weight": min_prob_weight,
-            "resolution": model_res.get("MechProbPoissonDist"),
+        "prob_poisson": {
+            "weight_col": "ProbPoissonDist",
+            "minimum_weight": min_edge_weight,
+            "resolution": model_res.get("ProbPoissonDist"),
         },
         "logit_linear": {
-            "weight_col": "LogitProbLinearDist",
-            "probability": True,
-            "minimum_weight": min_prob_weight,
-            "resolution": model_res.get("LogitProbLinearDist"),
+            "weight_col": "LogitLinearDist",
+            "minimum_weight": min_edge_weight,
+            "resolution": model_res.get("LogitLinearDist"),
         },
         "logit_poisson": {
-            "weight_col": "LogitProbPoissonDist",
-            "probability": True,
-            "minimum_weight": min_prob_weight,
-            "resolution": model_res.get("LogitProbPoissonDist"),
-        },
-        "snp_linear": {
-            "weight_col": "LinearDistScore",
-            "probability": False,
-            "minimum_weight": model_snp.get("LinearDistScore"),
-            "resolution": None,
-        },
-        "snp_poisson": {
-            "weight_col": "PoissonDistScore",
-            "probability": False,
-            "minimum_weight": model_snp.get("PoissonDistScore"),
-            "resolution": None,
-        },
+            "weight_col": "LogitPoissonDist",
+            "minimum_weight": min_edge_weight,
+            "resolution": model_res.get("LogitPoissonDist"),
+        }
     }
 
-    enabled_methods = deep_get(
-        stability_cfg,
-        ["methods", "enabled"],
-        ["mech_linear", "mech_poisson", "logit_linear", "logit_poisson"],
-    )
-    enabled_methods = [m for m in enabled_methods if m in methods]
-    enabled_methods = [m for m in enabled_methods if methods[m].get("resolution") is not None
-                       or methods[m].get("minimum_weight") is not None]
-
-    n_methods = len(enabled_methods)
-    if n_methods == 0:
-        raise ValueError("No valid methods enabled for stability outputs.")
-
-    for i, name in enumerate(enabled_methods):
+    for i, name in enumerate(methods.keys()):
         cfg = methods[name]
         print(f"Analysing: {name}")
         stability_df = cumulative_stability(
@@ -570,8 +449,7 @@ def main() -> None:
             **cfg,
         )
         summary = stability_df.groupby("t1")[["forward", "backward", "jaccard"]].mean()
-        summary.to_parquet(tabs_dir / f"stability_summary_{name}.parquet", index=False)
-
+        summary.to_parquet(tabs_dir / f"temporal_stability_{name}.parquet", index=True)
 
 if __name__ == "__main__":
     main()

@@ -1,11 +1,11 @@
 # evaluating-epilink
-Reproducibility code and analyses for *Threshold-Free Probabilistic Inference of Superspreading Molecular Transmission Clusters*.
+Reproducibility code and analyses for *epilink: Integrating Evolutionary and Epidemiological Signals to Uncover Superspreading Dynamics*.
 
 ---
 
 This repository contains the code and analysis workflows used in the paper:
 
-***Threshold-Free Probabilistic Inference of Superspreading Molecular Transmission Clusters***
+# *epilink: Integrating Evolutionary and Epidemiological Signals to Uncover Superspreading Dynamics*
 
 The paper introduces a probabilistic method for inferring recent transmission and identifying superspreading molecular 
 transmission clusters (SMTCs) from pathogen genomic data and sampling dates, without relying on fixed genetic or temporal thresholds.
@@ -34,8 +34,8 @@ The full implementation of the framework is available in the **[epilink](https:/
 
 ```
 config/     configuration files for simulation and analyses
-data/       raw and processed inputs (see data/README.md)
-figures/    manuscript figures (rendered from notebooks)
+data/       raw, processed and synthtic inputs
+figures/    manuscript figures
 tables/     parquet outputs used to build manuscript tables/figures
 notebooks/  exploratory notebooks
 scripts/    reproducible pipelines used for the manuscript

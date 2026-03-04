@@ -43,47 +43,22 @@ from epilink import (
 
 from utils import *
 
-MODELS = {
-    "LinearDistScore": "Lin–Score",
-    "PoissonDistScore": "Pois–Score",
-    "ProbLinearDist": "Lin–Prob",
-    "ProbPoissonDist": "Pois–Prob",
-    "LogitLinearDist10": "Lin–Logit(10)",
-    "LogitLinearDist100": "Lin–Logit(100)",
-    "LogitPoissonDist10": "Pois–Logit(10)",
-    "LogitPoissonDist100": "Pois–Logit(100)",
-}
 
-SCENARIOS = {
-    "baseline": "Baseline",
-    "surveillance_moderate": "Surveillance (moderate)",
-    "surveillance_severe": "Surveillance (severe)",
-    "low_clock_signal": "Low clock signal",
-    "low_incubation_shape": "Low incubation shape",
-    "low_incubation_scale": "Low incubation scale",
-    "high_clock_signal": "High clock signal",
-    "high_incubation_shape": "High incubation shape",
-    "high_incubation_scale": "High incubation scale",
-    "relaxed_clock": "Relaxed clock",
-    "adversarial": "Adversarial",
-}
-
-def evaluate(y: np.ndarray, score: np.ndarray, is_prob: bool) -> Dict[str, float]:
+def evaluate(y: np.ndarray, score: np.ndarray, is_prob: bool) -> dict[str, float]:
     out = {"ROC_AUC": float(roc_auc_score(y, score)) if len(np.unique(y)) == 2 else np.nan,
            "PR_AUC": float(average_precision_score(y, score)) if len(np.unique(y)) == 2 else np.nan,
            "Brier": float(brier_score_loss(y, score)) if is_prob else np.nan}
     return out
 
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
+    parser.add_argument("--datasets_cfg", default="../config/generate_datasets.yaml")
     parser.add_argument("--defaults", default="../config/default_parameters.yaml")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))
-    scenarios_cfg = load_yaml(Path(args.scenarios))
+    datasets_cfg = load_yaml(Path(args.datasets))
     defaults_cfg = load_yaml(Path(args.defaults))
 
     processed_dir = Path(
@@ -91,23 +66,24 @@ def main() -> None:
     )
 
     tabs_dir = Path(
-        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+        deep_get(paths_cfg, ["outputs", "tables"], "../tables")
     )
     tabs_dir = tabs_dir / "discrimination"
     ensure_dirs(tabs_dir)
 
     rng_seed = int(deep_get(defaults_cfg, ["rng_seed"], 12345))
-    params_cfg = deep_get(defaults_cfg, ["infectiousness_params"], {})
-    evol_cfg = deep_get(defaults_cfg, ["clock"], {})
+    toit_cfg = deep_get(defaults_cfg, ["infectiousness_params"], {})
+    clock_cfg = deep_get(defaults_cfg, ["clock"], {})
     inference_cfg = deep_get(defaults_cfg, ["inference"], {})
+    inference_cfg["intermediate_generations"] = tuple(inference_cfg["intermediate_generations"])
 
     rng = default_rng(rng_seed)
 
-    params = InfectiousnessParams(**params_cfg)
+    params = InfectiousnessParams(**toit_cfg)
     toit = TOIT(params=params,rng=rng)
-    clock = MolecularClock(**evol_cfg)
+    clock = MolecularClock(**clock_cfg)
 
-    scenarios = deep_get(scenarios_cfg, ["scenarios"], {})
+    scenarios = deep_get(datasets_cfg, ["scenarios"], {})
 
     rows = []
     for scen in scenarios.keys():
@@ -126,9 +102,7 @@ def main() -> None:
             clock=clock,
             genetic_distance=df["LinearDist"].values,
             temporal_distance=df["TemporalDist"].values,
-            intermediate_generations = tuple(inference_cfg["intermediate_generations"]),
-            intermediate_hosts = int(inference_cfg["intermediate_hosts"]),
-            num_simulations = int(inference_cfg["num_simulations"]),
+            **inference_cfg
         )
 
         df["ProbPoissonDist"] = linkage_probability(
@@ -136,9 +110,7 @@ def main() -> None:
             clock=clock,
             genetic_distance=df["PoissonDist"].values,
             temporal_distance=df["TemporalDist"].values,
-            intermediate_generations=tuple(inference_cfg["intermediate_generations"]),
-            intermediate_hosts=int(inference_cfg["intermediate_hosts"]),
-            num_simulations=int(inference_cfg["num_simulations"]),
+            **inference_cfg
         )
 
         # Logistic regression

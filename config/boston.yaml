@@ -1,3 +1,4 @@
+rng_seed: 12345
 inputs:
   metadata: boston_metadata.parquet
   pairwise_distances: boston_pairwise_distances.parquet
@@ -6,18 +7,25 @@ inputs:
   date_col: Date
   exposure_col: Exposure
   temporal_col: Temporal_Distance
-
+  genetic_col: SNP_Distance
+infectiousness_params:
+  incubation_shape: 5.807
+  incubation_scale: 0.948
+  latent_shape: 3.38
+  symptomatic_rate: 0.37
+  symptomatic_shape: 1.0
+  rel_presymptomatic_infectiousness: 2.29
+clock:
+  subs_rate: 0.001
+  relax_rate: True
+  subs_rate_sigma: 0.33
+  gen_len: 29903
 inference:
-  rng_seed: 42
-  subs_rate: 1e-3
-  relax_rate: false
-  subs_rate_sigma: 0.0
-  mutation_model: deterministic
-
+  num_simulations: 10000
+  intermediate_generations: [0,1]
+  intermediate_hosts: 10
 analysis:
   resolution: 0.3
-  probability_threshold: 0.0001
+  sparsify: {enabled: true, min_edge_weight: 0.0001}
   min_cluster_size: 2
-  focus_exposures:
-    - Conference
-    - SNF
+  focus_exposures: [Conference, SNF]

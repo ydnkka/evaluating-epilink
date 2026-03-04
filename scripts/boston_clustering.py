@@ -4,7 +4,7 @@ scripts/boston_clustering.py
 
 Boston empirical analysis pipeline:
   - load metadata + precomputed pairwise distances
-  - compute mechanistic linkage probabilities (epilink)
+  - compute linkage probabilities (epilink)
   - run Leiden community detection at a fixed resolution
   - summarize cluster composition and export manuscript tables
 
@@ -15,7 +15,7 @@ config/boston.yaml
 
 Outputs
 -------
-tables/main/
+tables/boston/
   - boston_cluster_summary.parquet
   - boston_cluster_composition.parquet
 """
@@ -23,28 +23,21 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
 
 import igraph as ig
 import numpy as np
+from numpy.random import default_rng
 import pandas as pd
 from scipy.stats import chisquare
 
-from epilink import TOIT, InfectiousnessParams, linkage_probability
+from epilink import (
+    TOIT,
+    MolecularClock,
+    InfectiousnessParams,
+    linkage_probability
+)
 
-from utils import deep_get, ensure_dirs, load_yaml
-
-
-def hart_default_params() -> InfectiousnessParams:
-    return InfectiousnessParams(
-        k_inc=5.807,
-        scale_inc=0.948,
-        k_E=3.38,
-        mu=0.37,
-        k_I=1,
-        alpha=2.29,
-    )
+from utils import *
 
 
 def add_temporal_distance(
@@ -95,7 +88,7 @@ def build_graph(
 def analyse_partition(
     part: ig.VertexClustering,
     node_attribute: str,
-    edge_attributes: Optional[Iterable[str]] = None,
+    edge_attributes: list = None,
     min_size: int = 1,
 ) -> pd.DataFrame:
     if edge_attributes is None:
@@ -144,7 +137,7 @@ def analyse_partition(
         others = list(set(range(g.vcount())) - set(members))
         inter_es = g.es.select(_between=(members, others))
 
-        edge_stats: Dict[str, Any] = {}
+        edge_stats: dict[str, Any] = {}
         for attr in edge_attributes:
             intra_vals = intra_es[attr]
             inter_vals = inter_es[attr]
@@ -160,9 +153,6 @@ def analyse_partition(
 
             edge_stats[f"inter_min_{attr}"] = np.min(inter_vals) if has_inter else None
             edge_stats[f"inter_mean_{attr}"] = np.mean(inter_vals) if has_inter else None
-
-            dunn_index = (np.mean(inter_vals) / intra_max) if has_inter and has_intra and intra_max > 0 else None
-            edge_stats[f"dunn_index_{attr}"] = dunn_index
 
         row = {
             "cluster_id": cid,
@@ -190,31 +180,22 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
     parser.add_argument("--boston", default="../config/boston.yaml")
-    parser.add_argument("--out-root", default="")
     args = parser.parse_args()
 
     paths_cfg = load_yaml(Path(args.paths))
     bos_cfg = load_yaml(Path(args.boston))
 
-    out_root = Path(args.out_root) if args.out_root else None
-
     data_boston = Path(deep_get(paths_cfg, ["data", "processed", "boston"], "../data/processed/boston"))
-    if out_root and not data_boston.is_absolute():
-        data_boston = out_root / data_boston
+    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables"], "../tables"))
+    tabs_dir = tabs_dir / "boston"
+    ensure_dirs( tabs_dir)
 
-    tables_main = Path(deep_get(paths_cfg, ["outputs", "tables", "main"], "../tables/main"))
-    if out_root:
-        if not tables_main.is_absolute():
-            tables_main = out_root / tables_main
+    metadata_path = data_boston / str(deep_get(bos_cfg, ["inputs", "metadata"]))
+    pairwise_path = data_boston / str(deep_get(bos_cfg, ["inputs", "pairwise_distances"]))
 
-    ensure_dirs(data_boston, tables_main)
-
-    metadata_path = data_boston / str(deep_get(bos_cfg, ["inputs", "metadata"], "boston_metadata.parquet"))
-    pairwise_path = data_boston / str(deep_get(bos_cfg, ["inputs", "pairwise_distances"], "boston_pairwise_distances.parquet"))
-
-    if not metadata_path.exists():
+    if metadata_path is None or not metadata_path.exists():
         raise FileNotFoundError(f"Boston metadata file not found: {metadata_path}")
-    if not pairwise_path.exists():
+    if metadata_path is None or not pairwise_path.exists():
         raise FileNotFoundError(f"Boston pairwise file not found: {pairwise_path}")
 
     metadata = pd.read_parquet(metadata_path)
@@ -225,8 +206,9 @@ def main() -> None:
     date_col = str(deep_get(bos_cfg, ["inputs", "date_col"], "Date"))
     exposure_col = str(deep_get(bos_cfg, ["inputs", "exposure_col"], "Exposure"))
     temporal_col = str(deep_get(bos_cfg, ["inputs", "temporal_col"], "Temporal_Distance"))
+    genetic_col = str(deep_get(bos_cfg, ["inputs", "genetic_col"], "SNP_Distance"))
 
-    required = {id_col_1, id_col_2, "SNP_Distance"}
+    required = {id_col_1, id_col_2, genetic_col}
     missing = required - set(pair_data.columns)
     if missing:
         raise ValueError(f"Missing required columns in Boston pairwise file: {missing}")
@@ -240,23 +222,31 @@ def main() -> None:
         out_col=temporal_col,
     )
 
-    params = hart_default_params()
-    rng_seed = int(deep_get(bos_cfg, ["inference", "rng_seed"], 42))
-    subs_rate = float(deep_get(bos_cfg, ["inference", "subs_rate"], 1e-3))
-    relax_rate = bool(deep_get(bos_cfg, ["inference", "relax_rate"], False))
-    sigma = float(deep_get(bos_cfg, ["inference", "subs_rate_sigma"], 0.0))
-    mutation_model = str(deep_get(bos_cfg, ["inference", "mutation_model"], "deterministic"))
+    rng_seed = int(deep_get(bos_cfg, ["rng_seed"], 12345))
+    toit_cfg = deep_get(bos_cfg, ["infectiousness_params"], {})
+    clock_cfg = deep_get(bos_cfg, ["clock"], {})
+    inference_cfg = deep_get(bos_cfg, ["inference"], {})
+    inference_cfg["intermediate_generations"] = tuple(inference_cfg["intermediate_generations"])
 
-    toit = TOIT(params=params, rng_seed=rng_seed, subs_rate=subs_rate, relax_rate=relax_rate, subs_rate_sigma=sigma)
+    rng = default_rng(rng_seed)
+
+    params = InfectiousnessParams(**toit_cfg)
+    toit = TOIT(params=params, rng=rng)
+    clock = MolecularClock(**clock_cfg)
+
     pair_data["Probability"] = linkage_probability(
         toit=toit,
-        genetic_distance=pair_data["SNP_Distance"].values,
+        clock=clock,
+        genetic_distance=pair_data[genetic_col].values,
         temporal_distance=pair_data[temporal_col].values,
+        **inference_cfg
     )
-    pair_data.to_parquet(data_boston / "boston_pairwise_with_probs.parquet", index=False)
 
     resolution = float(deep_get(bos_cfg, ["analysis", "resolution"], 0.3))
-    probability_threshold = float(deep_get(bos_cfg, ["analysis", "probability_threshold"], 0.0001))
+    minimum_weight = float(deep_get(bos_cfg, ["network", "sparsify", "min_edge_weight"], 0.0001))
+    sparsify = bool(deep_get(bos_cfg, ["network", "sparsify", "enabled"], True))
+    if not sparsify:
+        minimum_weight = 0.0
     min_cluster_size = int(deep_get(bos_cfg, ["analysis", "min_cluster_size"], 2))
     focus_exposures = list(deep_get(bos_cfg, ["analysis", "focus_exposures"], ["Conference", "SNF"]))
 
@@ -266,7 +256,7 @@ def main() -> None:
         id_col_1=id_col_1,
         id_col_2=id_col_2,
         exposure_col=exposure_col,
-        minimum_weight=probability_threshold,
+        minimum_weight=minimum_weight,
         probability_col="Probability",
     )
 
@@ -279,7 +269,7 @@ def main() -> None:
     prob_results = analyse_partition(
         part,
         node_attribute=exposure_col,
-        edge_attributes=["SNP_Distance", temporal_col],
+        edge_attributes=[genetic_col, temporal_col],
         min_size=min_cluster_size,
     )
 
@@ -294,32 +284,30 @@ def main() -> None:
     prob_summary = prob_focus[[
         "cluster_id",
         "size",
-        "intra_mean_SNP_Distance",
-        "intra_max_SNP_Distance",
+        f"intra_mean_{genetic_col}",
+        f"intra_max_{genetic_col}",
         f"intra_mean_{temporal_col}",
         f"intra_max_{temporal_col}",
-        "inter_mean_SNP_Distance",
-        "dunn_index_SNP_Distance",
+        f"inter_mean_{genetic_col}",
     ]].copy()
 
     prob_summary.rename(
         columns={
             "cluster_id": "Cluster ID",
             "size": "Size",
-            "intra_mean_SNP_Distance": "Intra-SNP (Mean)",
-            "intra_max_SNP_Distance": "Intra-SNP(Max)",
+            f"intra_mean_{genetic_col}": "Intra-SNP (Mean)",
+            f"intra_max_{genetic_col}": "Intra-SNP(Max)",
             f"intra_mean_{temporal_col}": "Intra-Time (Mean)",
             f"intra_max_{temporal_col}": "Intra-Time (Max)",
-            "inter_mean_SNP_Distance": "Inter-SNP (Mean)",
-            "dunn_index_SNP_Distance": "Dunn Index (Genetic)",
+            f"inter_mean_{genetic_col}": "Inter-SNP (Mean)",
         },
         inplace=True,
     )
 
-    prob_summary.to_parquet(tables_main / "boston_cluster_summary.parquet", index=False)
-    prob_focus.to_parquet(tables_main / "boston_cluster_composition.parquet", index=False)
+    prob_summary.to_parquet(tabs_dir / "boston_cluster_summary.parquet", index=False)
+    prob_focus.to_parquet(tabs_dir / "boston_cluster_composition.parquet", index=False)
 
-    print(f"Saved Boston outputs to: {tables_main}")
+    print(f"Saved Boston outputs to: {tabs_dir}")
 
 
 if __name__ == "__main__":

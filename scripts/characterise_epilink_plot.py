@@ -51,7 +51,7 @@ def main() -> None:
 
     paths_cfg = load_yaml(Path(args.paths))
     tabs_dir = Path(
-        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+        deep_get(paths_cfg, ["outputs", "tables"], "../tables")
     )
     tabs_dir = tabs_dir / "characterise_epilink"
 

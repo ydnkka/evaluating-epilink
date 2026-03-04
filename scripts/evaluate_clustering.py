@@ -3,26 +3,26 @@
 scripts/evaluate_clustering.py
 
 Evaluate clustering partitions against simulation ground truth using BCubed
-and quantify resolution stability (ARI between consecutive gammas).
+and quantify resolution stability (BCubed F1-score between consecutive gammas).
 
-This is a backbone: you’ll plug in your exact ground-truth construction and
-BCubed implementation (especially for overlapping truth).
+Config
+------
+config/paths.yaml
+config/generate_datasets.yaml
 
 Outputs
 -------
 tables/supplementary/
   - clustering_metrics.parquet
   - clustering_stability.parquet
-
-Config
-------
-config/paths.yaml
-config/generate_datasets.yaml
 """
 from __future__ import annotations
 
 import argparse
+import os
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -32,12 +32,14 @@ import bcubed
 
 from utils import *
 
+_WORKER_TRUTH: Optional[dict[int, set[int]]] = None
+
 
 # -----------------------------
 # Placeholders you should replace with your final definitions
 # -----------------------------
 
-def build_ground_truth_memberships(tree_path: Path) -> Dict[int, set[int]]:
+def build_ground_truth_memberships(tree_path: Path) -> dict[int, set[int]]:
     """
     Placeholder: construct overlapping ground-truth clusters from a populated tree.
     Return a mapping:
@@ -80,72 +82,140 @@ def bcubed_scores(pred, truth):
     return precision, recall, f_score
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--scenarios", default="../config/generate_datasets.yaml")
-    args = parser.parse_args()
+def _init_worker(truth: dict[int, set[int]]) -> None:
+    global _WORKER_TRUTH
+    _WORKER_TRUTH = truth
 
-    paths_cfg = load_yaml(Path(args.paths))
-    scenarios_cfg = load_yaml(Path(args.scenarios))
 
-    processed_dir = Path(deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic"))
-    tabs_dir = Path(deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary"))
-    ensure_dirs(processed_dir, tabs_dir)
+def evaluate_scenario(
+    scen: str,
+    processed_dir: Path,
+    tree_path: Path,
+    truth: Optional[dict[int, set[int]]] = None,
+) -> tuple[list[dict], list[dict]]:
+    if truth is None:
+        truth = _WORKER_TRUTH
+        if truth is None:
+            truth = build_ground_truth_memberships(tree_path)
 
-    tree_path = Path(deep_get(scenarios_cfg, ["backbone", "tree_gml"],
-                              "../data/processed/synthetic/scovmod_tree.gml"))
-    scenarios = deep_get(scenarios_cfg, ["scenarios"], {})
+    sc_dir = processed_dir / f"scenario={scen}"
+    part_path = sc_dir / "leiden_partitions.parquet"
 
+    if not part_path.exists() or not tree_path.exists():
+        return [], []
+
+    parts = pd.read_parquet(part_path)
     metrics_rows = []
     stability_rows = []
-    truth = build_ground_truth_memberships(tree_path)
 
-    for scen in scenarios.keys():
-        print(f">>> Evaluating: {scen}")
-        sc_dir = processed_dir / f"scenario={scen}"
-        part_path = sc_dir / "leiden_partitions.parquet"
+    # --- Clustering evaluation against ground truth
+    for (weight_col, res), sub in parts.groupby(["weight_col", "resolution"], observed=True):
+        pred = {int(k): {int(v)} for k, v in zip(sub["case_id"].tolist(), sub["cluster_id"].tolist())}
+        prec, rec, f1 = bcubed_scores(pred=pred, truth=truth)
+        metrics_rows.append({
+            "Scenario": scen,
+            "Resolution": res,
+            "Weight_Column": weight_col,
+            "BCubed_Precision": prec,
+            "BCubed_Recall": rec,
+            "BCubed_F1_Score": f1,
+            "N_cases": len(pred),
+        })
 
-        if not part_path.exists() or not tree_path.exists():
-            continue
-
-        parts = pd.read_parquet(part_path)
-
-        # --- Clustering evaluation against ground truth
-        for (weight_col, gamma), sub in parts.groupby(["weight_col", "gamma"], observed=True):
-            pred = dict(zip(sub["case_id"].tolist(), sub["cluster_id"].tolist()))
-            pred = {int(k): {int(v)} for k, v in pred.items()}  # make non-overlapping into overlapping
-            prec, rec, f1 = bcubed_scores(pred=pred, truth=truth)
-            metrics_rows.append({
+    # --- Stability between consecutive resolutions
+    resolutions = np.sort(parts["resolution"].unique())
+    for weight_col, sub in parts.groupby("weight_col", observed=True):
+        for res1, res2 in zip(resolutions[:-1], resolutions[1:]):
+            p1 = sub[sub["resolution"] == res1]
+            p2 = sub[sub["resolution"] == res2]
+            p1_mem = dict(zip(p1["case_id"].tolist(), p1["cluster_id"].tolist()))
+            p1_mem = {int(k): {int(v)} for k, v in p1_mem.items()}
+            p2_mem = dict(zip(p2["case_id"].tolist(), p2["cluster_id"].tolist()))
+            p2_mem = {int(k): {int(v)} for k, v in p2_mem.items()}
+            prec, rec, f1 = bcubed_scores(pred=p1_mem, truth=p2_mem)
+            stability_rows.append({
                 "Scenario": scen,
-                "gamma": float(gamma),
                 "Weight_Column": weight_col,
+                "Res1": res1,
+                "Res2": res2,
                 "BCubed_Precision": prec,
                 "BCubed_Recall": rec,
                 "BCubed_F1_Score": f1,
-                "N_cases": len(pred),
             })
 
-        # --- Stability between consecutive gammas
-        gammas = np.sort(parts["gamma"].unique())
-        for weight_col, sub in parts.groupby("weight_col", observed=True):
-            for g1, g2 in zip(gammas[:-1], gammas[1:]):
-                p1 = sub[sub["gamma"] == g1]
-                p2 = sub[sub["gamma"] == g2]
-                p1_mem = dict(zip(p1["case_id"].tolist(), p1["cluster_id"].tolist()))
-                p1_mem = {int(k): {int(v)} for k, v in p1_mem.items()}
-                p2_mem = dict(zip(p2["case_id"].tolist(), p2["cluster_id"].tolist()))
-                p2_mem = {int(k): {int(v)} for k, v in p2_mem.items()}
-                prec, rec, f1 = bcubed_scores(pred=p1_mem, truth=p2_mem)
-                stability_rows.append({
-                    "Scenario": scen,
-                    "Weight_Column": weight_col,
-                    "gamma1": float(g1),
-                    "gamma2": float(g2),
-                    "BCubed_Precision": prec,
-                    "BCubed_Recall": rec,
-                    "BCubed_F1_Score": f1,
-                })
+    return metrics_rows, stability_rows
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--paths", default="../config/paths.yaml")
+    parser.add_argument("--datasets", default="../config/generate_datasets.yaml")
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=None,
+        help="Number of parallel workers (<=1 for sequential)",
+    )
+    args = parser.parse_args()
+
+    paths_cfg = load_yaml(Path(args.paths))
+    datasets_cfg = load_yaml(Path(args.datasets))
+
+    tree_path = Path(
+        deep_get(datasets_cfg, ["backbone", "tree_gml"], "../data/processed/synthetic/scovmod_tree.gml")
+    )
+    processed_dir = Path(
+        deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic")
+    )
+    tabs_dir = Path(
+        deep_get(paths_cfg, ["outputs", "tables"], "../tables")
+    )
+    tabs_dir = tabs_dir / "clustering"
+    ensure_dirs(tabs_dir)
+
+    scenarios = deep_get(datasets_cfg, ["scenarios"], {})
+
+    truth = build_ground_truth_memberships(tree_path)
+
+    metrics_rows = []
+    stability_rows = []
+    scenario_list = list(scenarios.keys())
+    jobs = args.jobs if args.jobs is not None else (round(os.cpu_count() * 0.75)  or 1)
+
+    if jobs <= 1 or len(scenario_list) <= 1:
+        for scen in scenario_list:
+            print(f">>> Evaluating: {scen}")
+            scen_metrics, scen_stability = evaluate_scenario(
+                scen=scen,
+                processed_dir=processed_dir,
+                tree_path=tree_path,
+                truth=truth,
+            )
+            metrics_rows.extend(scen_metrics)
+            stability_rows.extend(scen_stability)
+    else:
+        with ProcessPoolExecutor(
+            max_workers=jobs,
+            initializer=_init_worker,
+            initargs=(truth,),
+        ) as executor:
+            futures = {
+                executor.submit(
+                    evaluate_scenario,
+                    scen,
+                    processed_dir,
+                    tree_path,
+                    None,
+                ): scen
+                for scen in scenario_list
+            }
+            for future in as_completed(futures):
+                scen = futures[future]
+                scen_metrics, scen_stability = future.result()
+                if scen_metrics or scen_stability:
+                    print(f">>> Evaluated: {scen}")
+                metrics_rows.extend(scen_metrics)
+                stability_rows.extend(scen_stability)
 
     pd.DataFrame(metrics_rows).to_parquet(tabs_dir / "clustering_metrics.parquet", index=False)
     pd.DataFrame(stability_rows).to_parquet(tabs_dir / "clustering_stability.parquet", index=False)

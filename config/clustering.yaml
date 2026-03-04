@@ -1,13 +1,12 @@
+rng_seed: 12345
 community_detection:
-  method: leiden
   resolution: {min: 0.1, max: 1.0, step: 0.05}
-  rng_seed: 12345
   n_restarts: 10
-  weight_columns:
-    - MechProbLinearDist
-    - MechProbPoissonDist
-    - LogitProbLinearDist_1.0
-    - LogitProbPoissonDist_1.0
 network:
+  weight_columns:
+    - ProbLinearDist
+    - ProbPoissonDist
+    - LogitLinearDist10
+    - LogitPoissonDist100
   sparsify: {enabled: true, min_edge_weight: 0.0001}
   min_edge_weights: [0.0, 0.0001, 0.0005, 0.001, 0.005, 0.01,  0.05, 0.1]

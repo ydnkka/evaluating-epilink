@@ -95,7 +95,7 @@ def parse_configs(
         deep_get(paths_cfg, ["data", "processed", "synthetic"], "../data/processed/synthetic")
     )
     tables_supp = Path(
-        deep_get(paths_cfg, ["outputs", "tables", "supplementary"], "../tables/supplementary")
+        deep_get(paths_cfg, ["outputs", "tables"], "../tables")
     )
 
     paths = PathsConfig(
@@ -331,7 +331,7 @@ def _degree_rows(graph: nx.DiGraph, label: str) -> list[dict[str, object]]:
     return rows
 
 
-def summarise_graph(graph: nx.DiGraph, label: str) -> Dict[str, Any]:
+def summarise_graph(graph: nx.DiGraph, label: str) -> dict[str, Any]:
     """
     Summarize degree and component statistics for a directed graph.
 
@@ -375,7 +375,7 @@ def main() -> None:
     """
     parser = argparse.ArgumentParser(description="Generate a transmission tree from SCoVMod outputs.")
     parser.add_argument("--paths", type=str, default="../config/paths.yaml", help="Path to config/paths.yaml")
-    parser.add_argument("--simulation", type=str, default="../config/scovmod.yaml", help="Path to config/scovmod.yaml")
+    parser.add_argument("--scovmod", type=str, default="../config/scovmod.yaml", help="Path to config/scovmod.yaml")
     parser.add_argument(
         "--out-prefix",
         type=str,
@@ -386,7 +386,7 @@ def main() -> None:
 
     paths, tree_cfg = parse_configs(
         paths_yaml=Path(args.paths),
-        scovmod_yaml=Path(args.simulation),
+        scovmod_yaml=Path(args.scovmod),
     )
 
     ensure_dirs(paths.processed_dir, paths.tables_out_dir)

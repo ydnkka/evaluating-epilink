@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List
-
+from typing import Any
 import yaml
 
-if TYPE_CHECKING:
-    from matplotlib.figure import Figure
+from matplotlib.figure import Figure
 
 
-def load_yaml(path: Path) -> Dict[str, Any]:
+def load_yaml(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
-def deep_get(d: Dict[str, Any], keys: List[str], default: Any = None) -> Any:
+def deep_get(d: dict[str, Any], keys: list[str], default: Any = None) -> Any:
     cur: Any = d
     for k in keys:
         if not isinstance(cur, dict) or k not in cur:
@@ -28,7 +26,7 @@ def ensure_dirs(*dirs: Path) -> None:
         d.mkdir(parents=True, exist_ok=True)
 
 
-def save_figure(fig: "Figure", out_base: Path, formats: List[str]) -> None:
+def save_figure(fig: "Figure", out_base: Path, formats: list[str]) -> None:
     for ext in formats:
         fig.savefig(out_base.with_suffix(f".{ext}"), bbox_inches="tight", dpi=300)
 
