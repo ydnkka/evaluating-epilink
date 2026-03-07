@@ -6,7 +6,7 @@ network:
   weight_columns:
     - ProbLinearDist
     - ProbPoissonDist
-    - LogitLinearDist10
+    - LogitLinearDist100
     - LogitPoissonDist100
   sparsify: {enabled: true, min_edge_weight: 0.0001}
   min_edge_weights: [0.0, 0.0001, 0.0005, 0.001, 0.005, 0.01,  0.05, 0.1]

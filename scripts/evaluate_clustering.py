@@ -12,7 +12,7 @@ config/generate_datasets.yaml
 
 Outputs
 -------
-tables/supplementary/
+tables/clustering/
   - clustering_metrics.parquet
   - clustering_stability.parquet
 """
