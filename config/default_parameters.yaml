@@ -13,7 +13,7 @@ clock:
   gen_len: 29903
 inference:
   num_simulations: 10000
-  intermediate_generations: [0,1]
+  intermediate_generations: [0,]
   intermediate_hosts: 10
 characterisation:
   genetic_distance_grid:

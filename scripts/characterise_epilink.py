@@ -251,13 +251,6 @@ def main() -> None:
     })
     temporal_df.to_parquet(table_path("temporal_linkage"), index=False)
 
-    genetic_relative = genetic_linkage_probability(
-        toit=toit,
-        clock=clock,
-        genetic_distance=snps.astype(float),
-        **cfg.inference_cfg,
-        kind="relative"
-    )
     genetic_raw = genetic_linkage_probability(
         toit=toit,
         clock=clock,
@@ -274,7 +267,6 @@ def main() -> None:
     )
     genetic_df = pd.DataFrame({
         "snp": snps.astype(int),
-        "relative": genetic_relative.astype(float),
         "raw": genetic_raw.astype(float),
         "normalized": genetic_normalized.astype(float),
     })

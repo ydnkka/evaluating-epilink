@@ -53,7 +53,7 @@ def evaluate(y: np.ndarray, score: np.ndarray, is_prob: bool) -> dict[str, float
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--paths", default="../config/paths.yaml")
-    parser.add_argument("--datasets_cfg", default="../config/generate_datasets.yaml")
+    parser.add_argument("--datasets", default="../config/generate_datasets.yaml")
     parser.add_argument("--defaults", default="../config/default_parameters.yaml")
     args = parser.parse_args()
 
