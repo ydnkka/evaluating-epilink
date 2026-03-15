@@ -33,7 +33,7 @@ class TreeConfig:
 
 @dataclass
 class PathsConfig:
-    scovmod_output_dir: Path
+    scovmod_dir: Path
     processed_dir: Path
     tables_out_dir: Path
 
@@ -45,12 +45,12 @@ def parse_configs(
     """Load merged base and SCoVMod-specific configuration."""
 
     config = load_merged_config(base_config_path, study_config_path)
-    scovmod_output = resolve_path(config_value(config, ["paths", "data", "raw", "scovmod_output"]))
+    scovmod_dir = resolve_path(config_value(config, ["paths", "data", "raw", "scovmod"]))
     processed_dir = resolve_path(config_value(config, ["paths", "data", "processed", "synthetic"])) / "scovmod"
     tables_out_dir = resolve_path(config_value(config, ["paths", "results", "scovmod"]))
 
     paths = PathsConfig(
-        scovmod_output_dir=scovmod_output,
+        scovmod_dir=scovmod_dir,
         processed_dir=processed_dir,
         tables_out_dir=tables_out_dir,
     )
@@ -356,8 +356,8 @@ def main() -> None:
     ensure_directories(paths.processed_dir, paths.tables_out_dir)
 
     # Inputs (SCoVMod output dir + file names from config)
-    infection_path = paths.scovmod_output_dir / tree_cfg.infection_history_file
-    transmission_path = paths.scovmod_output_dir / tree_cfg.transmission_events_file
+    infection_path = paths.scovmod_dir / tree_cfg.infection_history_file
+    transmission_path = paths.scovmod_dir / tree_cfg.transmission_events_file
 
     if not infection_path.exists():
         raise FileNotFoundError(f"Missing infection history file: {infection_path}")

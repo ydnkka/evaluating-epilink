@@ -1,0 +1,47 @@
+{
+  "config_digest": "fe5de9c2cd9a",
+  "created_at_utc": "2026-03-15T11:42:04.508711+00:00",
+  "execution": {
+    "cli_args": {
+      "base_config": "configs/base.yaml",
+      "out_prefix": null,
+      "study_config": "configs/scovmod.yaml"
+    },
+    "command": [
+      "scripts/generate_tree.py"
+    ],
+    "duration_seconds": 139.493,
+    "finished_at_utc": "2026-03-15T11:42:04.463200+00:00",
+    "hostname": "MacBookPro",
+    "pid": 62625,
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
+    "python_version": "3.14.3",
+    "started_at_utc": "2026-03-15T11:39:44.971339+00:00",
+    "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
+  },
+  "git_revision": "5671d219238ba061d41ed82b1dffca5f005995af",
+  "inputs": {
+    "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
+    "infection_history_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/raw/scovmod/InfectedIndividuals.1.csv",
+    "study_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/scovmod.yaml",
+    "transmission_events_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/raw/scovmod/TransmissionEvents.1.csv"
+  },
+  "outputs": {
+    "heterogeneity_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic/scovmod/scovmod_tree_tree_heterogeneity.json",
+    "results_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/scovmod",
+    "summary_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/scovmod/scovmod_tree_summary.parquet",
+    "tree_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic/scovmod/scovmod_tree.gml"
+  },
+  "repository_root": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink",
+  "stage_name": "scovmod",
+  "status": "completed",
+  "summary": {
+    "final_edges": 205,
+    "final_nodes": 206,
+    "output_prefix": "scovmod_tree",
+    "raw_edges": 561388,
+    "raw_nodes": 536866,
+    "target_component_size": 200
+  }
+}

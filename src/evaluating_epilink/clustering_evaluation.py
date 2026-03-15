@@ -47,7 +47,7 @@ def evaluate_scenario(
     # --- Clustering evaluation against ground truth
     for (weight_col, res), sub in parts.groupby(["weight_col", "resolution"], observed=True):
         pred = {int(k): {int(v)} for k, v in zip(sub["case_id"].tolist(), sub["cluster_id"].tolist())}
-        prec, rec, f1 = bcubed_scores(pred=pred, truth=truth)
+        prec, rec, f1 = bcubed_scores(predicted_memberships=pred, reference_memberships=truth)
         metrics_rows.append({
             "Scenario": scen,
             "Resolution": res,
@@ -68,7 +68,7 @@ def evaluate_scenario(
             p1_mem = {int(k): {int(v)} for k, v in p1_mem.items()}
             p2_mem = dict(zip(p2["case_id"].tolist(), p2["cluster_id"].tolist()))
             p2_mem = {int(k): {int(v)} for k, v in p2_mem.items()}
-            prec, rec, f1 = bcubed_scores(pred=p1_mem, truth=p2_mem)
+            prec, rec, f1 = bcubed_scores(predicted_memberships=p1_mem, reference_memberships=p2_mem)
             stability_rows.append({
                 "Scenario": scen,
                 "Weight_Column": weight_col,

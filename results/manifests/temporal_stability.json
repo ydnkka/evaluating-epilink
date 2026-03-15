@@ -1,0 +1,42 @@
+{
+  "config_digest": "e09d3f561fbc",
+  "created_at_utc": "2026-03-15T11:42:34.676623+00:00",
+  "execution": {
+    "cli_args": {
+      "base_config": "configs/base.yaml",
+      "study_config": "configs/studies/temporal_stability.yaml"
+    },
+    "command": [
+      "scripts/cluster_stability.py"
+    ],
+    "duration_seconds": 1.826,
+    "finished_at_utc": "2026-03-15T11:42:34.651539+00:00",
+    "hostname": "MacBookPro",
+    "pid": 62714,
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
+    "python_version": "3.14.3",
+    "started_at_utc": "2026-03-15T11:42:32.826039+00:00",
+    "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
+  },
+  "git_revision": "5671d219238ba061d41ed82b1dffca5f005995af",
+  "inputs": {
+    "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
+    "study_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/studies/temporal_stability.yaml",
+    "tree_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic/scovmod/scovmod_tree.gml"
+  },
+  "outputs": {
+    "results_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/temporal_stability"
+  },
+  "repository_root": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink",
+  "stage_name": "temporal_stability",
+  "status": "completed",
+  "summary": {
+    "num_cases": 206,
+    "num_initial_cases": 58,
+    "num_methods": 4,
+    "num_resolutions": 19,
+    "step_days": 7,
+    "train_max_time_index": 2
+  }
+}

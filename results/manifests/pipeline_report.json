@@ -1,0 +1,213 @@
+{
+  "generated_at_utc": "2026-03-15T11:42:55.081769+00:00",
+  "num_completed_stages": 10,
+  "num_expected_stages": 10,
+  "num_missing_stages": 0,
+  "stages": [
+    {
+      "created_at_utc": "2026-03-15T11:42:10.439836+00:00",
+      "duration_seconds": 0.658,
+      "output_keys": [
+        "results_dir"
+      ],
+      "stage_name": "characterisation",
+      "status": "completed",
+      "summary": {
+        "max_intermediate_hosts": 10,
+        "num_simulations": 10000,
+        "num_snp_grid_points": 11,
+        "num_temporal_grid_points": 16,
+        "output_prefix": "characteristic"
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:04.508711+00:00",
+      "duration_seconds": 139.493,
+      "output_keys": [
+        "heterogeneity_path",
+        "results_dir",
+        "summary_path",
+        "tree_path"
+      ],
+      "stage_name": "scovmod",
+      "status": "completed",
+      "summary": {
+        "final_edges": 205,
+        "final_nodes": 206,
+        "output_prefix": "scovmod_tree",
+        "raw_edges": 561388,
+        "raw_nodes": 536866,
+        "target_component_size": 200
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:13.359796+00:00",
+      "duration_seconds": 1.226,
+      "output_keys": [
+        "processed_dir",
+        "scenario_summary_path"
+      ],
+      "stage_name": "synthetic_data",
+      "status": "completed",
+      "summary": {
+        "num_scenarios": 11,
+        "scenario_names": [
+          "baseline",
+          "surveillance_moderate",
+          "surveillance_severe",
+          "low_clock_signal",
+          "high_clock_signal",
+          "relaxed_clock",
+          "low_incubation_shape",
+          "high_incubation_shape",
+          "low_incubation_scale",
+          "high_incubation_scale",
+          "adversarial"
+        ]
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:17.331547+00:00",
+      "duration_seconds": 1.835,
+      "output_keys": [
+        "metrics_path",
+        "results_dir"
+      ],
+      "stage_name": "pairwise_benchmark",
+      "status": "completed",
+      "summary": {
+        "evaluated_scenarios": [
+          "adversarial",
+          "baseline",
+          "high_clock_signal",
+          "high_incubation_scale",
+          "high_incubation_shape",
+          "low_clock_signal",
+          "low_incubation_scale",
+          "low_incubation_shape",
+          "relaxed_clock",
+          "surveillance_moderate",
+          "surveillance_severe"
+        ],
+        "num_configured_scenarios": 11,
+        "training_fractions": [
+          0.1,
+          1.0
+        ]
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:22.038839+00:00",
+      "duration_seconds": 3.562,
+      "output_keys": [
+        "processed_dir"
+      ],
+      "stage_name": "synthetic_clustering",
+      "status": "completed",
+      "summary": {
+        "clustered_scenarios": [
+          "adversarial",
+          "baseline",
+          "high_clock_signal",
+          "high_incubation_scale",
+          "high_incubation_shape",
+          "low_clock_signal",
+          "low_incubation_scale",
+          "low_incubation_shape",
+          "relaxed_clock",
+          "surveillance_moderate",
+          "surveillance_severe"
+        ],
+        "jobs": 6,
+        "num_clustered_scenarios": 11,
+        "num_configured_scenarios": 11,
+        "num_resolutions": 19,
+        "num_weight_columns": 4
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:29.490322+00:00",
+      "duration_seconds": 5.751,
+      "output_keys": [
+        "metrics_path",
+        "results_dir",
+        "stability_path"
+      ],
+      "stage_name": "clustering_evaluation",
+      "status": "completed",
+      "summary": {
+        "jobs": 6,
+        "num_configured_scenarios": 11,
+        "num_metric_rows": 836,
+        "num_stability_rows": 792
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:30.624116+00:00",
+      "duration_seconds": 0.156,
+      "output_keys": [
+        "results_dir",
+        "retention_path"
+      ],
+      "stage_name": "sparsify_analysis",
+      "status": "completed",
+      "summary": {
+        "gamma": 0.5,
+        "num_thresholds": 8,
+        "scenario": "baseline",
+        "weight_column": "ProbLinearDist"
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:34.676623+00:00",
+      "duration_seconds": 1.826,
+      "output_keys": [
+        "results_dir"
+      ],
+      "stage_name": "temporal_stability",
+      "status": "completed",
+      "summary": {
+        "num_cases": 206,
+        "num_initial_cases": 58,
+        "num_methods": 4,
+        "num_resolutions": 19,
+        "step_days": 7,
+        "train_max_time_index": 2
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:46.745194+00:00",
+      "duration_seconds": 9.932,
+      "output_keys": [
+        "composition_path",
+        "results_dir",
+        "summary_path"
+      ],
+      "stage_name": "boston",
+      "status": "completed",
+      "summary": {
+        "minimum_weight": 0.0001,
+        "num_clusters_reported": 6,
+        "num_pairwise_rows": 297606,
+        "num_sequences": 772,
+        "resolution": 0.3
+      }
+    },
+    {
+      "created_at_utc": "2026-03-15T11:42:54.610943+00:00",
+      "duration_seconds": 5.644,
+      "output_keys": [
+        "figures_dir"
+      ],
+      "stage_name": "figures",
+      "status": "completed",
+      "summary": {
+        "formats": [
+          "pdf"
+        ],
+        "num_figure_groups": 5
+      }
+    }
+  ],
+  "total_duration_seconds": 170.083
+}

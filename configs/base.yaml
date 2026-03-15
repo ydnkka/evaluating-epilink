@@ -4,7 +4,7 @@ project:
 paths:
   data:
     raw:
-      scovmod_output: data/raw/scovmod_output
+      scovmod: data/raw/scovmod
       boston: data/raw/boston
     processed:
       synthetic: data/processed/synthetic

@@ -240,14 +240,7 @@ def main() -> None:
         output_mode="raw",
         include_all_intermediate_counts=True,
     )
-    genetic_relative_all = estimate_genetic_scores(
-        transmission_profile,
-        molecular_clock,
-        genetic_distance=snps.astype(float),
-        config=study_config,
-        output_mode="relative",
-        include_all_intermediate_counts=True,
-    )
+
     genetic_normalized_all = estimate_genetic_scores(
         transmission_profile,
         molecular_clock,
@@ -266,7 +259,6 @@ def main() -> None:
                     "snp": int(snp_value),
                     "m": int(intermediate_count),
                     "raw": float(genetic_raw_all[snp_index, intermediate_count]),
-                    "relative": float(genetic_relative_all[snp_index, intermediate_count]),
                     "normalized": float(genetic_normalized_all[snp_index, intermediate_count]),
                 }
             )

@@ -1,0 +1,45 @@
+{
+  "config_digest": "fa0832047f00",
+  "created_at_utc": "2026-03-15T11:42:29.490322+00:00",
+  "execution": {
+    "cli_args": {
+      "base_config": "configs/base.yaml",
+      "jobs": null,
+      "study_config": "configs/studies/synthetic.yaml"
+    },
+    "command": [
+      "scripts/evaluate_clustering.py"
+    ],
+    "duration_seconds": 5.751,
+    "finished_at_utc": "2026-03-15T11:42:29.471842+00:00",
+    "hostname": "MacBookPro",
+    "pid": 62689,
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
+    "python_version": "3.14.3",
+    "started_at_utc": "2026-03-15T11:42:23.720818+00:00",
+    "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
+  },
+  "git_revision": "5671d219238ba061d41ed82b1dffca5f005995af",
+  "inputs": {
+    "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
+    "processed_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic",
+    "scenario_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/scenarios/synthetic.yaml",
+    "study_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/studies/synthetic.yaml",
+    "tree_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic/scovmod/scovmod_tree.gml"
+  },
+  "outputs": {
+    "metrics_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/clustering/clustering_metrics.parquet",
+    "results_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/clustering",
+    "stability_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/clustering/clustering_stability.parquet"
+  },
+  "repository_root": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink",
+  "stage_name": "clustering_evaluation",
+  "status": "completed",
+  "summary": {
+    "jobs": 6,
+    "num_configured_scenarios": 11,
+    "num_metric_rows": 836,
+    "num_stability_rows": 792
+  }
+}

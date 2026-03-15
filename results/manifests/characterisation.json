@@ -1,0 +1,40 @@
+{
+  "config_digest": "e71a67b908ad",
+  "created_at_utc": "2026-03-15T11:42:10.439836+00:00",
+  "execution": {
+    "cli_args": {
+      "base_config": "configs/base.yaml",
+      "study_config": "configs/studies/characterisation.yaml"
+    },
+    "command": [
+      "scripts/characterise_epilink.py"
+    ],
+    "duration_seconds": 0.658,
+    "finished_at_utc": "2026-03-15T11:42:10.415371+00:00",
+    "hostname": "MacBookPro",
+    "pid": 62656,
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
+    "python_version": "3.14.3",
+    "started_at_utc": "2026-03-15T11:42:09.757564+00:00",
+    "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
+  },
+  "git_revision": "5671d219238ba061d41ed82b1dffca5f005995af",
+  "inputs": {
+    "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
+    "study_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/studies/characterisation.yaml"
+  },
+  "outputs": {
+    "results_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/characterise_epilink"
+  },
+  "repository_root": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink",
+  "stage_name": "characterisation",
+  "status": "completed",
+  "summary": {
+    "max_intermediate_hosts": 10,
+    "num_simulations": 10000,
+    "num_snp_grid_points": 11,
+    "num_temporal_grid_points": 16,
+    "output_prefix": "characteristic"
+  }
+}

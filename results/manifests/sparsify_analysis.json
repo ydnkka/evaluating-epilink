@@ -1,0 +1,43 @@
+{
+  "config_digest": "9e3a7e33a698",
+  "created_at_utc": "2026-03-15T11:42:30.624116+00:00",
+  "execution": {
+    "cli_args": {
+      "base_config": "configs/base.yaml",
+      "gamma": 0.5,
+      "scenario": "baseline",
+      "study_config": "configs/studies/synthetic.yaml"
+    },
+    "command": [
+      "scripts/sparsify_effects.py"
+    ],
+    "duration_seconds": 0.156,
+    "finished_at_utc": "2026-03-15T11:42:30.607054+00:00",
+    "hostname": "MacBookPro",
+    "pid": 62706,
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
+    "python_version": "3.14.3",
+    "started_at_utc": "2026-03-15T11:42:30.450858+00:00",
+    "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
+  },
+  "git_revision": "5671d219238ba061d41ed82b1dffca5f005995af",
+  "inputs": {
+    "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
+    "scenario_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic/scenario=baseline",
+    "study_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/studies/synthetic.yaml"
+  },
+  "outputs": {
+    "results_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/sparsify",
+    "retention_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/results/sparsify/sparsify_edge_retention.parquet"
+  },
+  "repository_root": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink",
+  "stage_name": "sparsify_analysis",
+  "status": "completed",
+  "summary": {
+    "gamma": 0.5,
+    "num_thresholds": 8,
+    "scenario": "baseline",
+    "weight_column": "ProbLinearDist"
+  }
+}

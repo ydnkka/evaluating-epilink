@@ -18,6 +18,7 @@ dependencies = [
   "matplotlib",
   "networkx",
   "numpy",
+  "numba",
   "pandas",
   "pyarrow",
   "pyyaml",
