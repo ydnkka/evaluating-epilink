@@ -14,6 +14,8 @@ SCRIPTS=(
   "evaluate_clustering.py"
   "cluster_stability.py"
   "boston_clustering.py"
+  "render_figures.py"
+  "report_runs.py"
 )
 
 echo "Starting pipeline..."

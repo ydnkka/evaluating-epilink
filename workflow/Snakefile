@@ -1,0 +1,241 @@
+SCENARIOS = [
+    "baseline",
+    "surveillance_moderate",
+    "surveillance_severe",
+    "low_clock_signal",
+    "high_clock_signal",
+    "relaxed_clock",
+    "low_incubation_shape",
+    "high_incubation_shape",
+    "low_incubation_scale",
+    "high_incubation_scale",
+    "adversarial",
+]
+
+CHARACTERISATION_TABLES = [
+    "results/characterise_epilink/characteristic_samples.parquet",
+    "results/characterise_epilink/characteristic_probability_surface.parquet",
+    "results/characterise_epilink/characteristic_toit_grid.parquet",
+    "results/characterise_epilink/characteristic_tost_grid.parquet",
+    "results/characterise_epilink/characteristic_stage_samples.parquet",
+    "results/characterise_epilink/characteristic_sample_summary.parquet",
+    "results/characterise_epilink/characteristic_presymptomatic_fraction.parquet",
+    "results/characterise_epilink/characteristic_clock_rate_samples.parquet",
+    "results/characterise_epilink/characteristic_clock_rate_summary.parquet",
+    "results/characterise_epilink/characteristic_temporal_linkage.parquet",
+    "results/characterise_epilink/characteristic_genetic_linkage.parquet",
+    "results/characterise_epilink/characteristic_genetic_scenarios.parquet",
+]
+
+SCOVMOD_OUTPUTS = [
+    "data/processed/synthetic/scovmod/scovmod_tree.gml",
+    "data/processed/synthetic/scovmod/scovmod_tree_tree_heterogeneity.json",
+    "results/scovmod/scovmod_tree_summary.parquet",
+    "results/scovmod/scovmod_tree_component_sizes.parquet",
+    "results/scovmod/scovmod_tree_degree_distributions.parquet",
+]
+
+SYNTHETIC_PAIRWISE_TABLES = expand(
+    "data/processed/synthetic/scenario={scenario}/pairwise.parquet",
+    scenario=SCENARIOS,
+)
+
+SYNTHETIC_SCORED_TABLES = expand(
+    "data/processed/synthetic/scenario={scenario}/pairwise_scored.parquet",
+    scenario=SCENARIOS,
+)
+
+SYNTHETIC_PARTITION_TABLES = expand(
+    "data/processed/synthetic/scenario={scenario}/leiden_partitions.parquet",
+    scenario=SCENARIOS,
+)
+
+TEMPORAL_STABILITY_TABLES = [
+    "results/temporal_stability/case_counts_over_time.parquet",
+    "results/temporal_stability/temporal_stability_prob_linear.parquet",
+    "results/temporal_stability/temporal_stability_prob_poisson.parquet",
+    "results/temporal_stability/temporal_stability_logit_linear.parquet",
+    "results/temporal_stability/temporal_stability_logit_poisson.parquet",
+]
+
+FIGURE_OUTPUTS = [
+    "results/figures/epilink_feature_summary.pdf",
+    "results/figures/sm_scovmod_tree_overview.pdf",
+    "results/figures/discrimination_recovery.pdf",
+    "results/figures/sm_cluster_metrics_f1.pdf",
+    "results/figures/sm_cluster_metrics_precision.pdf",
+    "results/figures/sm_cluster_metrics_recall.pdf",
+    "results/figures/sm_clustering_stability_f1.pdf",
+    "results/figures/temporal_stability.pdf",
+    "results/figures/sm_temporal_stability.pdf",
+    "results/figures/boston_cluster.pdf",
+]
+
+
+rule all:
+    input:
+        "results/manifests/pipeline_report.json",
+        "results/manifests/pipeline_report.md",
+
+
+rule characterisation:
+    priority: 90
+    output:
+        CHARACTERISATION_TABLES + ["results/manifests/characterisation.json"]
+    shell:
+        "python scripts/characterise_epilink.py"
+
+
+rule scovmod:
+    priority: 100
+    output:
+        SCOVMOD_OUTPUTS + ["results/manifests/scovmod.json"]
+    shell:
+        "python scripts/generate_tree.py"
+
+
+rule synthetic_data:
+    priority: 80
+    input:
+        [
+            "data/processed/synthetic/scovmod/scovmod_tree.gml",
+            "results/manifests/scovmod.json",
+        ]
+    output:
+        SYNTHETIC_PAIRWISE_TABLES
+        + [
+            "results/scovmod/scenario_summary.parquet",
+            "results/manifests/synthetic_data.json",
+        ]
+    shell:
+        "python scripts/generate_datasets.py"
+
+
+rule pairwise_benchmark:
+    priority: 70
+    input:
+        SYNTHETIC_PAIRWISE_TABLES + ["results/manifests/synthetic_data.json"]
+    output:
+        SYNTHETIC_SCORED_TABLES
+        + [
+            "results/discrimination/discrimination_metrics.parquet",
+            "results/manifests/pairwise_benchmark.json",
+        ]
+    shell:
+        "python scripts/pairwise_discrimination.py"
+
+
+rule synthetic_clustering:
+    priority: 60
+    input:
+        SYNTHETIC_SCORED_TABLES + ["results/manifests/pairwise_benchmark.json"]
+    output:
+        SYNTHETIC_PARTITION_TABLES + ["results/manifests/synthetic_clustering.json"]
+    shell:
+        "python scripts/run_clustering.py"
+
+
+rule clustering_evaluation:
+    priority: 50
+    input:
+        SYNTHETIC_PARTITION_TABLES
+        + [
+            "data/processed/synthetic/scovmod/scovmod_tree.gml",
+            "results/manifests/synthetic_clustering.json",
+        ]
+    output:
+        "results/clustering/clustering_metrics.parquet",
+        "results/clustering/clustering_stability.parquet",
+        "results/manifests/clustering_evaluation.json",
+    shell:
+        "python scripts/evaluate_clustering.py"
+
+
+rule sparsify_analysis:
+    priority: 45
+    input:
+        [
+            "data/processed/synthetic/scenario=baseline/pairwise_scored.parquet",
+            "results/manifests/pairwise_benchmark.json",
+        ]
+    output:
+        "results/sparsify/sparsify_edge_retention.parquet",
+        "results/manifests/sparsify_analysis.json",
+    shell:
+        "python scripts/sparsify_effects.py"
+
+
+rule temporal_stability:
+    priority: 40
+    input:
+        [
+            "data/processed/synthetic/scovmod/scovmod_tree.gml",
+            "results/manifests/scovmod.json",
+        ]
+    output:
+        TEMPORAL_STABILITY_TABLES + ["results/manifests/temporal_stability.json"]
+    shell:
+        "python scripts/cluster_stability.py"
+
+
+rule boston:
+    priority: 30
+    output:
+        "results/boston/boston_cluster_summary.parquet",
+        "results/boston/boston_cluster_composition.parquet",
+        "results/manifests/boston.json",
+    shell:
+        "python scripts/boston_clustering.py"
+
+
+rule figures:
+    priority: 20
+    input:
+        CHARACTERISATION_TABLES
+        + [
+            "data/processed/synthetic/scovmod/scovmod_tree.gml",
+            "data/processed/synthetic/scovmod/scovmod_tree_tree_heterogeneity.json",
+            "results/scovmod/scovmod_tree_summary.parquet",
+            "results/scovmod/scovmod_tree_degree_distributions.parquet",
+            "results/scovmod/scovmod_tree_component_sizes.parquet",
+            "results/discrimination/discrimination_metrics.parquet",
+            "results/clustering/clustering_metrics.parquet",
+            "results/clustering/clustering_stability.parquet",
+            "results/temporal_stability/case_counts_over_time.parquet",
+            "results/temporal_stability/temporal_stability_prob_linear.parquet",
+            "results/temporal_stability/temporal_stability_prob_poisson.parquet",
+            "results/temporal_stability/temporal_stability_logit_linear.parquet",
+            "results/temporal_stability/temporal_stability_logit_poisson.parquet",
+            "results/boston/boston_cluster_summary.parquet",
+            "results/boston/boston_cluster_composition.parquet",
+            "results/manifests/characterisation.json",
+            "results/manifests/scovmod.json",
+            "results/manifests/pairwise_benchmark.json",
+            "results/manifests/clustering_evaluation.json",
+            "results/manifests/temporal_stability.json",
+            "results/manifests/boston.json",
+        ]
+    output:
+        FIGURE_OUTPUTS + ["results/manifests/figures.json"]
+    shell:
+        "python scripts/render_figures.py"
+
+
+rule report:
+    priority: 10
+    input:
+        "results/manifests/characterisation.json",
+        "results/manifests/scovmod.json",
+        "results/manifests/synthetic_data.json",
+        "results/manifests/pairwise_benchmark.json",
+        "results/manifests/synthetic_clustering.json",
+        "results/manifests/clustering_evaluation.json",
+        "results/manifests/sparsify_analysis.json",
+        "results/manifests/temporal_stability.json",
+        "results/manifests/boston.json",
+        "results/manifests/figures.json",
+    output:
+        "results/manifests/pipeline_report.json",
+        "results/manifests/pipeline_report.md",
+    shell:
+        "python scripts/report_runs.py"

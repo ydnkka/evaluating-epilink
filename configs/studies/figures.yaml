@@ -1,0 +1,5 @@
+study_name: figures
+
+render:
+  formats: [pdf]
+  font_scale: 1.5

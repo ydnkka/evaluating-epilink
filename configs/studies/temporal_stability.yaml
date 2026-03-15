@@ -1,0 +1,8 @@
+study_name: temporal_stability
+
+backbone:
+  tree_gml: data/processed/synthetic/scovmod/scovmod_tree.gml
+
+case_sampling:
+  step_days: 7
+  train_max_time_index: 2

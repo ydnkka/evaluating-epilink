@@ -1,0 +1,9 @@
+study_name: synthetic
+
+backbone:
+  tree_gml: data/processed/synthetic/scovmod/scovmod_tree.gml
+
+scenario_config: configs/scenarios/synthetic.yaml
+
+pairwise_benchmark:
+  logistic_training_fractions: [0.1, 1.0]

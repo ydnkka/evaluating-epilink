@@ -1,0 +1,112 @@
+scenarios:
+  baseline:
+    description: "High Signal"
+    model:
+      molecular_clock:
+        substitution_rate: 0.001
+        use_relaxed_clock: false
+        relaxed_clock_sigma: 0.0
+    surveillance:
+      sampled_fraction: 1.0
+      sampling_delay:
+        shape: 3.0
+        scale: 0.0
+
+  surveillance_moderate:
+    description: "Moderate surveillance degradation"
+    surveillance:
+      sampled_fraction: 0.5
+      sampling_delay:
+        shape: 3.0
+        scale: 1.0
+
+  surveillance_severe:
+    description: "Severe surveillance degradation"
+    surveillance:
+      sampled_fraction: 0.15
+      sampling_delay:
+        shape: 3.0
+        scale: 2.5
+
+  low_clock_signal:
+    description: "Low evolutionary signal (strict clock)"
+    model:
+      molecular_clock:
+        substitution_rate: 0.0005
+        use_relaxed_clock: false
+        relaxed_clock_sigma: 0.0
+
+  high_clock_signal:
+    description: "High evolutionary signal (strict clock)"
+    model:
+      molecular_clock:
+        substitution_rate: 0.0015
+        use_relaxed_clock: false
+        relaxed_clock_sigma: 0.0
+
+  relaxed_clock:
+    description: "Relaxed molecular clock"
+    model:
+      molecular_clock:
+        substitution_rate: 0.001
+        use_relaxed_clock: true
+        relaxed_clock_sigma: 0.33
+
+  low_incubation_shape:
+    description: "Lower incubation shape (more skew)"
+    model:
+      natural_history:
+        incubation_shape: 3.5
+    surveillance:
+      sampled_fraction: 1.0
+      sampling_delay:
+        shape: 3.0
+        scale: 0.0
+
+  high_incubation_shape:
+    description: "Higher incubation shape (less skew)"
+    model:
+      natural_history:
+        incubation_shape: 8.0
+    surveillance:
+      sampled_fraction: 1.0
+      sampling_delay:
+        shape: 3.0
+        scale: 0.0
+
+  low_incubation_scale:
+    description: "Lower incubation scale"
+    model:
+      natural_history:
+        incubation_scale: 0.448
+    surveillance:
+      sampled_fraction: 1.0
+      sampling_delay:
+        shape: 3.0
+        scale: 0.0
+
+  high_incubation_scale:
+    description: "Higher incubation scale"
+    model:
+      natural_history:
+        incubation_scale: 1.448
+    surveillance:
+      sampled_fraction: 1.0
+      sampling_delay:
+        shape: 3.0
+        scale: 0.0
+
+  adversarial:
+    description: "Sparse sampling, long delay, low signal, relaxed clock, altered incubation"
+    model:
+      natural_history:
+        incubation_shape: 4.0
+      molecular_clock:
+        substitution_rate: 0.0005
+        use_relaxed_clock: true
+        relaxed_clock_sigma: 0.33
+    surveillance:
+      sampled_fraction: 0.3
+      sampling_delay:
+        shape: 3.0
+        scale: 2.0

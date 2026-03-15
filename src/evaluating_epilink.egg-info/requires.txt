@@ -1,0 +1,14 @@
+bcubed
+igraph
+matplotlib
+networkx
+numpy
+pandas
+pyarrow
+pyyaml
+scikit-learn
+scipy
+seaborn
+
+[dev]
+pytest>=7.0

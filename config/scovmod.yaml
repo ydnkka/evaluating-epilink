@@ -1,5 +1,0 @@
-transmission_tree:
-  rng_seed: 12345
-  infection_history_file: "InfectedIndividuals.1.csv"
-  transmission_events_file: "TransmissionEvents.1.csv"
-  target_component_size: 5000

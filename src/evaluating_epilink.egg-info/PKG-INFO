@@ -1,0 +1,109 @@
+Metadata-Version: 2.4
+Name: evaluating-epilink
+Version: 0.1.0
+Summary: Reproducibility workflows and analyses for the epilink manuscript.
+Author: Dominic Arthur
+License: MIT
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: bcubed
+Requires-Dist: igraph
+Requires-Dist: matplotlib
+Requires-Dist: networkx
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: pyarrow
+Requires-Dist: pyyaml
+Requires-Dist: scikit-learn
+Requires-Dist: scipy
+Requires-Dist: seaborn
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+
+# evaluating-epilink
+
+Reproducibility workflows and manuscript analyses for *epilink: Integrating Evolutionary and Epidemiological Signals to Uncover Superspreading Dynamics*.
+
+The scientific method itself lives in the companion [`epilink`](https://github.com/ydnkka/epilink) package. This repository is the paper-facing analysis layer: it reconstructs the SCoVMod transmission backbone, generates synthetic datasets, benchmarks pairwise discrimination, runs network clustering, evaluates stability, and applies the same workflow to the Boston empirical dataset.
+
+## Structure
+
+```text
+configs/                 merged YAML config system
+data/                    raw inputs and processed intermediates
+results/                 generated analysis tables, figures, and manifests
+scripts/                 thin command-line entrypoints into package workflows
+src/evaluating_epilink/  reusable workflow code, figure renderers, and epilink adapter
+workflow/                dependency-aware orchestration (Snakemake)
+tests/                   smoke tests for config loading and adapter behavior
+```
+
+## Key design choices
+
+- The repo now uses a thin adapter around the current `epilink` API so package changes are isolated to one place.
+- Raw simulation outputs are kept separate from scored outputs.
+- Workflow stages emit JSON manifests in `results/manifests/` for provenance.
+- Legacy script names are preserved, but they now call the refactored package modules.
+
+## Environment setup
+
+1. Create the environment:
+
+   ```bash
+   conda env create -f environment.yml
+   conda activate evaluating-epilink
+   ```
+
+2. Install the companion `epilink` package from the sibling repo:
+
+   ```bash
+   cd ../epilink
+   pip install -e . --no-deps
+   ```
+
+3. Install this repo in editable mode:
+
+   ```bash
+   cd ../evaluating-epilink
+   pip install -e .
+   ```
+
+## Running the workflows
+
+You can run the original script entrypoints:
+
+```bash
+bash scripts/run_all.sh
+```
+
+Or render just the manuscript figures from existing workflow outputs:
+
+```bash
+python scripts/render_figures.py
+```
+
+Or run the dependency-aware workflow:
+
+```bash
+snakemake -s workflow/Snakefile --cores 1
+```
+
+## Outputs
+
+- Processed synthetic pairwise data are written under `data/processed/synthetic/scenario=<name>/`.
+- Scored synthetic pairwise tables are written as `pairwise_scored.parquet` beside the raw pairwise tables.
+- Derived manuscript tables, figures, and workflow manifests are written under `results/`.
+- The Boston empirical outputs are written under `results/boston/`.
+
+## Config layout
+
+- `configs/base.yaml` contains shared model, inference, network, and path defaults.
+- `configs/studies/` contains study-specific overrides.
+- `configs/scenarios/synthetic.yaml` contains the synthetic sensitivity scenarios.
+- `configs/scovmod.yaml` contains the transmission-backbone reconstruction settings.
+- `configs/studies/figures.yaml` contains figure-rendering options such as output formats and font scaling.
+
+## Notes
+
+- The empirical Boston workflow uses `included_intermediate_counts: [0]`, matching the intended `M = 0` recent-transmission target.
+- Figure generation now lives in `src/evaluating_epilink/plotting/manuscript.py` and is exposed through `scripts/render_figures.py`.

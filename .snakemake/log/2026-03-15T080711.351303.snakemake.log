@@ -1,0 +1,80 @@
+Assuming unrestricted shared filesystem usage.
+host: MacBookPro
+Building DAG of jobs...
+Using shell: /opt/homebrew/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                      count
+---------------------  -------
+boston                       1
+characterisation             1
+synthetic_data               1
+temporal_stability           1
+pairwise_benchmark           1
+sparsify_analysis            1
+synthetic_clustering         1
+clustering_evaluation        1
+figures                      1
+report                       1
+all                          1
+total                       11
+
+Select jobs to execute...
+Execute 1 jobs...
+[Sun Mar 15 08:07:11 2026]
+localrule characterisation:
+    output: results/manifests/characterisation.json
+    jobid: 2
+    reason: Missing output files: results/manifests/characterisation.json
+    resources: tmpdir=/var/folders/gd/2t3k6cc92s7fnffx31m2ml600000gn/T
+Select jobs to execute...
+[Sun Mar 15 08:07:19 2026]
+Finished jobid: 2 (Rule: characterisation)
+1 of 11 steps (9%) done
+Execute 1 jobs...
+[Sun Mar 15 08:07:19 2026]
+localrule boston:
+    output: results/manifests/boston.json
+    jobid: 10
+    reason: Missing output files: results/manifests/boston.json
+    resources: tmpdir=/var/folders/gd/2t3k6cc92s7fnffx31m2ml600000gn/T
+Select jobs to execute...
+[Sun Mar 15 08:07:32 2026]
+Finished jobid: 10 (Rule: boston)
+2 of 11 steps (18%) done
+Execute 1 jobs...
+[Sun Mar 15 08:07:32 2026]
+localrule synthetic_data:
+    input: results/manifests/scovmod.json
+    output: results/manifests/synthetic_data.json
+    jobid: 4
+    reason: Missing output files: results/manifests/synthetic_data.json
+    resources: tmpdir=/var/folders/gd/2t3k6cc92s7fnffx31m2ml600000gn/T
+Select jobs to execute...
+RuleException:
+CalledProcessError in file "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/workflow/Snakefile", line 27:
+Command 'set -euo pipefail;  python scripts/generate_datasets.py' returned non-zero exit status 1.
+[Sun Mar 15 08:07:34 2026]
+Error in rule synthetic_data:
+    message: None
+    jobid: 4
+    input: results/manifests/scovmod.json
+    output: results/manifests/synthetic_data.json
+    shell:
+        python scripts/generate_datasets.py
+        (command exited with non-zero exit code)
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look below for error messages
+[Sun Mar 15 08:07:34 2026]
+Error in rule synthetic_data:
+    message: None
+    jobid: 4
+    input: results/manifests/scovmod.json
+    output: results/manifests/synthetic_data.json
+    shell:
+        python scripts/generate_datasets.py
+        (command exited with non-zero exit code)
+Complete log(s): /Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/.snakemake/log/2026-03-15T080711.351303.snakemake.log
+WorkflowError:
+At least one job did not complete successfully.

@@ -1,0 +1,26 @@
+Assuming unrestricted shared filesystem usage.
+host: MacBookPro
+Building DAG of jobs...
+Using shell: /opt/homebrew/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                   count
+------------------  -------
+pairwise_benchmark        1
+total                     1
+
+Select jobs to execute...
+Execute 1 jobs...
+[Sun Mar 15 08:44:52 2026]
+localrule pairwise_benchmark:
+    input: data/processed/synthetic/scenario=baseline/pairwise.parquet, data/processed/synthetic/scenario=surveillance_moderate/pairwise.parquet, data/processed/synthetic/scenario=surveillance_severe/pairwise.parquet, data/processed/synthetic/scenario=low_clock_signal/pairwise.parquet, data/processed/synthetic/scenario=high_clock_signal/pairwise.parquet, data/processed/synthetic/scenario=relaxed_clock/pairwise.parquet, data/processed/synthetic/scenario=low_incubation_shape/pairwise.parquet, data/processed/synthetic/scenario=high_incubation_shape/pairwise.parquet, data/processed/synthetic/scenario=low_incubation_scale/pairwise.parquet, data/processed/synthetic/scenario=high_incubation_scale/pairwise.parquet, data/processed/synthetic/scenario=adversarial/pairwise.parquet, results/manifests/synthetic_data.json
+    output: data/processed/synthetic/scenario=baseline/pairwise_scored.parquet, data/processed/synthetic/scenario=surveillance_moderate/pairwise_scored.parquet, data/processed/synthetic/scenario=surveillance_severe/pairwise_scored.parquet, data/processed/synthetic/scenario=low_clock_signal/pairwise_scored.parquet, data/processed/synthetic/scenario=high_clock_signal/pairwise_scored.parquet, data/processed/synthetic/scenario=relaxed_clock/pairwise_scored.parquet, data/processed/synthetic/scenario=low_incubation_shape/pairwise_scored.parquet, data/processed/synthetic/scenario=high_incubation_shape/pairwise_scored.parquet, data/processed/synthetic/scenario=low_incubation_scale/pairwise_scored.parquet, data/processed/synthetic/scenario=high_incubation_scale/pairwise_scored.parquet, data/processed/synthetic/scenario=adversarial/pairwise_scored.parquet, results/discrimination/discrimination_metrics.parquet, results/manifests/pairwise_benchmark.json
+    jobid: 0
+    reason: Forced execution
+    priority: 70
+    resources: tmpdir=/var/folders/gd/2t3k6cc92s7fnffx31m2ml600000gn/T
+[Sun Mar 15 08:44:56 2026]
+Finished jobid: 0 (Rule: pairwise_benchmark)
+1 of 1 steps (100%) done
+Complete log(s): /Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/.snakemake/log/2026-03-15T084452.769056.snakemake.log

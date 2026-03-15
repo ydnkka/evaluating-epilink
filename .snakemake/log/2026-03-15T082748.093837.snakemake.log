@@ -1,0 +1,70 @@
+Assuming unrestricted shared filesystem usage.
+host: MacBookPro
+Building DAG of jobs...
+Using shell: /opt/homebrew/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job                      count
+---------------------  -------
+scovmod                      1
+synthetic_data               1
+temporal_stability           1
+pairwise_benchmark           1
+sparsify_analysis            1
+synthetic_clustering         1
+clustering_evaluation        1
+figures                      1
+report                       1
+all                          1
+total                       10
+
+Select jobs to execute...
+Execute 1 jobs...
+[Sun Mar 15 08:27:48 2026]
+localrule scovmod:
+    output: data/processed/synthetic/scovmod/scovmod_tree.gml, data/processed/synthetic/scovmod/scovmod_tree_tree_heterogeneity.json, results/scovmod/scovmod_tree_summary.parquet, results/scovmod/scovmod_tree_component_sizes.parquet, results/scovmod/scovmod_tree_degree_distributions.parquet, results/manifests/scovmod.json
+    jobid: 3
+    reason: Missing output files: data/processed/synthetic/scovmod/scovmod_tree.gml, data/processed/synthetic/scovmod/scovmod_tree_tree_heterogeneity.json
+    resources: tmpdir=/var/folders/gd/2t3k6cc92s7fnffx31m2ml600000gn/T
+[Sun Mar 15 08:30:05 2026]
+Finished jobid: 3 (Rule: scovmod)
+1 of 10 steps (10%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Sun Mar 15 08:30:05 2026]
+localrule temporal_stability:
+    input: data/processed/synthetic/scovmod/scovmod_tree.gml, results/manifests/scovmod.json
+    output: results/temporal_stability/case_counts_over_time.parquet, results/temporal_stability/temporal_stability_prob_linear.parquet, results/temporal_stability/temporal_stability_prob_poisson.parquet, results/temporal_stability/temporal_stability_logit_linear.parquet, results/temporal_stability/temporal_stability_logit_poisson.parquet, results/manifests/temporal_stability.json
+    jobid: 9
+    reason: Missing output files: results/temporal_stability/temporal_stability_logit_linear.parquet, results/temporal_stability/temporal_stability_prob_linear.parquet, results/temporal_stability/temporal_stability_logit_poisson.parquet, results/manifests/temporal_stability.json, results/temporal_stability/temporal_stability_prob_poisson.parquet, results/temporal_stability/case_counts_over_time.parquet; Input files updated by another job: data/processed/synthetic/scovmod/scovmod_tree.gml, results/manifests/scovmod.json
+    resources: tmpdir=/var/folders/gd/2t3k6cc92s7fnffx31m2ml600000gn/T
+Select jobs to execute...
+RuleException:
+CalledProcessError in file "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/workflow/Snakefile", line 170:
+Command 'set -euo pipefail;  python scripts/cluster_stability.py' returned non-zero exit status 1.
+[Sun Mar 15 08:30:09 2026]
+Error in rule temporal_stability:
+    message: None
+    jobid: 9
+    input: data/processed/synthetic/scovmod/scovmod_tree.gml, results/manifests/scovmod.json
+    output: results/temporal_stability/case_counts_over_time.parquet, results/temporal_stability/temporal_stability_prob_linear.parquet, results/temporal_stability/temporal_stability_prob_poisson.parquet, results/temporal_stability/temporal_stability_logit_linear.parquet, results/temporal_stability/temporal_stability_logit_poisson.parquet, results/manifests/temporal_stability.json
+    shell:
+        python scripts/cluster_stability.py
+        (command exited with non-zero exit code)
+Removing output files of failed job temporal_stability since they might be corrupted:
+results/temporal_stability/case_counts_over_time.parquet
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look below for error messages
+[Sun Mar 15 08:30:09 2026]
+Error in rule temporal_stability:
+    message: None
+    jobid: 9
+    input: data/processed/synthetic/scovmod/scovmod_tree.gml, results/manifests/scovmod.json
+    output: results/temporal_stability/case_counts_over_time.parquet, results/temporal_stability/temporal_stability_prob_linear.parquet, results/temporal_stability/temporal_stability_prob_poisson.parquet, results/temporal_stability/temporal_stability_logit_linear.parquet, results/temporal_stability/temporal_stability_logit_poisson.parquet, results/manifests/temporal_stability.json
+    shell:
+        python scripts/cluster_stability.py
+        (command exited with non-zero exit code)
+Complete log(s): /Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/.snakemake/log/2026-03-15T082748.093837.snakemake.log
+WorkflowError:
+At least one job did not complete successfully.

@@ -1,55 +1,74 @@
 # evaluating-epilink
-Reproducibility code and analyses for *epilink: Integrating Evolutionary and Epidemiological Signals to Uncover Superspreading Dynamics*.
 
----
+Reproducibility workflows and manuscript analyses for the `epilink` paper.
 
-This repository contains the code and analysis workflows used in the paper:
+This repository contains the paper-facing analysis pipeline: synthetic data generation, pairwise benchmarking, clustering, temporal stability analyses, the Boston application, and manuscript figure rendering.
 
-# *epilink: Integrating Evolutionary and Epidemiological Signals to Uncover Superspreading Dynamics*
+## Setup
 
-The paper introduces a probabilistic method for inferring recent transmission and identifying superspreading molecular 
-transmission clusters (SMTCs) from pathogen genomic data and sampling dates, without relying on fixed genetic or temporal thresholds.
+Create the environment:
 
-The methodological framework itself is implemented in the companion tool **[epilink](https://github.com/ydnkka/epilink)**. This repository is dedicated
-to the reproducibility of the results presented in the paper and includes scripts for data generation, analysis,
-benchmarking, and figure reproduction.
-
-The repository supports:
-
-* Simulation of epidemiological and genomic data along known transmission trees
-* Application of *epilink*
-* Network construction and community detection analyses
-* Evaluation of inferred clusters using [BCubed](https://github.com/hhromic/python-bcubed) metrics
-* Scenario-based sensitivity analyses
-* Benchmarking against logistic regression baselines
-* Reproduction of all figures and tables in the main text and supplementary material via data-first outputs
-
-This repository is intended for transparency and reproducibility and is not a standalone implementation of the framework.
-
-All analyses are fully configuration-driven. No parameters affecting results are hard-coded.
-
-The full implementation of the framework is available in the **[epilink](https://github.com/ydnkka/epilink)** repository.
-
-## Repository layout
-
-```
-config/     configuration files for simulation and analyses
-data/       raw, processed and synthtic inputs
-figures/    manuscript figures
-tables/     parquet outputs used to build manuscript tables/figures
-notebooks/  exploratory notebooks
-scripts/    reproducible pipelines used for the manuscript
+```bash
+conda env create -f environment.yml
+conda activate evaluating-epilink
 ```
 
-## Reproducing the paper
+Install `epilink` in one of two ways:
 
-1. Install dependencies (see `environment.yml`)
-2. Install [epilink](https://github.com/ydnkka/epilink)
-3. Run `scripts/run_all.sh` to generate parquet outputs in `tables/` and processed data
-4. Use `notebooks/` to render the main and supplementary figures from the parquet outputs
+From PyPI:
 
-### Boston empirical analysis
+```bash
+pip install epilink
+```
 
-The Boston pipeline is implemented in `scripts/boston_clustering.py` and configured via
-`config/boston.yaml`. Inputs are expected in `data/processed/boston/`, and outputs are
-written to `tables/main/` in parquet format (figures are rendered in notebooks).
+From a local clone:
+
+```bash
+cd ../epilink
+pip install -e . --no-deps
+```
+
+Install this repository:
+
+```bash
+cd ../evaluating-epilink
+pip install -e .
+```
+
+## Run
+
+Run the full workflow:
+
+```bash
+bash scripts/run_all.sh
+```
+
+Or use Snakemake:
+
+```bash
+snakemake -s workflow/Snakefile --cores 1
+```
+
+To render figures only:
+
+```bash
+python scripts/render_figures.py
+```
+
+## Layout
+
+```text
+configs/                 workflow and study configuration
+data/                    raw inputs and processed intermediates
+results/                 generated tables, figures, and manifests
+scripts/                 command-line entrypoints
+src/evaluating_epilink/  analysis code and epilink adapter
+workflow/                Snakemake workflow
+tests/                   smoke tests
+```
+
+## Notes
+
+- Boston uses `included_intermediate_counts: [0]`.
+- Figures are rendered from `src/evaluating_epilink/plotting/manuscript.py`.
+- Stage manifests and the pipeline report are written to `results/manifests/`.

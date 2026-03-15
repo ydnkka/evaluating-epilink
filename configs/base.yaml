@@ -1,0 +1,74 @@
+project:
+  rng_seed: 12345
+
+paths:
+  data:
+    raw:
+      scovmod_output: data/raw/scovmod_output
+      boston: data/raw/boston
+    processed:
+      synthetic: data/processed/synthetic
+      boston: data/processed/boston
+  results:
+    manifests: results/manifests
+    characterisation: results/characterise_epilink
+    scovmod: results/scovmod
+    discrimination: results/discrimination
+    clustering: results/clustering
+    sparsify: results/sparsify
+    temporal_stability: results/temporal_stability
+    boston: results/boston
+    figures: results/figures
+
+model:
+  natural_history:
+    incubation_shape: 5.807
+    incubation_scale: 0.948
+    latent_shape: 3.38
+    symptomatic_rate: 0.37
+    symptomatic_shape: 1.0
+    rel_presymptomatic_infectiousness: 2.29
+  molecular_clock:
+    substitution_rate: 0.001
+    use_relaxed_clock: true
+    relaxed_clock_sigma: 0.33
+    genome_length: 29903
+
+inference:
+  num_simulations: 10000
+  included_intermediate_counts: [0]
+  max_intermediate_hosts: 10
+
+characterisation:
+  output_prefix: characteristic
+  genetic_distance_grid:
+    max_snp: 10
+    step: 1
+  temporal_distance_grid:
+    max_days: 15
+    step: 1
+  toit_grid:
+    max_days: 60.0
+    step: 0.1
+  tost_grid:
+    min_days: -30.0
+    max_days: 30.0
+    step: 0.1
+
+network:
+  weight_columns:
+    - ProbLinearDist
+    - ProbPoissonDist
+    - LogitLinearDist100
+    - LogitPoissonDist100
+  min_edge_weights: [0.0, 0.0001, 0.0005, 0.001, 0.005, 0.01, 0.05, 0.1]
+  sparsify:
+    enabled: true
+    min_edge_weight: 0.0001
+
+clustering:
+  resolution:
+    min: 0.1
+    max: 1.0
+    step: 0.05
+  n_restarts: 10
