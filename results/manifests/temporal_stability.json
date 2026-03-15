@@ -1,6 +1,6 @@
 {
-  "config_digest": "e09d3f561fbc",
-  "created_at_utc": "2026-03-15T11:42:34.676623+00:00",
+  "config_digest": "fd11081dc039",
+  "created_at_utc": "2026-03-15T13:59:46.015901+00:00",
   "execution": {
     "cli_args": {
       "base_config": "configs/base.yaml",
@@ -9,17 +9,17 @@
     "command": [
       "scripts/cluster_stability.py"
     ],
-    "duration_seconds": 1.826,
-    "finished_at_utc": "2026-03-15T11:42:34.651539+00:00",
+    "duration_seconds": 1.818,
+    "finished_at_utc": "2026-03-15T13:59:45.992352+00:00",
     "hostname": "MacBookPro",
-    "pid": 62714,
+    "pid": 15955,
     "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
     "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
     "python_version": "3.14.3",
-    "started_at_utc": "2026-03-15T11:42:32.826039+00:00",
+    "started_at_utc": "2026-03-15T13:59:44.174030+00:00",
     "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
   },
-  "git_revision": "5671d219238ba061d41ed82b1dffca5f005995af",
+  "git_revision": "a0a84d3d5e303fd2c1916c49e0d37b1ba78def3e",
   "inputs": {
     "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
     "study_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/studies/temporal_stability.yaml",

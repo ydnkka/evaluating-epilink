@@ -13,18 +13,7 @@ SCENARIOS = [
 ]
 
 CHARACTERISATION_TABLES = [
-    "results/characterise_epilink/characteristic_samples.parquet",
     "results/characterise_epilink/characteristic_probability_surface.parquet",
-    "results/characterise_epilink/characteristic_toit_grid.parquet",
-    "results/characterise_epilink/characteristic_tost_grid.parquet",
-    "results/characterise_epilink/characteristic_stage_samples.parquet",
-    "results/characterise_epilink/characteristic_sample_summary.parquet",
-    "results/characterise_epilink/characteristic_presymptomatic_fraction.parquet",
-    "results/characterise_epilink/characteristic_clock_rate_samples.parquet",
-    "results/characterise_epilink/characteristic_clock_rate_summary.parquet",
-    "results/characterise_epilink/characteristic_temporal_linkage.parquet",
-    "results/characterise_epilink/characteristic_genetic_linkage.parquet",
-    "results/characterise_epilink/characteristic_genetic_scenarios.parquet",
 ]
 
 SCOVMOD_OUTPUTS = [
@@ -75,7 +64,7 @@ FIGURE_OUTPUTS = [
 rule all:
     input:
         "results/manifests/pipeline_report.json",
-        "results/manifests/pipeline_report.md",
+        "results/manifests/pipeline_report.md"
 
 
 rule characterisation:
@@ -146,7 +135,7 @@ rule clustering_evaluation:
     output:
         "results/clustering/clustering_metrics.parquet",
         "results/clustering/clustering_stability.parquet",
-        "results/manifests/clustering_evaluation.json",
+        "results/manifests/clustering_evaluation.json"
     shell:
         "python scripts/evaluate_clustering.py"
 
@@ -160,7 +149,7 @@ rule sparsify_analysis:
         ]
     output:
         "results/sparsify/sparsify_edge_retention.parquet",
-        "results/manifests/sparsify_analysis.json",
+        "results/manifests/sparsify_analysis.json"
     shell:
         "python scripts/sparsify_effects.py"
 
@@ -183,7 +172,8 @@ rule boston:
     output:
         "results/boston/boston_cluster_summary.parquet",
         "results/boston/boston_cluster_composition.parquet",
-        "results/manifests/boston.json",
+        "results/boston/boston_cluster_sizes.parquet",
+        "results/manifests/boston.json"
     shell:
         "python scripts/boston_clustering.py"
 
@@ -208,6 +198,7 @@ rule figures:
             "results/temporal_stability/temporal_stability_logit_poisson.parquet",
             "results/boston/boston_cluster_summary.parquet",
             "results/boston/boston_cluster_composition.parquet",
+            "results/boston/boston_cluster_sizes.parquet",
             "results/manifests/characterisation.json",
             "results/manifests/scovmod.json",
             "results/manifests/pairwise_benchmark.json",
@@ -233,9 +224,9 @@ rule report:
         "results/manifests/sparsify_analysis.json",
         "results/manifests/temporal_stability.json",
         "results/manifests/boston.json",
-        "results/manifests/figures.json",
+        "results/manifests/figures.json"
     output:
         "results/manifests/pipeline_report.json",
-        "results/manifests/pipeline_report.md",
+        "results/manifests/pipeline_report.md"
     shell:
         "python scripts/report_runs.py"

@@ -1,12 +1,12 @@
 {
-  "generated_at_utc": "2026-03-15T11:42:55.081769+00:00",
+  "generated_at_utc": "2026-03-15T14:43:29.827053+00:00",
   "num_completed_stages": 10,
   "num_expected_stages": 10,
   "num_missing_stages": 0,
   "stages": [
     {
-      "created_at_utc": "2026-03-15T11:42:10.439836+00:00",
-      "duration_seconds": 0.658,
+      "created_at_utc": "2026-03-15T13:59:22.558091+00:00",
+      "duration_seconds": 0.457,
       "output_keys": [
         "results_dir"
       ],
@@ -17,12 +17,36 @@
         "num_simulations": 10000,
         "num_snp_grid_points": 11,
         "num_temporal_grid_points": 16,
-        "output_prefix": "characteristic"
+        "output_prefix": "characteristic",
+        "slice_snps": [
+          0,
+          1,
+          2,
+          5
+        ],
+        "surface_variants": [
+          {
+            "included_intermediate_counts": [
+              0
+            ],
+            "label": "Direct only (M=0)",
+            "scenario": "default"
+          },
+          {
+            "included_intermediate_counts": [
+              0,
+              1,
+              2
+            ],
+            "label": "Allow up to 2 intermediates (M<=2)",
+            "scenario": "robustness"
+          }
+        ]
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:04.508711+00:00",
-      "duration_seconds": 139.493,
+      "created_at_utc": "2026-03-15T13:59:17.273963+00:00",
+      "duration_seconds": 134.536,
       "output_keys": [
         "heterogeneity_path",
         "results_dir",
@@ -41,8 +65,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:13.359796+00:00",
-      "duration_seconds": 1.226,
+      "created_at_utc": "2026-03-15T13:59:25.373704+00:00",
+      "duration_seconds": 1.218,
       "output_keys": [
         "processed_dir",
         "scenario_summary_path"
@@ -67,8 +91,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:17.331547+00:00",
-      "duration_seconds": 1.835,
+      "created_at_utc": "2026-03-15T13:59:29.139174+00:00",
+      "duration_seconds": 1.739,
       "output_keys": [
         "metrics_path",
         "results_dir"
@@ -97,8 +121,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:22.038839+00:00",
-      "duration_seconds": 3.562,
+      "created_at_utc": "2026-03-15T13:59:33.620385+00:00",
+      "duration_seconds": 3.416,
       "output_keys": [
         "processed_dir"
       ],
@@ -126,8 +150,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:29.490322+00:00",
-      "duration_seconds": 5.751,
+      "created_at_utc": "2026-03-15T13:59:41.037204+00:00",
+      "duration_seconds": 5.821,
       "output_keys": [
         "metrics_path",
         "results_dir",
@@ -143,8 +167,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:30.624116+00:00",
-      "duration_seconds": 0.156,
+      "created_at_utc": "2026-03-15T13:59:42.173956+00:00",
+      "duration_seconds": 0.162,
       "output_keys": [
         "results_dir",
         "retention_path"
@@ -159,8 +183,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:34.676623+00:00",
-      "duration_seconds": 1.826,
+      "created_at_utc": "2026-03-15T13:59:46.015901+00:00",
+      "duration_seconds": 1.818,
       "output_keys": [
         "results_dir"
       ],
@@ -176,9 +200,10 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:46.745194+00:00",
-      "duration_seconds": 9.932,
+      "created_at_utc": "2026-03-15T13:59:57.886161+00:00",
+      "duration_seconds": 9.855,
       "output_keys": [
+        "cluster_sizes_path",
         "composition_path",
         "results_dir",
         "summary_path"
@@ -187,15 +212,16 @@
       "status": "completed",
       "summary": {
         "minimum_weight": 0.0001,
-        "num_clusters_reported": 6,
+        "num_clusters_reported": 86,
+        "num_focus_clusters": 6,
         "num_pairwise_rows": 297606,
         "num_sequences": 772,
         "resolution": 0.3
       }
     },
     {
-      "created_at_utc": "2026-03-15T11:42:54.610943+00:00",
-      "duration_seconds": 5.644,
+      "created_at_utc": "2026-03-15T14:41:23.883390+00:00",
+      "duration_seconds": 5.556,
       "output_keys": [
         "figures_dir"
       ],
@@ -209,5 +235,5 @@
       }
     }
   ],
-  "total_duration_seconds": 170.083
+  "total_duration_seconds": 164.578
 }

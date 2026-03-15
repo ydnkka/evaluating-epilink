@@ -53,29 +53,36 @@ def main() -> None:
             continue
 
         scored_pairs = pd.read_parquet(pairwise_path)
-        scored_pairs = scored_pairs.loc[scored_pairs["Sampled"]].copy()
+        scored_pairs = scored_pairs.loc[scored_pairs["BothSampled"]].copy()
 
         scored_pairs["ProbLinearDist"] = estimate_linkage_scores(
             model_components.transmission_profile,
             model_components.molecular_clock,
-            genetic_distance=scored_pairs["LinearDist"].values,
-            temporal_distance=scored_pairs["TemporalDist"].values,
+            genetic_distance=scored_pairs["DeterministicDistance"].values,
+            temporal_distance=scored_pairs["SamplingDateDistanceDays"].values,
             config=study_config,
         )
 
         scored_pairs["ProbPoissonDist"] = estimate_linkage_scores(
             model_components.transmission_profile,
             model_components.molecular_clock,
-            genetic_distance=scored_pairs["PoissonDist"].values,
-            temporal_distance=scored_pairs["TemporalDist"].values,
+            genetic_distance=scored_pairs["StochasticDistance"].values,
+            temporal_distance=scored_pairs["SamplingDateDistanceDays"].values,
             config=study_config,
         )
 
-        y = scored_pairs["Related"].astype(int).values
+        y = scored_pairs["IsRelated"].astype(int).values
 
-        for training_fraction, distance_column in product(training_fractions, ("LinearDist", "PoissonDist")):
-            feature_matrix = scored_pairs[["TemporalDist", distance_column]].values
-            output_column = f"Logit{distance_column}{int(training_fraction * 100)}"
+        distance_columns = {
+            "LinearDist": "DeterministicDistance",
+            "PoissonDist": "StochasticDistance",
+        }
+        for training_fraction, (distance_label, distance_column) in product(
+            training_fractions,
+            distance_columns.items(),
+        ):
+            feature_matrix = scored_pairs[["SamplingDateDistanceDays", distance_column]].values
+            output_column = f"Logit{distance_label}{int(training_fraction * 100)}"
             scored_pairs[output_column] = predict_logistic_scores(
                 feature_matrix,
                 y,
@@ -83,8 +90,8 @@ def main() -> None:
                 rng_seed=rng_seed,
             )
 
-        scored_pairs["LinearDistScore"] = 1.0 / (scored_pairs["LinearDist"] + 1.0)
-        scored_pairs["PoissonDistScore"] = 1.0 / (scored_pairs["PoissonDist"] + 1.0)
+        scored_pairs["LinearDistScore"] = 1.0 / (scored_pairs["DeterministicDistance"] + 1.0)
+        scored_pairs["PoissonDistScore"] = 1.0 / (scored_pairs["StochasticDistance"] + 1.0)
 
         scored_pairs.to_parquet(scenario_dir / "pairwise_scored.parquet", index=False)
 

@@ -70,5 +70,5 @@ tests/                   smoke tests
 ## Notes
 
 - Boston uses `included_intermediate_counts: [0]`.
-- Figures are rendered from `src/evaluating_epilink/plotting/manuscript.py`.
+- Figures are rendered from `src/evaluating_epilink/plotting/manuscript.py`, with figure-specific modules under `src/evaluating_epilink/plotting/`.
 - Stage manifests and the pipeline report are written to `results/manifests/`.

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from pathlib import Path
 from typing import Any
 
 import igraph as ig
@@ -154,6 +153,16 @@ def analyse_partition(
     return df
 
 
+def summarise_cluster_sizes(cluster_results: pd.DataFrame, focus_cluster_ids: set[int]) -> pd.DataFrame:
+    """Return all reported cluster sizes and flag the focus clusters used in the heatmap."""
+
+    cluster_sizes = cluster_results[["cluster_id", "size"]].copy()
+    cluster_sizes = cluster_sizes.sort_values(["size", "cluster_id"], ascending=[False, True]).reset_index(drop=True)
+    cluster_sizes["rank"] = np.arange(1, len(cluster_sizes) + 1, dtype=int)
+    cluster_sizes["is_focus_cluster"] = cluster_sizes["cluster_id"].isin(focus_cluster_ids)
+    return cluster_sizes
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-config", default="configs/base.yaml")
@@ -269,10 +278,14 @@ def main() -> None:
         inplace=True,
     )
 
+    cluster_sizes = summarise_cluster_sizes(prob_results, set(prob_focus["cluster_id"].astype(int)))
+
     summary_path = results_dir / "boston_cluster_summary.parquet"
     composition_path = results_dir / "boston_cluster_composition.parquet"
+    cluster_sizes_path = results_dir / "boston_cluster_sizes.parquet"
     prob_summary.to_parquet(summary_path, index=False)
     prob_focus.to_parquet(composition_path, index=False)
+    cluster_sizes.to_parquet(cluster_sizes_path, index=False)
 
     finish_stage_run(
         stage_run,
@@ -288,11 +301,13 @@ def main() -> None:
             "results_dir": str(results_dir),
             "summary_path": str(summary_path),
             "composition_path": str(composition_path),
+            "cluster_sizes_path": str(cluster_sizes_path),
         },
         summary={
             "num_sequences": len(metadata),
             "num_pairwise_rows": len(pair_data),
-            "num_clusters_reported": len(prob_focus),
+            "num_clusters_reported": len(prob_results),
+            "num_focus_clusters": len(prob_focus),
             "resolution": resolution,
             "minimum_weight": minimum_weight,
         },

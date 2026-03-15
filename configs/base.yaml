@@ -47,13 +47,9 @@ characterisation:
   temporal_distance_grid:
     max_days: 15
     step: 1
-  toit_grid:
-    max_days: 60.0
-    step: 0.1
-  tost_grid:
-    min_days: -30.0
-    max_days: 30.0
-    step: 0.1
+  slice_snps: [0, 1, 2, 5]
+  robustness:
+    included_intermediate_counts: [0, 1, 2]
 
 network:
   weight_columns:

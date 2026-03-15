@@ -7,14 +7,12 @@ from dataclasses import dataclass
 from typing import Any
 
 from numpy.random import Generator, default_rng
-import pandas as pd
 
 from epilink import (
     InfectiousnessToTransmissionTime,
     MolecularClock,
     NaturalHistoryParameters,
     SymptomOnsetToTransmissionTime,
-    build_pairwise_case_table,
     estimate_genetic_linkage_probability,
     estimate_linkage_probability,
     estimate_presymptomatic_transmission_fraction,
@@ -24,16 +22,6 @@ from epilink import (
 )
 
 from .config import config_value
-
-PAIRWISE_COLUMN_MAP = {
-    "CaseA": "NodeA",
-    "CaseB": "NodeB",
-    "IsRelated": "Related",
-    "BothSampled": "Sampled",
-    "DeterministicDistance": "LinearDist",
-    "StochasticDistance": "PoissonDist",
-    "SamplingDateDistanceDays": "TemporalDist",
-}
 
 
 @dataclass(frozen=True)
@@ -54,20 +42,10 @@ def _section(config: Mapping[str, Any], *keys: str) -> dict[str, Any]:
     return dict(current) if isinstance(current, Mapping) else {}
 
 
-def _natural_history_section(config: Mapping[str, Any]) -> dict[str, Any]:
-    nested = _section(config, "model", "natural_history")
-    return nested or _section(config, "infectiousness_params")
-
-
-def _clock_section(config: Mapping[str, Any]) -> dict[str, Any]:
-    nested = _section(config, "model", "molecular_clock")
-    return nested or _section(config, "clock")
-
-
 def build_natural_history_parameters(config: Mapping[str, Any]) -> NaturalHistoryParameters:
     """Build NaturalHistoryParameters from either the new or legacy config shape."""
 
-    natural_history_config = _natural_history_section(config)
+    natural_history_config = _section(config, "model", "natural_history")
     return NaturalHistoryParameters(
         incubation_shape=float(natural_history_config.get("incubation_shape", 5.807)),
         incubation_scale=float(natural_history_config.get("incubation_scale", 0.948)),
@@ -88,7 +66,7 @@ def build_molecular_clock(
 ) -> MolecularClock:
     """Build MolecularClock from either the new or legacy config shape."""
 
-    clock_config = _clock_section(config)
+    clock_config = _section(config, "model", "molecular_clock")
     return MolecularClock(
         substitution_rate=float(clock_config.get("substitution_rate", clock_config.get("subs_rate", 1e-3))),
         use_relaxed_clock=bool(clock_config.get("use_relaxed_clock", clock_config.get("relax_rate", True))),
@@ -134,7 +112,7 @@ def build_symptom_onset_profile(
 def build_model_components(config: Mapping[str, Any]) -> ModelComponents:
     """Construct the epilink model objects from a merged workflow config."""
 
-    rng_seed = int(config_value(config, ["project", "rng_seed"], config.get("rng_seed", 12345)))
+    rng_seed = int(config_value(config, ["project", "rng_seed"]))
     rng = default_rng(rng_seed)
     transmission_profile = build_transmission_profile(config, rng=rng)
     molecular_clock = build_molecular_clock(config, rng=rng)
@@ -149,18 +127,13 @@ def build_inference_kwargs(config: Mapping[str, Any]) -> dict[str, Any]:
     """Normalise inference settings to the current epilink estimator names."""
 
     inference_config = _section(config, "inference")
-    included_intermediate_counts = inference_config.get(
-        "included_intermediate_counts",
-        inference_config.get("intermediate_generations", [0]),
-    )
+    included_intermediate_counts = inference_config.get("included_intermediate_counts", [0])
     if isinstance(included_intermediate_counts, int):
         included_intermediate_counts = [included_intermediate_counts]
     return {
         "num_simulations": int(inference_config.get("num_simulations", 10_000)),
         "included_intermediate_counts": tuple(int(value) for value in included_intermediate_counts),
-        "max_intermediate_hosts": int(
-            inference_config.get("max_intermediate_hosts", inference_config.get("intermediate_hosts", 10))
-        ),
+        "max_intermediate_hosts": int(inference_config.get("max_intermediate_hosts", 10)),
     }
 
 
@@ -202,26 +175,6 @@ def simulate_genomic_outputs(molecular_clock: MolecularClock, tree) -> dict[str,
     """Generate simulated genomic outputs using the current epilink package API."""
 
     return simulate_genomic_sequences(clock=molecular_clock, tree=tree)
-
-
-def build_pairwise_table(packed_genomic_data, tree) -> pd.DataFrame:
-    """Build and normalise pairwise outputs to the workflow column names."""
-
-    pairwise_table = build_pairwise_case_table(packed_genomic_data=packed_genomic_data, tree=tree)
-    renamed = pairwise_table.rename(columns=PAIRWISE_COLUMN_MAP)
-    expected_columns = {
-        "NodeA",
-        "NodeB",
-        "Related",
-        "Sampled",
-        "LinearDist",
-        "PoissonDist",
-        "TemporalDist",
-    }
-    missing_columns = expected_columns - set(renamed.columns)
-    if missing_columns:
-        raise ValueError(f"Pairwise table is missing expected columns: {sorted(missing_columns)}")
-    return renamed
 
 
 def estimate_linkage_scores(

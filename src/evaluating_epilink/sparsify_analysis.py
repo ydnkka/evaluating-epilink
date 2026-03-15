@@ -84,7 +84,7 @@ def main() -> None:
 
     reference_threshold = float(min(min_edge_weights))
     reference_frame = sparsify_edges(scored_pairs, reference_threshold, weight_column)
-    reference_nodes = pd.Index(pd.unique(reference_frame[["NodeA", "NodeB"]].values.ravel())).astype(str)
+    reference_nodes = pd.Index(pd.unique(reference_frame[["CaseA", "CaseB"]].values.ravel())).astype(str)
 
     reference_weight = total_edge_weight(reference_frame, weight_column=weight_column)
     reference_edge_count = int(len(reference_frame)) if len(reference_frame) else 0

@@ -7,12 +7,12 @@ import argparse
 import networkx as nx
 import numpy as np
 import pandas as pd
+from epilink import build_pairwise_case_table
 from sklearn.linear_model import LogisticRegression
 
 from .config import config_value, ensure_directories, load_merged_config, resolve_path
 from .epilink_adapter import (
     build_model_components,
-    build_pairwise_table,
     estimate_linkage_scores,
     simulate_epidemic_tree,
     simulate_genomic_outputs,
@@ -135,7 +135,7 @@ def main() -> None:
         study_config,
     )
     genomic_outputs = simulate_genomic_outputs(model_components.molecular_clock, populated_tree)
-    pairwise_frame = build_pairwise_table(genomic_outputs["packed"], populated_tree)
+    pairwise_frame = build_pairwise_case_table(genomic_outputs["packed"], populated_tree)
 
     case_meta = sampling_times(populated_tree, step_days=step_days)
     case_counts = (
@@ -148,28 +148,31 @@ def main() -> None:
     pairwise_frame["ProbLinearDist"] = estimate_linkage_scores(
         model_components.transmission_profile,
         model_components.molecular_clock,
-        genetic_distance=pairwise_frame["LinearDist"].values,
-        temporal_distance=pairwise_frame["TemporalDist"].values,
+        genetic_distance=pairwise_frame["DeterministicDistance"].values,
+        temporal_distance=pairwise_frame["SamplingDateDistanceDays"].values,
         config=study_config,
     )
     pairwise_frame["ProbPoissonDist"] = estimate_linkage_scores(
         model_components.transmission_profile,
         model_components.molecular_clock,
-        genetic_distance=pairwise_frame["PoissonDist"].values,
-        temporal_distance=pairwise_frame["TemporalDist"].values,
+        genetic_distance=pairwise_frame["StochasticDistance"].values,
+        temporal_distance=pairwise_frame["SamplingDateDistanceDays"].values,
         config=study_config,
     )
 
     initial_nodes = set(case_meta.loc[case_meta["available_time"] <= train_max_time_index, "node"])
     initial_pairs = subset_pairs_for_nodes(pairwise_frame, initial_nodes)
-    y = initial_pairs["Related"].astype(int).values
-    for distance_column in ("LinearDist", "PoissonDist"):
-        feature_matrix = initial_pairs[["TemporalDist", distance_column]].values
-        output_column = f"Logit{distance_column}"
+    y = initial_pairs["IsRelated"].astype(int).values
+    logistic_distance_columns = {
+        "LogitLinearDist": "DeterministicDistance",
+        "LogitPoissonDist": "StochasticDistance",
+    }
+    for output_column, distance_column in logistic_distance_columns.items():
+        feature_matrix = initial_pairs[["SamplingDateDistanceDays", distance_column]].values
         classifier = LogisticRegression(solver="lbfgs", max_iter=200)
         classifier.fit(feature_matrix, y)
         pairwise_frame[output_column] = classifier.predict_proba(
-            pairwise_frame[["TemporalDist", distance_column]].values
+            pairwise_frame[["SamplingDateDistanceDays", distance_column]].values
         )[:, 1]
     initial_pairs = subset_pairs_for_nodes(pairwise_frame, initial_nodes)
 

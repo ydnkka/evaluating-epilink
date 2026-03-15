@@ -15,8 +15,8 @@ def build_weighted_graph(
     *,
     weight_column: str,
     minimum_weight: float,
-    source_column: str = "NodeA",
-    target_column: str = "NodeB",
+    source_column: str = "CaseA",
+    target_column: str = "CaseB",
     vertex_ids: list[str] | pd.Index | None = None,
 ) -> ig.Graph:
     """Build an undirected weighted graph from a pairwise edge table."""
@@ -112,5 +112,5 @@ def total_edge_weight(pairwise_frame: pd.DataFrame, *, weight_column: str) -> fl
 def subset_pairs_for_nodes(pairwise_frame: pd.DataFrame, node_ids: set[Any]) -> pd.DataFrame:
     """Return the induced pairwise subgraph for a set of nodes."""
 
-    mask = pairwise_frame["NodeA"].isin(node_ids) & pairwise_frame["NodeB"].isin(node_ids)
+    mask = pairwise_frame["CaseA"].isin(node_ids) & pairwise_frame["CaseB"].isin(node_ids)
     return pairwise_frame.loc[mask].copy()

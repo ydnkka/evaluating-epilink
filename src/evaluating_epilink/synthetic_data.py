@@ -10,9 +10,10 @@ import numpy as np
 import pandas as pd
 
 import networkx as nx
+from epilink import build_pairwise_case_table
 
 from .config import config_value, deep_merge, ensure_directories, load_merged_config, load_yaml, resolve_path
-from .epilink_adapter import build_pairwise_table, build_model_components, simulate_epidemic_tree, simulate_genomic_outputs
+from .epilink_adapter import build_model_components, simulate_epidemic_tree, simulate_genomic_outputs
 from .execution import finish_stage_run, start_stage_run
 
 
@@ -22,7 +23,7 @@ def summarise_data(
     description: str,
     metrics: list[str],
     params_row: dict,
-    related_col: str = "Related",
+    related_col: str = "IsRelated",
 ) -> pd.DataFrame:
     """
     Long table:
@@ -91,13 +92,13 @@ def main() -> None:
             scenario_config_merged,
         )
         genomic_outputs = simulate_genomic_outputs(model_components.molecular_clock, populated_tree)
-        pairwise = build_pairwise_table(genomic_outputs["packed"], populated_tree)
+        pairwise = build_pairwise_case_table(genomic_outputs["packed"], populated_tree)
 
         pairwise.to_parquet(scenario_dir / "pairwise.parquet", index=False)
 
-        sampled_pairs = pairwise.loc[pairwise["Sampled"]].copy()
+        sampled_pairs = pairwise.loc[pairwise["BothSampled"]].copy()
 
-        metrics = ["TemporalDist", "PoissonDist", "LinearDist"]
+        metrics = ["SamplingDateDistanceDays", "StochasticDistance", "DeterministicDistance"]
         natural_history_config = config_value(scenario_config_merged, ["model", "natural_history"], {})
         surveillance_config = config_value(scenario_config_merged, ["surveillance"], {})
         sampling_delay_config = config_value(surveillance_config, ["sampling_delay"], {})
