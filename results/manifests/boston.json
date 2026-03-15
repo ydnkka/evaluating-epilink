@@ -1,6 +1,6 @@
 {
   "config_digest": "9b2958d01c47",
-  "created_at_utc": "2026-03-15T13:59:57.886161+00:00",
+  "created_at_utc": "2026-03-15T14:51:27.450796+00:00",
   "execution": {
     "cli_args": {
       "base_config": "configs/base.yaml",
@@ -9,17 +9,17 @@
     "command": [
       "scripts/boston_clustering.py"
     ],
-    "duration_seconds": 9.855,
-    "finished_at_utc": "2026-03-15T13:59:57.854547+00:00",
+    "duration_seconds": 10.474,
+    "finished_at_utc": "2026-03-15T14:51:27.414799+00:00",
     "hostname": "MacBookPro",
-    "pid": 15960,
+    "pid": 34194,
     "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
     "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
     "python_version": "3.14.3",
-    "started_at_utc": "2026-03-15T13:59:47.999297+00:00",
+    "started_at_utc": "2026-03-15T14:51:16.940857+00:00",
     "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
   },
-  "git_revision": "a0a84d3d5e303fd2c1916c49e0d37b1ba78def3e",
+  "git_revision": "a99800b775ea60b4527f5bc471f47e7787fa6f39",
   "inputs": {
     "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
     "metadata_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/boston/boston_metadata.parquet",
@@ -37,7 +37,7 @@
   "status": "completed",
   "summary": {
     "minimum_weight": 0.0001,
-    "num_clusters_reported": 86,
+    "num_clusters_reported": 87,
     "num_focus_clusters": 6,
     "num_pairwise_rows": 297606,
     "num_sequences": 772,

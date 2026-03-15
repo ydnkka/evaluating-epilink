@@ -1,12 +1,12 @@
 {
-  "generated_at_utc": "2026-03-15T14:43:29.827053+00:00",
+  "generated_at_utc": "2026-03-15T16:05:18.153566+00:00",
   "num_completed_stages": 10,
   "num_expected_stages": 10,
   "num_missing_stages": 0,
   "stages": [
     {
-      "created_at_utc": "2026-03-15T13:59:22.558091+00:00",
-      "duration_seconds": 0.457,
+      "created_at_utc": "2026-03-15T14:51:17.562145+00:00",
+      "duration_seconds": 0.573,
       "output_keys": [
         "results_dir"
       ],
@@ -45,8 +45,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:17.273963+00:00",
-      "duration_seconds": 134.536,
+      "created_at_utc": "2026-03-15T14:53:43.368604+00:00",
+      "duration_seconds": 146.762,
       "output_keys": [
         "heterogeneity_path",
         "results_dir",
@@ -56,17 +56,17 @@
       "stage_name": "scovmod",
       "status": "completed",
       "summary": {
-        "final_edges": 205,
-        "final_nodes": 206,
+        "final_edges": 4989,
+        "final_nodes": 4990,
         "output_prefix": "scovmod_tree",
         "raw_edges": 561388,
         "raw_nodes": 536866,
-        "target_component_size": 200
+        "target_component_size": 5000
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:25.373704+00:00",
-      "duration_seconds": 1.218,
+      "created_at_utc": "2026-03-15T14:55:44.561055+00:00",
+      "duration_seconds": 115.486,
       "output_keys": [
         "processed_dir",
         "scenario_summary_path"
@@ -91,8 +91,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:29.139174+00:00",
-      "duration_seconds": 1.739,
+      "created_at_utc": "2026-03-15T15:05:12.173652+00:00",
+      "duration_seconds": 564.597,
       "output_keys": [
         "metrics_path",
         "results_dir"
@@ -121,8 +121,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:33.620385+00:00",
-      "duration_seconds": 3.416,
+      "created_at_utc": "2026-03-15T15:35:14.448796+00:00",
+      "duration_seconds": 1799.984,
       "output_keys": [
         "processed_dir"
       ],
@@ -150,8 +150,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:41.037204+00:00",
-      "duration_seconds": 5.821,
+      "created_at_utc": "2026-03-15T16:05:09.094967+00:00",
+      "duration_seconds": 1791.543,
       "output_keys": [
         "metrics_path",
         "results_dir",
@@ -167,8 +167,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:42.173956+00:00",
-      "duration_seconds": 0.162,
+      "created_at_utc": "2026-03-15T15:06:04.289267+00:00",
+      "duration_seconds": 49.895,
       "output_keys": [
         "results_dir",
         "retention_path"
@@ -183,16 +183,16 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:46.015901+00:00",
-      "duration_seconds": 1.818,
+      "created_at_utc": "2026-03-15T15:00:40.952569+00:00",
+      "duration_seconds": 410.7,
       "output_keys": [
         "results_dir"
       ],
       "stage_name": "temporal_stability",
       "status": "completed",
       "summary": {
-        "num_cases": 206,
-        "num_initial_cases": 58,
+        "num_cases": 4990,
+        "num_initial_cases": 77,
         "num_methods": 4,
         "num_resolutions": 19,
         "step_days": 7,
@@ -200,8 +200,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T13:59:57.886161+00:00",
-      "duration_seconds": 9.855,
+      "created_at_utc": "2026-03-15T14:51:27.450796+00:00",
+      "duration_seconds": 10.474,
       "output_keys": [
         "cluster_sizes_path",
         "composition_path",
@@ -212,7 +212,7 @@
       "status": "completed",
       "summary": {
         "minimum_weight": 0.0001,
-        "num_clusters_reported": 86,
+        "num_clusters_reported": 87,
         "num_focus_clusters": 6,
         "num_pairwise_rows": 297606,
         "num_sequences": 772,
@@ -220,8 +220,8 @@
       }
     },
     {
-      "created_at_utc": "2026-03-15T14:41:23.883390+00:00",
-      "duration_seconds": 5.556,
+      "created_at_utc": "2026-03-15T16:05:17.596055+00:00",
+      "duration_seconds": 5.955,
       "output_keys": [
         "figures_dir"
       ],
@@ -235,5 +235,5 @@
       }
     }
   ],
-  "total_duration_seconds": 164.578
+  "total_duration_seconds": 4895.969
 }

@@ -1,6 +1,6 @@
 {
   "config_digest": "403db3364571",
-  "created_at_utc": "2026-03-15T14:41:23.883390+00:00",
+  "created_at_utc": "2026-03-15T16:05:17.596055+00:00",
   "execution": {
     "cli_args": {
       "base_config": "configs/base.yaml",
@@ -9,17 +9,17 @@
     "command": [
       "scripts/render_figures.py"
     ],
-    "duration_seconds": 5.556,
-    "finished_at_utc": "2026-03-15T14:41:23.846146+00:00",
+    "duration_seconds": 5.955,
+    "finished_at_utc": "2026-03-15T16:05:17.559196+00:00",
     "hostname": "MacBookPro",
-    "pid": 28851,
+    "pid": 46941,
     "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
     "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
     "python_version": "3.14.3",
-    "started_at_utc": "2026-03-15T14:41:18.290604+00:00",
+    "started_at_utc": "2026-03-15T16:05:11.604585+00:00",
     "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
   },
-  "git_revision": "a0a84d3d5e303fd2c1916c49e0d37b1ba78def3e",
+  "git_revision": "a99800b775ea60b4527f5bc471f47e7787fa6f39",
   "inputs": {
     "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
     "processed_synthetic_dir": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/processed/synthetic",

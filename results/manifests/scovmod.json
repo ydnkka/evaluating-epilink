@@ -1,6 +1,6 @@
 {
-  "config_digest": "3049525f2d86",
-  "created_at_utc": "2026-03-15T13:59:17.273963+00:00",
+  "config_digest": "0f175b65e732",
+  "created_at_utc": "2026-03-15T14:53:43.368604+00:00",
   "execution": {
     "cli_args": {
       "base_config": "configs/base.yaml",
@@ -10,17 +10,17 @@
     "command": [
       "scripts/generate_tree.py"
     ],
-    "duration_seconds": 134.536,
-    "finished_at_utc": "2026-03-15T13:59:17.229483+00:00",
+    "duration_seconds": 146.762,
+    "finished_at_utc": "2026-03-15T14:53:43.312379+00:00",
     "hostname": "MacBookPro",
-    "pid": 15458,
+    "pid": 34195,
     "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
     "python_executable": "/opt/homebrew/Caskroom/miniconda/base/envs/evaluating-epilink/bin/python",
     "python_version": "3.14.3",
-    "started_at_utc": "2026-03-15T13:57:02.694260+00:00",
+    "started_at_utc": "2026-03-15T14:51:16.550441+00:00",
     "working_directory": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink"
   },
-  "git_revision": "a0a84d3d5e303fd2c1916c49e0d37b1ba78def3e",
+  "git_revision": "a99800b775ea60b4527f5bc471f47e7787fa6f39",
   "inputs": {
     "base_config": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/configs/base.yaml",
     "infection_history_path": "/Users/ydnkka/Desktop/Phd Project/projects/evaluating-epilink/data/raw/scovmod/InfectedIndividuals.1.csv",
@@ -37,11 +37,11 @@
   "stage_name": "scovmod",
   "status": "completed",
   "summary": {
-    "final_edges": 205,
-    "final_nodes": 206,
+    "final_edges": 4989,
+    "final_nodes": 4990,
     "output_prefix": "scovmod_tree",
     "raw_edges": 561388,
     "raw_nodes": 536866,
-    "target_component_size": 200
+    "target_component_size": 5000
   }
 }
